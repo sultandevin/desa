@@ -2,6 +2,8 @@
 
 Website terbaik untuk mata kuliah Projek Rekayasa Perangkat Lunak (PRPL) di Universitas Gadjah Mada.
 
+Sebelum mulai, baca panduan development di [sini](./docs/development.md).
+
 ## 🚀 Features
 
 - TBD
