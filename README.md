@@ -8,7 +8,7 @@ Sebelum mulai, baca panduan development [di sini](./docs/development.md).
 
 - Inventaris dan Kekayaan (Kelompok 2)
 - Ilham R.S.
-- A. Sudais
+- Keputusan Kepala Desa (Kelompok 8)
 
 ## 🛠️ Tech Stack
 
@@ -21,4 +21,5 @@ Sebelum mulai, baca panduan development [di sini](./docs/development.md).
 
 <a href="https://github.com/sultandevin/desa/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=sultandevin/desa" />
+
 </a>
