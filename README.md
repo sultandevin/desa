@@ -1,4 +1,4 @@
-# Inventory Website
+# Village Administration Website
 
 Website terbaik untuk mata kuliah Projek Rekayasa Perangkat Lunak (PRPL) di Universitas Gadjah Mada.
 
@@ -19,7 +19,7 @@ Sebelum mulai, baca panduan development [di sini](./docs/development.md).
 - Drizzle ORM
 - PostgreSQL 16
 
-## Testing
+## ⚡ User Flow
 
 ```mermaid
 sequenceDiagram
@@ -67,8 +67,11 @@ sequenceDiagram
     Frontend-->>User: Tampilkan notifikasi "Peraturan Berhasil Diunggah"
 ```
 
+## 👥 Contributors
+
 <a href="https://github.com/sultandevin/desa/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=sultandevin/desa" />
 </a>
+
 
 
