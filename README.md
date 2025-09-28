@@ -2,11 +2,13 @@
 
 Website terbaik untuk mata kuliah Projek Rekayasa Perangkat Lunak (PRPL) di Universitas Gadjah Mada.
 
-Sebelum mulai, baca panduan development di [sini](./docs/development.md).
+Sebelum mulai, baca panduan development [di sini](./docs/development.md).
 
-## 🚀 Features
+## 🚀 Modules
 
-- TBD
+- Inventaris dan Kekayaan (Kelompok 2)
+- Ilham R.S.
+- A. Sudais
 
 ## 🛠️ Tech Stack
 
@@ -17,9 +19,6 @@ Sebelum mulai, baca panduan development di [sini](./docs/development.md).
 - Drizzle ORM
 - PostgreSQL 16
 
-## 👥 Contributors
-
-- Sultan Devino Suyudi
-- Muhammad Natha Ulinnuha
-- Fahmi Shampoerna
-- Muhammad Hafizh Ardiansyah
+<a href="https://github.com/sultandevin/desa/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=sultandevin/desa" />
+</a>

@@ -1,9 +1,9 @@
+import { ModeToggle } from "@/app/components/theme-toggle";
 import Container from "@/components/container";
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "./theme-toggle";
 import Link from "next/link";
 
-const Navbar = () => {
+const DashboardNavbar = () => {
   return (
     <nav className="border-b border-accent">
       <Container className="h-16 py-0 flex-row items-center justify-between">
@@ -12,8 +12,8 @@ const Navbar = () => {
         </Link>
 
         <div className="flex items-center gap-2">
-          <Button asChild>
-            <Link href={"/dashboard/inventory"}>Dashboard</Link>
+          <Button asChild variant="outline">
+            <Link href={"/account"}>Account</Link>
           </Button>
 
           <ModeToggle />
@@ -23,4 +23,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default DashboardNavbar;
