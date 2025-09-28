@@ -7,7 +7,7 @@ Sebelum mulai, baca panduan development [di sini](./docs/development.md).
 ## 🚀 Modules
 
 - Inventaris dan Kekayaan (Kelompok 2)
-- Ilham R.S.
+- Peraturan Desa (Kelompok 7)
 - Keputusan Kepala Desa (Kelompok 8)
 
 ## 🛠️ Tech Stack
@@ -23,3 +23,4 @@ Sebelum mulai, baca panduan development [di sini](./docs/development.md).
   <img src="https://contrib.rocks/image?repo=sultandevin/desa" />
 
 </a>
+
