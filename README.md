@@ -65,6 +65,31 @@ sequenceDiagram
     Backend-->>Frontend: Response: 201 Created
     deactivate Backend
     Frontend-->>User: Tampilkan notifikasi "Peraturan Berhasil Diunggah"
+
+    %% Spasi untuk memisahkan alur
+        rect rgb(240, 240, 240)
+        Note over User, ObjectStorage: Contoh Alur 3: Mencatat Keputusan Kepala Desa (Modul Keputusan)
+    end
+
+    User->>Frontend: Mengisi form keputusan + unggah lampiran (opsional)
+    Frontend->>Backend: POST /api/keputusan (metadata + file opsional)
+    activate Backend
+
+    alt Ada file lampiran
+        Backend->>ObjectStorage: Upload file
+        activate ObjectStorage
+        ObjectStorage-->>Backend: Kembalikan URL file
+        deactivate ObjectStorage
+    end
+
+    Backend->>Database: INSERT INTO KEPUTUSAN (metadata, file_url)
+    activate Database
+    Database-->>Backend: Sukses
+    deactivate Database
+
+    Backend-->>Frontend: Response: 201 Created
+    deactivate Backend
+    Frontend-->>User: Tampilkan notifikasi "Keputusan Kepala Desa Berhasil Dicatat"
 ```
 
 ## 👥 Contributors
@@ -72,6 +97,7 @@ sequenceDiagram
 <a href="https://github.com/sultandevin/desa/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=sultandevin/desa" />
 </a>
+
 
 
 
