@@ -8,11 +8,17 @@ Website administrasi terbaik untuk mata kuliah Projek Rekayasa Perangkat Lunak (
 - Peraturan Desa (Kelompok 7)
 - Keputusan Kepala Desa (Kelompok 8)
 
-## Prerequisites
+## Features
 
-- **Bun (Runtime)** - Preferred, but you can use Node.js
-- **Bun (Package Manager)** - Preferred package manager, but you can use `pnpm` or worse, `npm`
-- **Docker** - Required to run local PostgreSQL instance
+- **TypeScript** - For type safety and improved developer experience
+- **Next.js** - Full-stack React framework
+- **TailwindCSS** - Utility-first CSS for rapid UI development
+- **shadcn/ui** - Reusable UI components
+- **oRPC** - End-to-end type-safe APIs with OpenAPI integration
+- **Drizzle** - TypeScript-first ORM
+- **PostgreSQL** - Database engine
+- **Authentication** - Better-Auth
+- **Turborepo** - Optimized monorepo build system
 
 ## Getting Started
 
@@ -42,6 +48,15 @@ bun dev
 ```
 
 Open [http://localhost:3001](http://localhost:3001) in your browser to see your fullstack application.
+Open [http://localhost:3001](http://localhost:3001/api/rpc/api-reference) in your browser to see the generated API documentation.
+
+4. Start drizzle studio for database management:
+
+```bash
+bun db:studio
+```
+
+Open [http://local.drizzle.studio](http://local.drizzle.studio) in your browser to see the database management page.
 
 ## Project Structure
 
@@ -60,9 +75,6 @@ desa/
 - `bun dev`: Start all applications in development mode
 - `bun build`: Build all applications
 - `bun check-types`: Check TypeScript types across all apps
-- `bun db:start`: Start DB (PostgreSQL) using Docker
-- `bun db:stop`: Stop DB using `docker compose stop` 
-- `bun db:down`: Stop DB using `docker compose down`
 - `bun db:push`: Push schema changes to database
 - `bun db:studio`: Open database studio UI
 
@@ -96,4 +108,3 @@ The subject contains a brief description of the change:
 - Use the imperative, present tense: "change" not "changed" nor "changes"
 - Don't capitalize the first letter
 - No period (.) at the end
-

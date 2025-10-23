@@ -3,6 +3,7 @@ name: desa
 services:
   postgres:
     image: postgres:18.0-alpine
+    platform: linux/amd64
     container_name: desa-postgres
     environment:
       POSTGRES_DB: desa
