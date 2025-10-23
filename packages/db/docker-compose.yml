@@ -2,7 +2,7 @@ name: desa
 
 services:
   postgres:
-    image: postgres
+    image: postgres:18.0-alpine
     container_name: desa-postgres
     environment:
       POSTGRES_DB: desa

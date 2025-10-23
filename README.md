@@ -60,10 +60,13 @@ desa/
 - `bun dev`: Start all applications in development mode
 - `bun build`: Build all applications
 - `bun check-types`: Check TypeScript types across all apps
+- `bun db:start`: Start DB (PostgreSQL) using Docker
+- `bun db:stop`: Stop DB using `docker compose stop` 
+- `bun db:down`: Stop DB using `docker compose down`
 - `bun db:push`: Push schema changes to database
 - `bun db:studio`: Open database studio UI
 
-## 📝 Commit Convention
+## Commit Convention
 
 We follow a [standardized commit message](https://conventionalcommits.org) format to maintain a clean and informative git history. Each commit message should be structured as follows:
 
@@ -93,3 +96,4 @@ The subject contains a brief description of the change:
 - Use the imperative, present tense: "change" not "changed" nor "changes"
 - Don't capitalize the first letter
 - No period (.) at the end
+
