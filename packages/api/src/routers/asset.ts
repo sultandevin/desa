@@ -1,13 +1,15 @@
 import { createSelectSchema, db, eq } from "@desa/db";
 import { asset } from "@desa/db/schema/asset";
-import { publicProcedure } from "..";
-import * as z from "zod";
 import { ORPCError } from "@orpc/client";
+import * as z from "zod";
+import { publicProcedure } from "..";
 
-const assetSchema = createSelectSchema(asset);
+const assetSchema = createSelectSchema(asset, {
+  id: z.string(),
+});
 
 export const assetRouter = {
-  listAssets: publicProcedure
+  list: publicProcedure
     .route({
       method: "GET",
       path: "/assets",
@@ -20,7 +22,7 @@ export const assetRouter = {
 
       return assets;
     }),
-  findAssetById: publicProcedure
+  find: publicProcedure
     .route({
       method: "GET",
       path: "/assets/{id}",
@@ -36,9 +38,15 @@ export const assetRouter = {
     .handler(async ({ input }) => {
       const id = input.id;
 
-      const assetItem = await db.select().from(asset).where(eq(asset.id, id)).limit(1);
+      const assetItem = await db
+        .select()
+        .from(asset)
+        .where(eq(asset.id, id))
+        .limit(1);
       if (assetItem.length === 0) {
-        throw new ORPCError("Asset not found");
+        throw new ORPCError("ASSET_NOT_FOUND", {
+          message: `Asset with ID ${id} not found`,
+        });
       }
 
       return assetItem[0]!;

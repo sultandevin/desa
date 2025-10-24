@@ -1,4 +1,3 @@
-import { auth } from "@desa/auth";
 import { db } from "@desa/db";
 
 const ApiStatusServer = async () => {

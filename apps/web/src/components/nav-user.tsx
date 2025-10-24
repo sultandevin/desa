@@ -3,10 +3,8 @@ import {
   Bell,
   ChevronsUpDown,
   CreditCard,
-  LogOut,
-  Sparkles,
+  LogOut
 } from "lucide-react"
-
 import {
   Avatar,
   AvatarFallback,
@@ -28,10 +26,18 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { authClient } from "@/lib/auth-client"
+import { useRouter } from "next/navigation"
 
 export function NavUser() {
   const { isMobile } = useSidebar()
   const session = authClient.useSession()
+  const router = useRouter()
+
+  function handleLogout() {
+    authClient.signOut().then(() => {
+      router.push("/")
+    })
+  }
 
   return (
     <SidebarMenu>
@@ -74,13 +80,6 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
                 <BadgeCheck />
                 Account
               </DropdownMenuItem>
@@ -94,7 +93,17 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                authClient.signOut({
+                  fetchOptions: {
+                    onSuccess: () => {
+                      router.push("/");
+                    },
+                  },
+                });
+              }}
+              className="hover:cursor-pointer">
               <LogOut />
               Log out
             </DropdownMenuItem>
