@@ -1,19 +1,18 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
-import { useQuery } from "@tanstack/react-query";
 import { orpc } from "@/utils/orpc";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Dashboard({
-	session,
+  session,
 }: {
-	session: typeof authClient.$Infer.Session;
+  session: typeof authClient.$Infer.Session;
 }) {
-	const privateData = useQuery(orpc.privateData.queryOptions());
+  const privateData = useQuery(orpc.privateData.queryOptions());
 
-	return (
-		<>
-			<p>API: {privateData.data?.message}</p>
-		</>
-	);
+  return (
+    <>
+      <p>API: {privateData.data?.message}</p>
+    </>
+  );
 }
