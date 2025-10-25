@@ -24,11 +24,11 @@ export default function DashboardPage() {
       <DashboardHeader>
         <DashboardTitle className="text-2xl">Dashboard</DashboardTitle>
         <DashboardDescription className="">
-          Selamat datang di Dashboard yang dibuat dengan Next.js 16 + Turbopack
+          Selamat datang di Dashboard yang dibuat dengan Next.js 16 + Turborepo
           + oRPC + Drizzle ORM + Tanstack Query
         </DashboardDescription>
       </DashboardHeader>
-      <DashboardSection>
+      <DashboardSection className="[&>p]:max-w-3xl">
         <p>
           Coba buka <code>apps/web/src/app/dashboard/page.tsx</code>, bakal
           melihat ada 2 cara buat ngefetch data:
