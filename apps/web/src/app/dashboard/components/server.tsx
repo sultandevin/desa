@@ -19,7 +19,9 @@ const Server = async () => {
           />
           Server Side
         </CardTitle>
-        <CardDescription>Fetching data dari server component via oRPC</CardDescription>
+        <CardDescription>
+          Fetching data dari server component via oRPC
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {assets && assets.length > 0 && <p>Found: {assets[0].name}</p>}

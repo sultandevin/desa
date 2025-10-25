@@ -7,6 +7,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 export function NavMain({
   items,
@@ -20,6 +21,8 @@ export function NavMain({
     }[];
   }[];
 }) {
+  const pathname = usePathname();
+
   return (
     <div>
       {items.map((item) => (
@@ -28,7 +31,11 @@ export function NavMain({
           <SidebarMenu>
             {item.items.map((link) => (
               <SidebarMenuItem key={link.title}>
-                <SidebarMenuButton tooltip={link.title} asChild>
+                <SidebarMenuButton
+                  tooltip={link.title}
+                  asChild
+                  isActive={pathname === link.url}
+                >
                   <Link
                     href={{
                       pathname: link.url,

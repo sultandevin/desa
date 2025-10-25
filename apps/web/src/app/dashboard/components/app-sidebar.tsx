@@ -15,8 +15,9 @@ import {
 } from "@/components/ui/sidebar";
 import {
   Bot,
-  ChevronsUpDown,
+  Home,
   Instagram,
+  MessageCircleWarning,
   Skull,
   SquareTerminal,
   Text,
@@ -26,12 +27,27 @@ import * as React from "react";
 const data = {
   navMain: [
     {
+      title: "Dashboard",
+      items: [
+        {
+          title: "Beranda",
+          icon: Home,
+          url: "/dashboard",
+        },
+      ],
+    },
+    {
       title: "Inventaris & Kekayaan",
       items: [
         {
           title: "Manajemen Aset",
           icon: SquareTerminal,
           url: "/dashboard/assets",
+        },
+        {
+          title: "Laporan Kerusakan",
+          icon: MessageCircleWarning,
+          url: "/dashboard/damage-reports",
         },
       ],
     },

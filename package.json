@@ -33,16 +33,20 @@
     "db:start": "turbo -F @desa/db db:start",
     "db:watch": "turbo -F @desa/db db:watch",
     "db:stop": "turbo -F @desa/db db:stop",
-    "db:down": "turbo -F @desa/db db:down"
+    "db:down": "turbo -F @desa/db db:down",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\""
   },
   "dependencies": {
     "dotenv": "^17.2.2",
-    "zod": "^4.1.11"
+    "zod": "^4.1.12"
   },
   "devDependencies": {
-    "turbo": "^2.5.4",
+    "@types/node": "^22.13.11",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.7.1",
     "tsdown": "^0.15.5",
-    "@types/node": "^22.13.11"
+    "turbo": "^2.5.4"
   },
   "packageManager": "bun@1.2.20"
 }

@@ -14,7 +14,6 @@ const TITLE_TEXT = `
  `;
 
 export default function Home() {
-
   return (
     <>
       <Header />
@@ -23,7 +22,7 @@ export default function Home() {
         <div className="grid gap-6">
           <Suspense
             fallback={
-              <section className="rounded-lg border min-h-30 animate-pulse" />
+              <section className="min-h-30 animate-pulse rounded-lg border" />
             }
           >
             <ApiStatusServer />

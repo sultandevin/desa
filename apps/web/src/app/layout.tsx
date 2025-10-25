@@ -11,7 +11,7 @@ const outfit = Outfit({
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair-display",
   subsets: ["latin"],
-})
+});
 
 const jetbrains = JetBrains_Mono({
   variable: "--font-jetbrains",
@@ -34,7 +34,7 @@ export default function RootLayout({
         className={`${outfit.variable} ${outfit.className} ${playfairDisplay.variable} ${jetbrains.variable} antialiased`}
       >
         <Providers>
-          <div className="grid grid-rows-[auto_1fr] h-svh">{children}</div>
+          <div className="grid h-svh grid-rows-[auto_1fr]">{children}</div>
         </Providers>
       </body>
     </html>

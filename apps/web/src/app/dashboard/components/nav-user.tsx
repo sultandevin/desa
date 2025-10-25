@@ -21,7 +21,7 @@ import {
   LogOut,
   Monitor,
   Moon,
-  Sun
+  Sun,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
@@ -94,21 +94,21 @@ export function NavUser() {
                 <Sun />
                 Light
                 {theme === "light" && (
-                  <Check className="ml-auto size-4 text-primary" />
+                  <Check className="text-primary ml-auto size-4" />
                 )}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme("dark")}>
                 <Moon />
                 Dark
                 {theme === "dark" && (
-                  <Check className="ml-auto size-4 text-primary" />
+                  <Check className="text-primary ml-auto size-4" />
                 )}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme("system")}>
                 <Monitor />
                 System
                 {theme === "system" && (
-                  <Check className="ml-auto size-4 text-primary" />
+                  <Check className="text-primary ml-auto size-4" />
                 )}
               </DropdownMenuItem>
             </DropdownMenuGroup>
