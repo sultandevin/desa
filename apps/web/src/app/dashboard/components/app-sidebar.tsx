@@ -1,21 +1,8 @@
-"use client"
+"use client";
 
-import {
-  AudioWaveform,
-  Bot,
-  ChevronsUpDown,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Skull,
-  SquareTerminal
-} from "lucide-react"
-import * as React from "react"
-
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
+import { NavMain } from "@/app/dashboard/components/nav-main";
+import { NavOthers } from "@/app/dashboard/components/nav-others";
+import { NavUser } from "@/app/dashboard/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -25,78 +12,53 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
+import {
+  Bot,
+  ChevronsUpDown,
+  Instagram,
+  Skull,
+  SquareTerminal,
+  Text,
+} from "lucide-react";
+import * as React from "react";
 
-// This is sample data.
 const data = {
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
   navMain: [
     {
-      title: "Assets",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
+      title: "Inventaris & Kekayaan",
       items: [
         {
-          title: "All Assets",
-          url: "#",
+          title: "Manajemen Aset",
+          icon: SquareTerminal,
+          url: "/dashboard/assets",
         },
       ],
     },
     {
-      title: "Sexy Grok",
-      url: "#",
-      icon: Bot,
+      title: "Keputusan Kepala Desa",
       items: [
         {
-          title: "18+",
-          url: "#",
-        },
-        {
-          title: "Pinterest",
-          url: "#",
-        },
-        {
-          title: "Quantum",
+          title: "Reyhan",
+          icon: Bot,
           url: "#",
         },
       ],
     },
   ],
-  projects: [
+  navOthers: [
     {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
+      title: "Dokumentasi API",
+      icon: Text,
+      url: "http://localhost:3001/api/rpc/api-reference",
     },
     {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
+      title: "Instagram Ilham",
+      icon: Instagram,
+      url: "https://www.instagram.com/ilhammrajo/",
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -116,8 +78,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <span className="truncate font-medium">{"PELERPL"}</span>
                 <span className="truncate text-xs">{"Ahmad Sudais"}</span>
               </div>
-
-              <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -125,6 +85,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarContent>
         <NavMain items={data.navMain} />
+        <NavOthers items={data.navOthers} />
       </SidebarContent>
 
       <SidebarFooter>
@@ -132,5 +93,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }
