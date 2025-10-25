@@ -1,10 +1,12 @@
+import { Suspense } from "react";
 import {
   Dashboard,
   DashboardDescription,
   DashboardHeader,
-  DashboardSection,
   DashboardTitle,
 } from "../components/dashboard";
+import AssetTable from "./components/asset-table";
+import Loader from "@/components/loader";
 
 export default function AssetsPage() {
   return (
@@ -15,7 +17,9 @@ export default function AssetsPage() {
           Kelola inventaris oleh Mas Fah...
         </DashboardDescription>
       </DashboardHeader>
-      <DashboardSection>peler ilham</DashboardSection>
+      <Suspense fallback={<Loader />}>
+        <AssetTable />
+      </Suspense>
     </Dashboard>
   );
 }

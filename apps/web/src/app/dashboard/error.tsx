@@ -16,7 +16,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-2">
+    <div className="flex min-h-[80vh] flex-col items-center justify-center gap-2">
       <h2 className="text-3xl">Something went wrong!</h2>
       <Button
         onClick={
