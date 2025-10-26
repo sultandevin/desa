@@ -16,9 +16,19 @@ export const assetRouter = {
       summary: "List All Assets",
       tags: ["Assets"],
     })
+    .input(
+      z.object({
+        limit: z.number().int().min(1).max(100).optional().default(10),
+        offset: z.number().int().min(0).optional().default(0),
+      }),
+    )
     .output(z.array(assetSchema))
-    .handler(async () => {
-      const assets = await db.select().from(asset);
+    .handler(async ({ input }) => {
+      const assets = await db
+        .select()
+        .from(asset)
+        .limit(input.limit)
+        .offset(input.offset);
 
       return assets;
     }),

@@ -27,7 +27,9 @@ export function NavMain({
     <div>
       {items.map((item) => (
         <SidebarGroup key={item.title}>
-          <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+          <SidebarGroupLabel className="pointer-events-none select-none">
+            {item.title}
+          </SidebarGroupLabel>
           <SidebarMenu>
             {item.items.map((link) => (
               <SidebarMenuItem key={link.title}>

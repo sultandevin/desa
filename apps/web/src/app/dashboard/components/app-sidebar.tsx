@@ -16,11 +16,10 @@ import {
 import {
   Bot,
   Home,
-  Instagram,
   MessageCircleWarning,
   Skull,
   SquareTerminal,
-  Text,
+  Text
 } from "lucide-react";
 import * as React from "react";
 
@@ -68,11 +67,6 @@ const data = {
       icon: Text,
       url: "http://localhost:3001/api/rpc/api-reference",
     },
-    {
-      title: "Instagram Ilham",
-      icon: Instagram,
-      url: "https://www.instagram.com/ilhammrajo/",
-    },
   ],
 };
 
@@ -90,7 +84,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <Skull className="size-4" />
               </div>
 
-              <div className="grid flex-1 text-left text-sm leading-tight">
+              <div className="grid flex-1 text-left text-sm leading-tight *:select-none">
                 <span className="truncate font-medium">{"PELERPL"}</span>
                 <span className="truncate text-xs">{"Ahmad Sudais"}</span>
               </div>

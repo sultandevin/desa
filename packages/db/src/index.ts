@@ -18,6 +18,7 @@ async function addDummyData() {
   await reset(db, { asset });
   await seed(db, { asset }).refine((funcs) => ({
     asset: {
+      count: 100,
       columns: {
         createdBy: funcs.valuesFromArray({ values: [userInstance.id] }),
       },

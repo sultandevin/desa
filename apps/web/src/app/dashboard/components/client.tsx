@@ -1,6 +1,5 @@
 "use client";
 
-import Loader from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,7 +14,9 @@ import { useQuery } from "@tanstack/react-query";
 import { LoaderCircle, RotateCcw } from "lucide-react";
 
 const Client = () => {
-  const data = useQuery(orpc.asset.list.queryOptions());
+  const data = useQuery(
+    orpc.asset.list.queryOptions({ input: { limit: 1, offset: 1 } }),
+  );
 
   return (
     <Card>

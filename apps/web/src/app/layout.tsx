@@ -19,8 +19,8 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "desa",
-  description: "desa",
+  title: "Sistem Informasi Desa",
+  description: "Aplikasi ini dibuat oleh Mas Fah... untuk desa Bpk Natha",
 };
 
 export default function RootLayout({
