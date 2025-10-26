@@ -20,6 +20,7 @@ async function addDummyData() {
     asset: {
       count: 100,
       columns: {
+        valueRp: funcs.number({ minValue: 0 }),
         createdBy: funcs.valuesFromArray({ values: [userInstance.id] }),
       },
     },
