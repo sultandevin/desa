@@ -21,7 +21,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
-  const { data, isPending } = authClient.useSession();
+  const { isPending } = authClient.useSession();
   const router = useRouter();
 
   const form = useForm({
@@ -38,7 +38,7 @@ export function LoginForm({
         {
           onSuccess: () => {
             router.push("/dashboard");
-            toast.success("Sign in successful");
+            toast.success("Sign in berhasil!");
           },
           onError: (error) => {
             toast.error(error.error.message || error.error.statusText);
@@ -48,8 +48,8 @@ export function LoginForm({
     },
     validators: {
       onSubmit: z.object({
-        email: z.email("Invalid email address"),
-        password: z.string().min(8, "Password must be at least 8 characters"),
+        email: z.email("Alamat email tidak valid"),
+        password: z.string().min(8, "Password harus terdiri dari minimal 8 karakter"),
       }),
     },
   });
