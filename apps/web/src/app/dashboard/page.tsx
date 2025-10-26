@@ -9,15 +9,18 @@ import {
   DashboardTitle,
 } from "./components/dashboard";
 import Server from "./components/server";
+import { auth } from "@desa/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function DashboardPage() {
-  // const session = await auth.api.getSession({
-  //   headers: await headers(),
-  // });
-  //
-  // if (!session?.user) {
-  //   redirect("/login");
-  // }
+export default async function DashboardPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user) {
+    redirect("/login");
+  }
 
   return (
     <Dashboard>
