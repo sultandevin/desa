@@ -27,6 +27,7 @@
     "dev:native": "turbo -F native dev",
     "dev:web": "turbo -F web dev",
     "build:web": "turbo -F web build",
+    "start:web": "turbo -F web start",
     "db:push": "turbo -F @desa/db db:push",
     "db:studio": "turbo -F @desa/db db:studio",
     "db:generate": "turbo -F @desa/db db:generate",
