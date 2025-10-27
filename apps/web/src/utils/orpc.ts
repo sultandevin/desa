@@ -1,9 +1,13 @@
+import type { AppRouterClient } from "@desa/api/routers/index";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import type { AppRouterClient } from "@desa/api/routers/index";
+
+declare global {
+  var $client: AppRouterClient | undefined;
+}
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -21,7 +25,12 @@ export const queryClient = new QueryClient({
 });
 
 export const link = new RPCLink({
-  url: `${typeof window !== "undefined" ? window.location.origin : "http://localhost:3001"}/api/rpc`,
+  url: () => {
+    if (typeof window === "undefined") {
+      throw new Error("RPCLink is not allowed on the server side.");
+    }
+    return `${window.location.origin}/api/rpc`;
+  },
   fetch(url, options) {
     return fetch(url, {
       ...options,
@@ -38,6 +47,10 @@ export const link = new RPCLink({
   },
 });
 
-export const client: AppRouterClient = createORPCClient(link);
+/**
+ * Fallback to client-side client if server-side client is not available.
+ */
+export const client: AppRouterClient =
+  globalThis.$client ?? createORPCClient(link);
 
 export const orpc = createTanstackQueryUtils(client);

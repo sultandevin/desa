@@ -1,4 +1,5 @@
 import Providers from "@/components/providers";
+import "@/utils/orpc.server";
 import type { Metadata } from "next";
 import { JetBrains_Mono, Outfit, Playfair_Display } from "next/font/google";
 import "../index.css";
