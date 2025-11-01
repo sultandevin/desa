@@ -12,7 +12,7 @@ import { sql } from "drizzle-orm";
 export const asset = pgTable(
   "asset",
   {
-    id: uuid().primaryKey(),
+    id: uuid().primaryKey().defaultRandom(),
     name: text().notNull(),
     code: text(),
     nup: text(),
