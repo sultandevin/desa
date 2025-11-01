@@ -27,7 +27,9 @@ async function addDummyData() {
   }));
 }
 
-addDummyData();
+if (process.env.NODE_ENV === "development") {
+  addDummyData().catch(console.error);
+}
 
 export { eq } from "drizzle-orm";
 export { createSelectSchema } from "drizzle-zod";
