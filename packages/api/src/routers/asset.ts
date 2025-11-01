@@ -1,6 +1,5 @@
 import { createSelectSchema, db, eq } from "@desa/db";
 import { asset } from "@desa/db/schema/asset";
-import { ORPCError } from "@orpc/client";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 
@@ -22,12 +21,16 @@ const list = publicProcedure
     }),
   )
   .output(z.array(assetSchema))
-  .handler(async ({ input }) => {
+  .handler(async ({ input, errors }) => {
     const assets = await db
       .select()
       .from(asset)
       .limit(input.limit)
       .offset(input.offset);
+
+    if (!assets) {
+      throw errors.NOT_FOUND();
+    }
 
     return assets;
   });
@@ -45,7 +48,7 @@ const find = publicProcedure
     }),
   )
   .output(assetSchema)
-  .handler(async ({ input }) => {
+  .handler(async ({ input, errors }) => {
     const id = input.id;
 
     const [assetItem] = await db
@@ -55,9 +58,7 @@ const find = publicProcedure
       .limit(1);
 
     if (!assetItem) {
-      throw new ORPCError("NOT_FOUND", {
-        message: `Asset with ID ${id} not found`,
-      });
+      throw errors.NOT_FOUND();
     }
 
     return assetItem;
@@ -82,7 +83,7 @@ const create = protectedProcedure
     }),
   )
   .output(assetSchema)
-  .handler(async ({ input, context }) => {
+  .handler(async ({ input, errors, context }) => {
     const [newAsset] = await db
       .insert(asset)
       .values({
@@ -93,16 +94,47 @@ const create = protectedProcedure
       .returning();
 
     if (!newAsset) {
-      throw new ORPCError("INTERNAL_ERROR", {
-        message: "Failed to create asset",
-      });
+      throw errors.NOT_FOUND();
     }
 
     return newAsset;
+  });
+
+const remove = protectedProcedure
+  .route({
+    method: "DELETE",
+    path: "/assets/{id}",
+    summary: "Delete an asset by ID",
+    tags: ["Assets"],
+  })
+  .input(
+    z.object({
+      id: z.string(),
+    }),
+  )
+  .output(
+    z.object({
+      message: z.string(),
+    }),
+  )
+  .handler(async ({ input, errors }) => {
+    const [deletedAsset] = await db
+      .delete(asset)
+      .where(eq(asset.id, input.id))
+      .returning();
+
+    if (!deletedAsset) {
+      throw errors.NOT_FOUND();
+    }
+
+    return {
+      message: "Successfully deleted asset with ID " + deletedAsset.id,
+    };
   });
 
 export const assetRouter = {
   list,
   find,
   create,
+  remove,
 };
