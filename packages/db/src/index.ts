@@ -2,6 +2,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { reset, seed } from "drizzle-seed";
 import { asset } from "./schema/asset";
 import { user } from "./schema/auth";
+import { file, peraturan } from "./schema/peraturan";
 
 export const db = drizzle({
   connection: process.env.DATABASE_URL || "",
@@ -27,8 +28,29 @@ async function addDummyData() {
   }));
 }
 
+async function addDummyRegData() {
+  const [regInstance] = await db.select().from(peraturan).limit(1);
+  if (!regInstance) {
+    const [userInstances] = await db.select().from(user);
+    const [fileInstances] = await db.select().from(file);
+
+    await reset(db, { peraturan });
+    await seed(db, { peraturan }).refine((funcs) => ({
+      peraturan: {
+        count: 100,
+        columns: {
+          berlaku_sejak: funcs.date(),
+          created_by: funcs.valuesFromArray({ values: [userInstances?.id] }),
+          file: funcs.valuesFromArray({ values: [fileInstances?.id] }),
+        },
+      },
+    }));
+  }
+}
+
 if (process.env.NODE_ENV === "development") {
   addDummyData().catch(console.error);
+  addDummyRegData().catch(console.error);
 }
 
 export { eq } from "drizzle-orm";

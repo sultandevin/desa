@@ -15,12 +15,15 @@ import {
 } from "@/components/ui/sidebar";
 import {
   Bot,
+  BotIcon,
   Home,
   MessageCircleWarning,
   Skull,
   SquareTerminal,
-  Text
+  SquareTerminalIcon,
+  Text,
 } from "lucide-react";
+import { title } from "process";
 import * as React from "react";
 
 const data = {
@@ -57,6 +60,16 @@ const data = {
           title: "Reyhan",
           icon: Bot,
           url: "#",
+        },
+      ],
+    },
+    {
+      title: "peraturan di Desa",
+      items: [
+        {
+          title: "Peraturan Desa",
+          icon: SquareTerminalIcon,
+          url: "/dashboard/peraturan",
         },
       ],
     },

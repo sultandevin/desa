@@ -1,7 +1,7 @@
 import { createSelectSchema, db, eq } from "@desa/db";
 import { peraturan, file } from "@desa/db/schema/peraturan";
 import * as z from "zod";
-import { protectedProcedure, publicProcedure } from "..";
+import { publicProcedure } from "..";
 
 const peraturanSchema = createSelectSchema(peraturan, {
   id: z.string(),
@@ -85,7 +85,7 @@ const create = publicProcedure // hapus line ini kalo auth udah siap
     }),
   )
   .output(peraturanSchema)
-  .handler(async ({ input, errors, context }) => {
+  .handler(async ({ input, errors }) => {
     if (input.file) {
       const [fileExists] = await db
         .select()
@@ -199,7 +199,7 @@ const upload = publicProcedure // hapus line ini kalo auth udah siap
     }),
   )
   .output(fileSchema)
-  .handler(async ({ input, errors, context }) => {
+  .handler(async ({ input, errors }) => {
     const [uploadedFile] = await db
       .insert(file)
       .values({
