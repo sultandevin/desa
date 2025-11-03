@@ -19,13 +19,13 @@ export const file = pgTable("file", {
 
 export const keputusan = pgTable("keputusan", {
   id: text("id").primaryKey(),
-  nomor_keputusan: varchar("nomor_keputusan").notNull(),
-  tanggal_keputusan: date("tangal_keputusan").notNull(),
-  tentang: varchar("tentang").notNull(),
-  uraian_singkat: text("uploaded_by"),
-  nomor_laporan: varchar("nomor_laporan").notNull(),
-  tanggal_laporan: date("tangal_laporan").notNull(),
-  keterangan: text("keterangan"),
+  decision_number: varchar("decision_number").notNull(),
+  decision_date: date("decision_date").notNull(),
+  regarding: varchar("regarding").notNull(),
+  short_description: text("short_description"),
+  report_number: varchar("report_number").notNull(),
+  report_date: date("report_date").notNull(),
+  notes: text("notes"),
   file: text("file").references(() => file.id),
   created_by: text("created_by")
     .notNull()
