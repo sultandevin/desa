@@ -1,4 +1,6 @@
 CREATE TYPE "public"."transaction" AS ENUM('INSERT', 'UPDATE', 'DELETE');--> statement-breakpoint
+CREATE TYPE "public"."asset_removal_status" AS ENUM('PENDING', 'APPROVED', 'REJECTED');--> statement-breakpoint
+CREATE TYPE "public"."damage_status" AS ENUM('SEVERE', 'MILD', 'MINIMAL');--> statement-breakpoint
 CREATE TABLE "asset_audit" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "asset_audit_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"assest_id" uuid,
@@ -6,7 +8,17 @@ CREATE TABLE "asset_audit" (
 	"before" json,
 	"after" json,
 	"user_id" text,
-	"modified_at" date DEFAULT now() NOT NULL
+	"modified_at" timestamp DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "asset_removal_request" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"assetId" uuid NOT NULL,
+	"reason" text NOT NULL,
+	"status" "asset_removal_status",
+	"decision_letter" text,
+	"reported_by" text NOT NULL,
+	"decided_by" text
 );
 --> statement-breakpoint
 CREATE TABLE "asset" (
@@ -17,6 +29,7 @@ CREATE TABLE "asset" (
 	"brand_type" text,
 	"value_rp" numeric,
 	"condition" text,
+	"proof_of_ownership" text,
 	"status" text,
 	"note" text,
 	"acquisition_year" timestamp,
@@ -75,21 +88,23 @@ CREATE TABLE "verification" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "file" (
-	"id" text PRIMARY KEY NOT NULL,
-	"nama_file" varchar NOT NULL,
-	"file_path" varchar NOT NULL,
-	"uploaded_by" text NOT NULL,
-	"uploaded_at" timestamp DEFAULT now()
+CREATE TABLE "damage_report" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"asset_id" uuid NOT NULL,
+	"description" text NOT NULL,
+	"status" "damage_status",
+	"reported_by" text NOT NULL,
+	"verified_by" text,
+	"reported_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "keputusan" (
 	"id" text PRIMARY KEY NOT NULL,
-	"decision_number" varchar NOT NULL,
-	"decision_date" date NOT NULL,
-	"regarding" varchar NOT NULL,
+	"number" text NOT NULL,
+	"date" date NOT NULL,
+	"regarding" text NOT NULL,
 	"short_description" text,
-	"report_number" varchar NOT NULL,
+	"report_number" text NOT NULL,
 	"report_date" date NOT NULL,
 	"notes" text,
 	"file" text,
@@ -97,50 +112,41 @@ CREATE TABLE "keputusan" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
-CREATE TABLE "peraturan" (
+CREATE TABLE "file" (
 	"id" text PRIMARY KEY NOT NULL,
-	"judul" varchar NOT NULL,
-	"nomor_peraturan" varchar NOT NULL,
-	"tingkat_peraturan" varchar NOT NULL,
-	"deskripsi" text,
+	"nama_file" text NOT NULL,
+	"file_path" text NOT NULL,
+	"uploaded_by" text NOT NULL,
+	"uploaded_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "regulation" (
+	"id" text PRIMARY KEY NOT NULL,
+	"title" varchar NOT NULL,
+	"number" varchar NOT NULL,
+	"level" varchar NOT NULL,
+	"description" text,
 	"file" text,
-	"berlaku_sejak" text,
+	"effective_by" timestamp,
 	"created_by" text NOT NULL,
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 ALTER TABLE "asset_audit" ADD CONSTRAINT "asset_audit_assest_id_asset_id_fk" FOREIGN KEY ("assest_id") REFERENCES "public"."asset"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "asset_audit" ADD CONSTRAINT "asset_audit_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "asset_removal_request" ADD CONSTRAINT "asset_removal_request_assetId_asset_id_fk" FOREIGN KEY ("assetId") REFERENCES "public"."asset"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "asset_removal_request" ADD CONSTRAINT "asset_removal_request_decision_letter_file_id_fk" FOREIGN KEY ("decision_letter") REFERENCES "public"."file"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "asset_removal_request" ADD CONSTRAINT "asset_removal_request_reported_by_user_id_fk" FOREIGN KEY ("reported_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "asset_removal_request" ADD CONSTRAINT "asset_removal_request_decided_by_user_id_fk" FOREIGN KEY ("decided_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "asset" ADD CONSTRAINT "asset_proof_of_ownership_file_id_fk" FOREIGN KEY ("proof_of_ownership") REFERENCES "public"."file"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "asset" ADD CONSTRAINT "asset_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "file" ADD CONSTRAINT "file_uploaded_by_user_id_fk" FOREIGN KEY ("uploaded_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "damage_report" ADD CONSTRAINT "damage_report_asset_id_asset_id_fk" FOREIGN KEY ("asset_id") REFERENCES "public"."asset"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "damage_report" ADD CONSTRAINT "damage_report_reported_by_user_id_fk" FOREIGN KEY ("reported_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "damage_report" ADD CONSTRAINT "damage_report_verified_by_user_id_fk" FOREIGN KEY ("verified_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "keputusan" ADD CONSTRAINT "keputusan_file_file_id_fk" FOREIGN KEY ("file") REFERENCES "public"."file"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "keputusan" ADD CONSTRAINT "keputusan_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "peraturan" ADD CONSTRAINT "peraturan_file_file_id_fk" FOREIGN KEY ("file") REFERENCES "public"."file"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "peraturan" ADD CONSTRAINT "peraturan_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
---> statement-breakpoint
--- Trigger to log asset changes to assset_audit
-CREATE OR REPLACE FUNCTION log_asset_changes()
-RETURNS TRIGGER AS $$
-BEGIN 
-  IF (TG_OP = 'INSERT') THEN
-    INSERT INTO "asset_audit" (asset_id, transaction, after, user_id)
-    VALUES (NEW.id, 'INSERT', to_json(NEW), current_user);
-    RETURN OLD;
-  ELSIF (TG_OP = 'UPDATE') THEN
-    INSERT INTO "asset_audit" (asset_id, transaction, before, after, user_id)
-    VALUES (OLD.id, 'UPDATE', to_json(OLD), to_json(NEW), current_user);
-    RETURN NEW;
-  ELSIF (TG_OP = 'DELETE') THEN
-    INSERT INTO "asset_audit" (asset_id, transaction, before, user_id)
-    VALUES (OLD.id, 'DELETE', to_json(OLD), current_user);
-    RETURN OLD;
-  END IF;
-RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER asset_audit_trigger
-AFTER INSERT OR UPDATE OR DELETE ON asset
-FOR EACH ROW EXECUTE FUNCTION log_asset_changes();
+ALTER TABLE "file" ADD CONSTRAINT "file_uploaded_by_user_id_fk" FOREIGN KEY ("uploaded_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "regulation" ADD CONSTRAINT "regulation_file_file_id_fk" FOREIGN KEY ("file") REFERENCES "public"."file"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "regulation" ADD CONSTRAINT "regulation_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;

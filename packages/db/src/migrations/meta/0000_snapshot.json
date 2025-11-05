@@ -1,5 +1,5 @@
 {
-  "id": "40eaf6ab-10fa-4f48-ab3e-18dd57aaa8ff",
+  "id": "0167b8a3-4893-4529-8c8f-e01e5861dba9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -58,7 +58,7 @@
         },
         "modified_at": {
           "name": "modified_at",
-          "type": "date",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
@@ -85,6 +85,116 @@
           "tableTo": "user",
           "columnsFrom": [
             "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.asset_removal_request": {
+      "name": "asset_removal_request",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "assetId": {
+          "name": "assetId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "asset_removal_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "decision_letter": {
+          "name": "decision_letter",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reported_by": {
+          "name": "reported_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "decided_by": {
+          "name": "decided_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "asset_removal_request_assetId_asset_id_fk": {
+          "name": "asset_removal_request_assetId_asset_id_fk",
+          "tableFrom": "asset_removal_request",
+          "tableTo": "asset",
+          "columnsFrom": [
+            "assetId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "asset_removal_request_decision_letter_file_id_fk": {
+          "name": "asset_removal_request_decision_letter_file_id_fk",
+          "tableFrom": "asset_removal_request",
+          "tableTo": "file",
+          "columnsFrom": [
+            "decision_letter"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "asset_removal_request_reported_by_user_id_fk": {
+          "name": "asset_removal_request_reported_by_user_id_fk",
+          "tableFrom": "asset_removal_request",
+          "tableTo": "user",
+          "columnsFrom": [
+            "reported_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "asset_removal_request_decided_by_user_id_fk": {
+          "name": "asset_removal_request_decided_by_user_id_fk",
+          "tableFrom": "asset_removal_request",
+          "tableTo": "user",
+          "columnsFrom": [
+            "decided_by"
           ],
           "columnsTo": [
             "id"
@@ -146,6 +256,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "proof_of_ownership": {
+          "name": "proof_of_ownership",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "status": {
           "name": "status",
           "type": "text",
@@ -193,6 +309,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "asset_proof_of_ownership_file_id_fk": {
+          "name": "asset_proof_of_ownership_file_id_fk",
+          "tableFrom": "asset",
+          "tableTo": "file",
+          "columnsFrom": [
+            "proof_of_ownership"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
         "asset_created_by_user_id_fk": {
           "name": "asset_created_by_user_id_fk",
           "tableFrom": "asset",
@@ -525,50 +654,90 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.file": {
-      "name": "file",
+    "public.damage_report": {
+      "name": "damage_report",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
-        "nama_file": {
-          "name": "nama_file",
-          "type": "varchar",
+        "asset_id": {
+          "name": "asset_id",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "file_path": {
-          "name": "file_path",
-          "type": "varchar",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "uploaded_by": {
-          "name": "uploaded_by",
+        "description": {
+          "name": "description",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "uploaded_at": {
-          "name": "uploaded_at",
+        "status": {
+          "name": "status",
+          "type": "damage_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reported_by": {
+          "name": "reported_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "verified_by": {
+          "name": "verified_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reported_at": {
+          "name": "reported_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "file_uploaded_by_user_id_fk": {
-          "name": "file_uploaded_by_user_id_fk",
-          "tableFrom": "file",
+        "damage_report_asset_id_asset_id_fk": {
+          "name": "damage_report_asset_id_asset_id_fk",
+          "tableFrom": "damage_report",
+          "tableTo": "asset",
+          "columnsFrom": [
+            "asset_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "damage_report_reported_by_user_id_fk": {
+          "name": "damage_report_reported_by_user_id_fk",
+          "tableFrom": "damage_report",
           "tableTo": "user",
           "columnsFrom": [
-            "uploaded_by"
+            "reported_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "damage_report_verified_by_user_id_fk": {
+          "name": "damage_report_verified_by_user_id_fk",
+          "tableFrom": "damage_report",
+          "tableTo": "user",
+          "columnsFrom": [
+            "verified_by"
           ],
           "columnsTo": [
             "id"
@@ -593,21 +762,21 @@
           "primaryKey": true,
           "notNull": true
         },
-        "decision_number": {
-          "name": "decision_number",
-          "type": "varchar",
+        "number": {
+          "name": "number",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "decision_date": {
-          "name": "decision_date",
+        "date": {
+          "name": "date",
           "type": "date",
           "primaryKey": false,
           "notNull": true
         },
         "regarding": {
           "name": "regarding",
-          "type": "varchar",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -619,7 +788,7 @@
         },
         "report_number": {
           "name": "report_number",
-          "type": "varchar",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -690,8 +859,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.peraturan": {
-      "name": "peraturan",
+    "public.file": {
+      "name": "file",
       "schema": "",
       "columns": {
         "id": {
@@ -700,26 +869,84 @@
           "primaryKey": true,
           "notNull": true
         },
-        "judul": {
-          "name": "judul",
+        "nama_file": {
+          "name": "nama_file",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "file_path": {
+          "name": "file_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "uploaded_by": {
+          "name": "uploaded_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "uploaded_at": {
+          "name": "uploaded_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "file_uploaded_by_user_id_fk": {
+          "name": "file_uploaded_by_user_id_fk",
+          "tableFrom": "file",
+          "tableTo": "user",
+          "columnsFrom": [
+            "uploaded_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.regulation": {
+      "name": "regulation",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
-        "nomor_peraturan": {
-          "name": "nomor_peraturan",
+        "number": {
+          "name": "number",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
-        "tingkat_peraturan": {
-          "name": "tingkat_peraturan",
+        "level": {
+          "name": "level",
           "type": "varchar",
           "primaryKey": false,
           "notNull": true
         },
-        "deskripsi": {
-          "name": "deskripsi",
+        "description": {
+          "name": "description",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -730,9 +957,9 @@
           "primaryKey": false,
           "notNull": false
         },
-        "berlaku_sejak": {
-          "name": "berlaku_sejak",
-          "type": "text",
+        "effective_by": {
+          "name": "effective_by",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": false
         },
@@ -752,9 +979,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "peraturan_file_file_id_fk": {
-          "name": "peraturan_file_file_id_fk",
-          "tableFrom": "peraturan",
+        "regulation_file_file_id_fk": {
+          "name": "regulation_file_file_id_fk",
+          "tableFrom": "regulation",
           "tableTo": "file",
           "columnsFrom": [
             "file"
@@ -765,9 +992,9 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "peraturan_created_by_user_id_fk": {
-          "name": "peraturan_created_by_user_id_fk",
-          "tableFrom": "peraturan",
+        "regulation_created_by_user_id_fk": {
+          "name": "regulation_created_by_user_id_fk",
+          "tableFrom": "regulation",
           "tableTo": "user",
           "columnsFrom": [
             "created_by"
@@ -794,6 +1021,24 @@
         "INSERT",
         "UPDATE",
         "DELETE"
+      ]
+    },
+    "public.asset_removal_status": {
+      "name": "asset_removal_status",
+      "schema": "public",
+      "values": [
+        "PENDING",
+        "APPROVED",
+        "REJECTED"
+      ]
+    },
+    "public.damage_status": {
+      "name": "damage_status",
+      "schema": "public",
+      "values": [
+        "SEVERE",
+        "MILD",
+        "MINIMAL"
       ]
     }
   },

@@ -2,7 +2,8 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { reset, seed } from "drizzle-seed";
 import { asset } from "./schema/asset";
 import { user } from "./schema/auth";
-import { file, peraturan } from "./schema/peraturan";
+import { regulation } from "./schema/regulation";
+import { file } from "./schema/file";
 
 export const db = drizzle({
   connection: process.env.DATABASE_URL || "",
@@ -35,14 +36,14 @@ async function addDummyData() {
 }
 
 async function addDummyRegData() {
-  const [regInstance] = await db.select().from(peraturan).limit(1);
+  const [regInstance] = await db.select().from(regulation).limit(1);
   if (!regInstance) {
     const [userInstances] = await db.select().from(user);
     const [fileInstances] = await db.select().from(file);
 
-    await reset(db, { peraturan });
-    await seed(db, { peraturan }).refine((funcs) => ({
-      peraturan: {
+    await reset(db, { regulation });
+    await seed(db, { regulation }).refine((funcs) => ({
+      regulation: {
         count: 100,
         columns: {
           berlaku_sejak: funcs.date(),
@@ -51,10 +52,10 @@ async function addDummyRegData() {
         },
       },
     }));
-    console.log("[INFO] ✨ 'peraturan' table data successfully seeded!");
+    console.log("[INFO] ✨ 'regulation' table data successfully seeded!");
   } else {
     console.log(
-      "[WARN] 'peraturan' table seeding failed due to no user instances found.",
+      "[WARN] 'regulation' table seeding failed due to no user instances found.",
     );
   }
 }
