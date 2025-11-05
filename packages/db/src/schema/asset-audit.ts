@@ -1,10 +1,10 @@
 import {
-  date,
   integer,
   json,
   pgEnum,
   pgTable,
   text,
+  timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
 import { asset } from "./asset";
@@ -23,5 +23,5 @@ export const assetHistory = pgTable("asset_audit", {
   before: json(),
   after: json(),
   userId: text("user_id").references(() => user.id),
-  modifiedAt: date("modified_at").notNull().defaultNow().notNull(),
+  modifiedAt: timestamp("modified_at").notNull().defaultNow().notNull(),
 });

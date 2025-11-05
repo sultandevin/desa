@@ -8,6 +8,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { user } from "./auth";
 import { sql } from "drizzle-orm";
+import { file } from "./file";
 
 export const asset = pgTable(
   "asset",
@@ -19,6 +20,7 @@ export const asset = pgTable(
     brandType: text("brand_type"),
     valueRp: decimal("value_rp"),
     condition: text(),
+    proofOfOwnership: text("proof_of_ownership").references(() => file.id),
     status: text(),
     note: text(),
     acquiredAt: timestamp("acquisition_year"),
