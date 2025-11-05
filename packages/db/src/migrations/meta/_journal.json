@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1761228356602,
-      "tag": "0000_high_vulture",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1762069708682,
-      "tag": "0001_hard_strong_guy",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1762069912839,
-      "tag": "0002_stale_alex_power",
+      "when": 1762356923750,
+      "tag": "0000_talented_tattoo",
       "breakpoints": true
     }
   ]

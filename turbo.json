@@ -51,6 +51,10 @@
     "db:down": {
       "cache": false,
       "persistent": true
+    },
+    "db:down:v": {
+      "cache": false,
+      "persistent": true
     }
   }
 }

@@ -16,7 +16,7 @@ async function addDummyData() {
   const [userInstance] = await db.select().from(user).limit(1);
   if (!userInstance) {
     console.log(
-      "[WARN] Dummy asset data seeding failed due to no user instances found.",
+      "[WARN] 'asset' table seeding failed due to no user instances found.",
     );
     return;
   }
@@ -31,7 +31,7 @@ async function addDummyData() {
       },
     },
   }));
-  console.log("[INFO] Dummy asset data seeded.");
+  console.log("[INFO] ✨ 'asset' table data successfully seeded!");
 }
 
 async function addDummyRegData() {
@@ -51,10 +51,10 @@ async function addDummyRegData() {
         },
       },
     }));
-    console.log("[INFO] Dummy regulation data seeded.");
+    console.log("[INFO] ✨ 'peraturan' table data successfully seeded!");
   } else {
     console.log(
-      "[WARN] Dummy regulation data seeding failed due to no user instances found.",
+      "[WARN] 'peraturan' table seeding failed due to no user instances found.",
     );
   }
 }
