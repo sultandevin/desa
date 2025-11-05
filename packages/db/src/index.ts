@@ -14,7 +14,12 @@ export const db = drizzle({
 
 async function addDummyData() {
   const [userInstance] = await db.select().from(user).limit(1);
-  if (!userInstance) return;
+  if (!userInstance) {
+    console.log(
+      "[WARN] Dummy asset data seeding failed due to no user instances found.",
+    );
+    return;
+  }
 
   await reset(db, { asset });
   await seed(db, { asset }).refine((funcs) => ({
@@ -26,6 +31,7 @@ async function addDummyData() {
       },
     },
   }));
+  console.log("[INFO] Dummy asset data seeded.");
 }
 
 async function addDummyRegData() {
@@ -45,6 +51,11 @@ async function addDummyRegData() {
         },
       },
     }));
+    console.log("[INFO] Dummy regulation data seeded.");
+  } else {
+    console.log(
+      "[WARN] Dummy regulation data seeding failed due to no user instances found.",
+    );
   }
 }
 
