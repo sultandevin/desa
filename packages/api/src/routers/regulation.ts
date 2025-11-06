@@ -2,13 +2,9 @@ import { createSelectSchema, db, eq } from "@desa/db";
 import { regulation } from "@desa/db/schema/regulation";
 import { file } from "@desa/db/schema/file";
 import * as z from "zod";
-import { publicProcedure } from "..";
+import { protectedProcedure, publicProcedure } from "..";
 
 const regulationSchema = createSelectSchema(regulation, {
-  id: z.string(),
-});
-
-const fileSchema = createSelectSchema(file, {
   id: z.string(),
 });
 
@@ -67,8 +63,7 @@ const find = publicProcedure
     return regulationItem;
   });
 
-const create = publicProcedure // hapus line ini kalo auth udah siap
-  //const create = protectedProcedure
+const create = protectedProcedure
   .route({
     method: "POST",
     path: "/regulations",
@@ -82,11 +77,11 @@ const create = publicProcedure // hapus line ini kalo auth udah siap
       level: z.string(),
       description: z.string().optional(),
       file: z.string().optional(),
-      effectiveBy: z.string().optional(),
+      effectiveBy: z.date().optional(),
     }),
   )
   .output(regulationSchema)
-  .handler(async ({ input, errors }) => {
+  .handler(async ({ input, errors, context }) => {
     if (input.file) {
       const [fileExists] = await db
         .select()
@@ -100,10 +95,7 @@ const create = publicProcedure // hapus line ini kalo auth udah siap
       .insert(regulation)
       .values({
         ...input,
-        id: crypto.randomUUID(),
-        //createdBy: context.session.user.id,
-        createdBy: crypto.randomUUID(), // hapus line ini kalo auth udah siap
-        createdAt: new Date(),
+        createdBy: context.session.user.id,
       })
       .returning();
     if (!newRegulation) {
@@ -128,7 +120,7 @@ const update = publicProcedure // hapus line ini kalo auth udah siap
       level: z.string().optional(),
       description: z.string().optional(),
       file: z.string().optional(),
-      effectiveBy: z.string().optional(),
+      effectiveBy: z.date().optional(),
     }),
   )
   .output(regulationSchema)
@@ -145,12 +137,7 @@ const update = publicProcedure // hapus line ini kalo auth udah siap
     const [updatedRegulation] = await db
       .update(regulation)
       .set({
-        title: input.title,
-        number: input.number,
-        level: input.level,
-        description: input.description,
-        file: input.file,
-        effectiveBy: input.effectiveBy,
+        ...input,
       })
       .where(eq(regulation.id, input.id))
       .returning();
@@ -185,39 +172,6 @@ const remove = publicProcedure // hapus line ini kalo auth udah siap
     };
   });
 
-const upload = publicProcedure // hapus line ini kalo auth udah siap
-  //const upload = protectedProcedure
-  .route({
-    method: "POST",
-    path: "/files/upload",
-    summary: "Upload file regulation",
-    tags: ["File"],
-  })
-  .input(
-    z.object({
-      name: z.string(),
-      path: z.string(),
-    }),
-  )
-  .output(fileSchema)
-  .handler(async ({ input, errors }) => {
-    const [uploadedFile] = await db
-      .insert(file)
-      .values({
-        ...input,
-        id: crypto.randomUUID(),
-        //uploaded_by: context.session.user.id,
-        uploaded_by: crypto.randomUUID(), // hapus line ini kalo auth udah siap
-        uploaded_at: new Date(),
-      })
-      .returning();
-
-    if (!uploadedFile) {
-      throw errors.NOT_FOUND();
-    }
-
-    return uploadedFile;
-  });
 
 export const regulationRouter = {
   list,
@@ -227,6 +181,3 @@ export const regulationRouter = {
   remove,
 };
 
-export const fileRouter = {
-  upload,
-};

@@ -3,12 +3,13 @@ import {
   varchar,
   text,
   timestamp,
+  uuid,
 } from "drizzle-orm/pg-core";
 import { user } from "./auth";
 import { file } from "./file";
 
 export const regulation = pgTable("regulation", {
-  id: text("id").primaryKey(),
+  id: uuid().primaryKey().defaultRandom(),
   title: varchar().notNull(),
   number: varchar().notNull(),
   level: varchar().notNull(),
