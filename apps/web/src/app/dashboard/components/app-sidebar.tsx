@@ -57,9 +57,9 @@ const data = {
       title: "Keputusan Kepala Desa",
       items: [
         {
-          title: "Reyhan",
-          icon: Bot,
-          url: "#",
+          title: "Daftar Keputusan",
+          icon: Text,
+          url: "/dashboard/keputusan",
         },
       ],
     },
