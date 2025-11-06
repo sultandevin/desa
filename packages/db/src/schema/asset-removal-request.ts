@@ -1,4 +1,5 @@
 import { pgEnum, pgTable, text, uuid } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { asset } from "./asset";
 import { file } from "./file";
 import { user } from "./auth";
@@ -20,3 +21,6 @@ export const assetRemovalRequest = pgTable("asset_removal_request", {
   reportedBy: text("reported_by").references(() => user.id).notNull(),
   decidedBy: text("decided_by").references(() => user.id),
 });
+
+export const assetRemovalRequestSelectSchema = createSelectSchema(assetRemovalRequest);
+export const assetRemovalRequestInsertSchema = createInsertSchema(assetRemovalRequest);

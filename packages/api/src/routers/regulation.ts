@@ -1,8 +1,9 @@
 import { db, eq } from "@desa/db";
-import { regulation, regulationSelectSchema } from "@desa/db/schema/regulation";
+import { regulation, regulationInsertSchema, regulationSelectSchema } from "@desa/db/schema/regulation";
 import { file } from "@desa/db/schema/file";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
+import { paginationSchema } from "../schemas";
 
 const list = publicProcedure
   .route({
@@ -11,12 +12,7 @@ const list = publicProcedure
     summary: "List ALL Regulations",
     tags: ["Regulations"],
   })
-  .input(
-    z.object({
-      limit: z.number().int().min(1).max(100).optional().default(10),
-      offset: z.number().int().min(0).optional().default(0),
-    }),
-  )
+  .input(paginationSchema)
   .output(z.array(regulationSelectSchema))
   .handler(async ({ input, errors }) => {
     const regulations = await db
@@ -66,16 +62,7 @@ const create = protectedProcedure
     summary: "Create a new regulation",
     tags: ["Regulations"],
   })
-  .input(
-    z.object({
-      title: z.string(),
-      number: z.string(),
-      level: z.string(),
-      description: z.string().optional(),
-      file: z.string().optional(),
-      effectiveBy: z.date().optional(),
-    }),
-  )
+  .input(regulationInsertSchema.omit({ id: true, createdBy: true, createdAt: true }))
   .output(regulationSelectSchema)
   .handler(async ({ input, errors, context }) => {
     if (input.file) {
@@ -108,18 +95,8 @@ const update = publicProcedure // hapus line ini kalo auth udah siap
     summary: "Update regulation by ID",
     tags: ["Regulations"],
   })
-  .input(
-    z.object({
-      id: z.string(),
-      title: z.string().optional(),
-      number: z.string().optional(),
-      level: z.string().optional(),
-      description: z.string().optional(),
-      file: z.string().optional(),
-      effectiveBy: z.date().optional(),
-    }),
-  )
-  .output(regulationSchema)
+  .input(regulationInsertSchema.omit({ createdBy: true, createdAt: true }).partial().required({ id: true }))
+  .output(regulationSelectSchema)
   .handler(async ({ input, errors }) => {
     if (input.file) {
       const [fileExists] = await db

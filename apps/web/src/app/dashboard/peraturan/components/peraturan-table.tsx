@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 
 const PeraturanTable = () => {
   const peraturan = useQuery(
-    orpc.peraturan.list.queryOptions({ input: { offset: 0, limit: 10 } }),
+    orpc.regulation.list.queryOptions({ input: { offset: 0, limit: 10 } }),
   );
 
   const columns: ColumnDef<NonNullable<typeof peraturan.data>[number]>[] = [

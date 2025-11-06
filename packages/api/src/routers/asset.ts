@@ -1,10 +1,9 @@
 import { db, eq } from "@desa/db";
-import { asset } from "@desa/db/schema/asset";
+import { asset, assetInsertSchema, assetSelectSchema } from "@desa/db/schema/asset";
+import { damageReport, damageReportSelectSchema } from "@desa/db/schema/damage-report";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
-import { damageReportSelectSchema } from "@desa/db/schema/damage-report";
-import { damageReport } from "@desa/db/schema/damage-report";
-import { assetSelectSchema } from "@desa/db/schema/asset";
+import { paginationSchema } from "../schemas";
 
 const list = publicProcedure
   .route({
@@ -13,12 +12,7 @@ const list = publicProcedure
     summary: "List All Assets",
     tags: ["Assets"],
   })
-  .input(
-    z.object({
-      limit: z.number().int().min(1).max(100).optional().default(10),
-      offset: z.number().int().min(0).optional().default(0),
-    }),
-  )
+  .input(paginationSchema)
   .output(z.array(assetSelectSchema))
   .handler(async ({ input, errors }) => {
     const assets = await db
@@ -70,17 +64,7 @@ const create = protectedProcedure
     summary: "Create a new asset",
     tags: ["Assets"],
   })
-  .input(
-    z.object({
-      name: z.string(),
-      code: z.string().optional(),
-      nup: z.string().optional(),
-      valueRp: z.number().min(0).optional(),
-      condition: z.string().optional(),
-      note: z.string().optional(),
-      acquiredAt: z.date().optional(),
-    }),
-  )
+  .input(assetInsertSchema.omit({ id: true, createdBy: true, createdAt: true }))
   .output(assetSelectSchema)
   .handler(async ({ input, errors, context }) => {
     const [newAsset] = await db

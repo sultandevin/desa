@@ -1,4 +1,5 @@
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { user } from "./auth";
 
 export const file = pgTable("file", {
@@ -10,4 +11,7 @@ export const file = pgTable("file", {
     .references(() => user.id),
   uploadedAt: timestamp("uploaded_at").defaultNow(),
 });
+
+export const fileSelectSchema = createSelectSchema(file);
+export const fileInsertSchema = createInsertSchema(file);
 

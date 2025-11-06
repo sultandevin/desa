@@ -7,6 +7,7 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
+import { createSelectSchema } from "drizzle-zod";
 import { asset } from "./asset";
 import { user } from "./auth";
 
@@ -25,3 +26,5 @@ export const assetHistory = pgTable("asset_audit", {
   userId: text("user_id").references(() => user.id),
   modifiedAt: timestamp("modified_at").notNull().defaultNow().notNull(),
 });
+
+export const assetHistorySelectSchema = createSelectSchema(assetHistory);

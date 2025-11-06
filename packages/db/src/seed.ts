@@ -13,8 +13,8 @@ async function main() {
 async function addDummyData() {
   const [userInstance] = await db.select().from(user).limit(1);
   if (!userInstance) {
-    console.log(
-      "[WARN] 'asset' table seeding failed due to no user instances found.",
+    console.error(
+      "Table 'asset' seed function failed due to no user instances found.",
     );
     return;
   }
@@ -29,7 +29,7 @@ async function addDummyData() {
       },
     },
   }));
-  console.log("[INFO] ✨ 'asset' table data successfully seeded!");
+  console.log("✨ 'asset' table data successfully seeded!");
 }
 
 async function addDummyRegData() {
@@ -39,8 +39,8 @@ async function addDummyRegData() {
     const [fileInstances] = await db.select().from(file);
 
     if (!userInstance) {
-      console.log(
-        "[WARN] 'regulation' table seeding failed due to no user instances found.",
+      console.error(
+        "Table 'regulation' data seed function failed due to no user instances found.",
       );
       return;
     }
@@ -56,7 +56,7 @@ async function addDummyRegData() {
         },
       },
     }));
-    console.log("[INFO] ✨ 'regulation' table data successfully seeded!");
+    console.log("✨ 'regulation' table data successfully seeded!");
   }
 }
 

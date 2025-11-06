@@ -8,6 +8,7 @@ import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { isForeignKeyError } from "@desa/db/lib/errors";
 import { ORPCError } from "@orpc/client";
+import { paginationSchema } from "../schemas";
 
 const list = publicProcedure
   .route({
@@ -16,12 +17,7 @@ const list = publicProcedure
     summary: "List All Damage Reports",
     tags: ["Damage Reports"],
   })
-  .input(
-    z.object({
-      limit: z.number().int().min(1).max(100).optional().default(10),
-      offset: z.number().int().min(0).optional().default(0),
-    }),
-  )
+  .input(paginationSchema)
   .output(z.array(damageReportSelectSchema))
   .handler(async ({ input, errors }) => {
     const reports = await db
