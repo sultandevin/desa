@@ -33,6 +33,7 @@
     "db:generate": "turbo -F @desa/db db:generate",
     "db:generate:auth": "bunx @better-auth/cli@latest generate --output ./packages/db/src/schema/auth.ts --config ./packages/auth/src/index.ts",
     "db:migrate": "turbo -F @desa/db db:migrate",
+    "db:seed": "turbo -F @desa/db db:seed",
     "db:start": "turbo -F @desa/db db:start",
     "db:watch": "turbo -F @desa/db db:watch",
     "db:stop": "turbo -F @desa/db db:stop",
