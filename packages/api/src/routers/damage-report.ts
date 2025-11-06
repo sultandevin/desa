@@ -74,16 +74,25 @@ const create = protectedProcedure
         .returning();
 
       if (!newReport) {
+        console.error("Failed to create Damage Report: No report returned");
         throw new ORPCError("BAD_REQUEST");
       }
 
       return newReport;
     } catch (err) {
       if (isForeignKeyError(err)) {
+        console.error(
+          "Failed to create Damage Report due to foreign key constraint:",
+          err,
+        );
         throw new ORPCError("BAD_REQUEST", {
           message: "Invalid foreign key reference",
         });
       }
+      console.error(
+        "Failed to create Damage Report due to unexpected error:",
+        err,
+      );
       throw new ORPCError("INTERNAL_SERVER_ERROR");
     }
   });

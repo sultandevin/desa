@@ -1,9 +1,17 @@
 import { db, eq } from "@desa/db";
-import { asset, assetInsertSchema, assetSelectSchema } from "@desa/db/schema/asset";
-import { damageReport, damageReportSelectSchema } from "@desa/db/schema/damage-report";
+import {
+  asset,
+  assetInsertSchema,
+  assetSelectSchema,
+} from "@desa/db/schema/asset";
+import {
+  damageReport,
+  damageReportSelectSchema,
+} from "@desa/db/schema/damage-report";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
+import { ORPCError } from "@orpc/client";
 
 const list = publicProcedure
   .route({
@@ -66,7 +74,7 @@ const create = protectedProcedure
   })
   .input(assetInsertSchema.omit({ id: true, createdBy: true, createdAt: true }))
   .output(assetSelectSchema)
-  .handler(async ({ input, errors, context }) => {
+  .handler(async ({ input, context }) => {
     const [newAsset] = await db
       .insert(asset)
       .values({
@@ -77,7 +85,7 @@ const create = protectedProcedure
       .returning();
 
     if (!newAsset) {
-      throw errors.NOT_FOUND();
+      throw new ORPCError("BAD_REQUEST");
     }
 
     return newAsset;
