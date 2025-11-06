@@ -1,14 +1,9 @@
-import {
-  pgTable,
-  text,
-  timestamp,
-  date,
-} from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, date, uuid } from "drizzle-orm/pg-core";
 import { user } from "./auth";
 import { file } from "./file";
 
-export const keputusan = pgTable("keputusan", {
-  id: text().primaryKey(),
+export const decision = pgTable("decision", {
+  id: uuid().primaryKey().defaultRandom(),
   number: text().notNull(),
   date: date().notNull(),
   regarding: text().notNull(),

@@ -41,28 +41,30 @@ async function addDummyRegData() {
     const [userInstances] = await db.select().from(user);
     const [fileInstances] = await db.select().from(file);
 
+    if (!userInstances) {
+      console.log(
+        "[WARN] 'regulation' table seeding failed due to no user instances found.",
+      );
+    }
+
     await reset(db, { regulation });
     await seed(db, { regulation }).refine((funcs) => ({
       regulation: {
         count: 100,
         columns: {
-          berlaku_sejak: funcs.date(),
-          created_by: funcs.valuesFromArray({ values: [userInstances?.id] }),
+          effectiveBy: funcs.date(),
+          createdBy: funcs.valuesFromArray({ values: [userInstances?.id] }),
           file: funcs.valuesFromArray({ values: [fileInstances?.id] }),
         },
       },
     }));
     console.log("[INFO] ✨ 'regulation' table data successfully seeded!");
-  } else {
-    console.log(
-      "[WARN] 'regulation' table seeding failed due to no user instances found.",
-    );
   }
 }
 
 if (process.env.NODE_ENV === "development") {
-  addDummyData().catch(console.error);
-  addDummyRegData().catch(console.error);
+  addDummyData();
+  // addDummyRegData();
 }
 
 export { eq } from "drizzle-orm";

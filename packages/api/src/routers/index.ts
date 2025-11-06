@@ -2,6 +2,7 @@ import { protectedProcedure, publicProcedure } from "../index";
 import type { RouterClient } from "@orpc/server";
 import { assetRouter } from "./asset";
 import { regulationRouter } from "./regulation";
+import { damageReportRouter } from "./damage-report";
 
 export const appRouter = {
   healthCheck: publicProcedure.handler(() => {
@@ -15,6 +16,7 @@ export const appRouter = {
   }),
   asset: assetRouter,
   regulation: regulationRouter,
+  damageReport: damageReportRouter,
 };
 
 export type AppRouter = typeof appRouter;

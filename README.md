@@ -73,8 +73,8 @@ desa/
 ## Available Scripts
 
 - `bun dev`: Start all applications in development mode
-- `bun build`: Build all applications
-- `bun check-types`: Check TypeScript types across all apps
+- `bun run build`: Build all applications
+- `bun db:start`: Start local database instance
 - `bun db:push`: Push schema changes to database
 - `bun db:studio`: Open database studio UI
 

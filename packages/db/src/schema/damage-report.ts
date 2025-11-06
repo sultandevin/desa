@@ -14,10 +14,12 @@ export const damageReport = pgTable("damage_report", {
     .notNull()
     .references(() => asset.id),
   description: text().notNull(),
-  status: damageStatusEnum(),
+  status: damageStatusEnum().notNull(),
   reportedBy: text("reported_by")
     .notNull()
     .references(() => user.id),
-  verifiedBy: text("verified_by").references(() => user.id),
+  verifiedBy: text("verified_by")
+    .references(() => user.id)
+    .notNull(),
   reportedAt: timestamp("reported_at").notNull().defaultNow(),
 });

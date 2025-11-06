@@ -2,8 +2,10 @@ import { createSelectSchema, db, eq } from "@desa/db";
 import { asset } from "@desa/db/schema/asset";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
+import { damageReportSelectSchema } from "./damage-report";
+import { damageReport } from "@desa/db/schema/damage-report";
 
-const assetSchema = createSelectSchema(asset, {
+export const assetSelectSchema = createSelectSchema(asset, {
   id: z.string(),
 });
 
@@ -20,7 +22,7 @@ const list = publicProcedure
       offset: z.number().int().min(0).optional().default(0),
     }),
   )
-  .output(z.array(assetSchema))
+  .output(z.array(assetSelectSchema))
   .handler(async ({ input, errors }) => {
     const assets = await db
       .select()
@@ -47,7 +49,7 @@ const find = publicProcedure
       id: z.string(),
     }),
   )
-  .output(assetSchema)
+  .output(assetSelectSchema)
   .handler(async ({ input, errors }) => {
     const id = input.id;
 
@@ -82,7 +84,7 @@ const create = protectedProcedure
       acquiredAt: z.date().optional(),
     }),
   )
-  .output(assetSchema)
+  .output(assetSelectSchema)
   .handler(async ({ input, errors, context }) => {
     const [newAsset] = await db
       .insert(asset)
@@ -132,9 +134,35 @@ const remove = protectedProcedure
     };
   });
 
+const listDamageReports = publicProcedure
+  .route({
+    method: "GET",
+    path: "/assets/{id}/damage-reports",
+    summary: "List Damage Reports related to an Asset",
+    tags: ["Assets", "Damage Reports"],
+  })
+  .input(
+    z.object({
+      id: z.string(),
+    }),
+  )
+  .output(damageReportSelectSchema)
+  .handler(async ({ input, errors }) => {
+    const [report] = await db
+      .select()
+      .from(damageReport)
+      .where(eq(damageReport.assetId, input.id))
+      .limit(1);
+
+    if (!report) throw errors.NOT_FOUND;
+
+    return report;
+  });
+
 export const assetRouter = {
   list,
   find,
   create,
   remove,
+  listDamageReports,
 };
