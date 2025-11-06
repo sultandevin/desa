@@ -1,6 +1,8 @@
 import { pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { asset } from "./asset";
 import { user } from "./auth";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import * as z from "zod";
 
 export const damageStatusEnum = pgEnum("damage_status", [
   "SEVERE",
@@ -18,8 +20,18 @@ export const damageReport = pgTable("damage_report", {
   reportedBy: text("reported_by")
     .notNull()
     .references(() => user.id),
-  verifiedBy: text("verified_by")
-    .references(() => user.id)
-    .notNull(),
-  reportedAt: timestamp("reported_at").notNull().defaultNow(),
+  verifiedBy: text("verified_by").references(() => user.id),
+  reportedAt: timestamp("reported_at").defaultNow().notNull(),
+});
+
+export const damageReportSelectSchema = createSelectSchema(damageReport, {
+  id: z.string(),
+  assetId: z.string(),
+});
+
+export const damageReportInsertSchema = createInsertSchema(damageReport).omit({
+  id: true,
+  verifiedBy: true,
+  reportedAt: true,
+  reportedBy: true,
 });

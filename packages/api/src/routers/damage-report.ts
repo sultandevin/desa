@@ -1,12 +1,13 @@
-import { createSelectSchema, db, eq } from "@desa/db";
-import { damageReport } from "@desa/db/schema/damage-report";
+import { db, eq } from "@desa/db";
+import {
+  damageReport,
+  damageReportInsertSchema,
+  damageReportSelectSchema,
+} from "@desa/db/schema/damage-report";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
-
-export const damageReportSelectSchema = createSelectSchema(damageReport, {
-  id: z.string(),
-  assetId: z.string(),
-});
+import { isForeignKeyError } from "@desa/db/lib/errors";
+import { ORPCError } from "@orpc/client";
 
 const list = publicProcedure
   .route({
@@ -57,14 +58,42 @@ const find = publicProcedure
     return report;
   });
 
-// const create = protectedProcedure.route({
-//   method: "POST",
-//   path: "/damage-reports",
-//   summary: "Create a new Damage Report for an Asset",
-//   tags: ["Damage Reports", "Assets"]
-// }).input().output
+const create = protectedProcedure
+  .route({
+    method: "POST",
+    path: "/damage-reports",
+    summary: "Create a new Damage Report for an Asset",
+    tags: ["Damage Reports", "Assets"],
+  })
+  .input(damageReportInsertSchema)
+  .output(damageReportSelectSchema)
+  .handler(async ({ input, context }) => {
+    try {
+      const [newReport] = await db
+        .insert(damageReport)
+        .values({
+          ...input,
+          reportedBy: context.session.user.id,
+        })
+        .returning();
+
+      if (!newReport) {
+        throw new ORPCError("BAD_REQUEST");
+      }
+
+      return newReport;
+    } catch (err) {
+      if (isForeignKeyError(err)) {
+        throw new ORPCError("BAD_REQUEST", {
+          message: "Invalid foreign key reference",
+        });
+      }
+      throw new ORPCError("INTERNAL_SERVER_ERROR");
+    }
+  });
 
 export const damageReportRouter = {
   list,
   find,
+  create,
 };

@@ -1,13 +1,10 @@
-import { createSelectSchema, db, eq } from "@desa/db";
+import { db, eq } from "@desa/db";
 import { asset } from "@desa/db/schema/asset";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
-import { damageReportSelectSchema } from "./damage-report";
+import { damageReportSelectSchema } from "@desa/db/schema/damage-report";
 import { damageReport } from "@desa/db/schema/damage-report";
-
-export const assetSelectSchema = createSelectSchema(asset, {
-  id: z.string(),
-});
+import { assetSelectSchema } from "@desa/db/schema/asset";
 
 const list = publicProcedure
   .route({

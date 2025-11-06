@@ -1,12 +1,8 @@
-import { createSelectSchema, db, eq } from "@desa/db";
-import { regulation } from "@desa/db/schema/regulation";
+import { db, eq } from "@desa/db";
+import { regulation, regulationSelectSchema } from "@desa/db/schema/regulation";
 import { file } from "@desa/db/schema/file";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
-
-const regulationSchema = createSelectSchema(regulation, {
-  id: z.string(),
-});
 
 const list = publicProcedure
   .route({
@@ -21,7 +17,7 @@ const list = publicProcedure
       offset: z.number().int().min(0).optional().default(0),
     }),
   )
-  .output(z.array(regulationSchema))
+  .output(z.array(regulationSelectSchema))
   .handler(async ({ input, errors }) => {
     const regulations = await db
       .select()
@@ -48,7 +44,7 @@ const find = publicProcedure
       id: z.string(),
     }),
   )
-  .output(regulationSchema)
+  .output(regulationSelectSchema)
   .handler(async ({ input, errors }) => {
     const id = input.id;
     const [regulationItem] = await db
@@ -80,7 +76,7 @@ const create = protectedProcedure
       effectiveBy: z.date().optional(),
     }),
   )
-  .output(regulationSchema)
+  .output(regulationSelectSchema)
   .handler(async ({ input, errors, context }) => {
     if (input.file) {
       const [fileExists] = await db

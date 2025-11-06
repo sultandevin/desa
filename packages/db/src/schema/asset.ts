@@ -9,6 +9,8 @@ import {
 import { user } from "./auth";
 import { sql } from "drizzle-orm";
 import { file } from "./file";
+import * as z from "zod";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const asset = pgTable(
   "asset",
@@ -34,3 +36,9 @@ export const asset = pgTable(
   },
   (t) => [check("price_check", sql`${t.valueRp} >= 0`)],
 );
+
+export const assetSelectSchema = createSelectSchema(asset, {
+  id: z.string(),
+});
+
+export const assetInsertSchema = createInsertSchema(asset);

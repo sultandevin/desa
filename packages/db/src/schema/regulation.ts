@@ -1,12 +1,8 @@
-import {
-  pgTable,
-  varchar,
-  text,
-  timestamp,
-  uuid,
-} from "drizzle-orm/pg-core";
+import { pgTable, varchar, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { user } from "./auth";
 import { file } from "./file";
+import * as z from "zod";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const regulation = pgTable("regulation", {
   id: uuid().primaryKey().defaultRandom(),
@@ -21,3 +17,9 @@ export const regulation = pgTable("regulation", {
     .references(() => user.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
+
+export const regulationSelectSchema = createSelectSchema(regulation, {
+  id: z.string(),
+});
+
+export const regulationInsertSchema = createInsertSchema(regulation);
