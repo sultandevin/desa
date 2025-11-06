@@ -1,8 +1,8 @@
 import { protectedProcedure, publicProcedure } from "../index";
 import type { RouterClient } from "@orpc/server";
 import { assetRouter } from "./asset";
-import { peraturanRouter } from "./peraturan";
-import { fileRouter } from "./peraturan";
+import { regulationRouter } from "./regulation";
+import { fileRouter } from "./regulation";
 
 export const appRouter = {
   healthCheck: publicProcedure.handler(() => {
@@ -15,7 +15,7 @@ export const appRouter = {
     };
   }),
   asset: assetRouter,
-  peraturan: peraturanRouter,
+  regulation: regulationRouter,
   file: fileRouter,
 };
 export type AppRouter = typeof appRouter;

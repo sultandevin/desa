@@ -1,9 +1,10 @@
 import { createSelectSchema, db, eq } from "@desa/db";
-import { peraturan, file } from "@desa/db/schema/peraturan";
+import { regulation } from "@desa/db/schema/regulation";
+import { file } from "@desa/db/schema/file";
 import * as z from "zod";
 import { publicProcedure } from "..";
 
-const peraturanSchema = createSelectSchema(peraturan, {
+const regulationSchema = createSelectSchema(regulation, {
   id: z.string(),
 });
 
@@ -24,11 +25,11 @@ const list = publicProcedure
       offset: z.number().int().min(0).optional().default(0),
     }),
   )
-  .output(z.array(peraturanSchema))
+  .output(z.array(regulationSchema))
   .handler(async ({ input, errors }) => {
     const regulations = await db
       .select()
-      .from(peraturan)
+      .from(regulation)
       .limit(input.limit)
       .offset(input.offset);
 
@@ -51,13 +52,13 @@ const find = publicProcedure
       id: z.string(),
     }),
   )
-  .output(peraturanSchema)
+  .output(regulationSchema)
   .handler(async ({ input, errors }) => {
     const id = input.id;
     const [regulationItem] = await db
       .select()
-      .from(peraturan)
-      .where(eq(peraturan.id, id))
+      .from(regulation)
+      .where(eq(regulation.id, id))
       .limit(1);
 
     if (!regulationItem) {
@@ -76,15 +77,15 @@ const create = publicProcedure // hapus line ini kalo auth udah siap
   })
   .input(
     z.object({
-      judul: z.string(),
-      nomor_peraturan: z.string(),
-      tingkat_peraturan: z.string(),
-      deskripsi: z.string().optional(),
+      title: z.string(),
+      number: z.string(),
+      level: z.string(),
+      description: z.string().optional(),
       file: z.string().optional(),
-      berlaku_sejak: z.string().optional(),
+      effectiveBy: z.string().optional(),
     }),
   )
-  .output(peraturanSchema)
+  .output(regulationSchema)
   .handler(async ({ input, errors }) => {
     if (input.file) {
       const [fileExists] = await db
@@ -96,13 +97,13 @@ const create = publicProcedure // hapus line ini kalo auth udah siap
       if (!fileExists) throw errors.NOT_FOUND({ message: "File not found" });
     }
     const [newRegulation] = await db
-      .insert(peraturan)
+      .insert(regulation)
       .values({
         ...input,
         id: crypto.randomUUID(),
-        //created_by: context.session.user.id,
-        created_by: crypto.randomUUID(), // hapus line ini kalo auth udah siap
-        created_at: new Date(),
+        //createdBy: context.session.user.id,
+        createdBy: crypto.randomUUID(), // hapus line ini kalo auth udah siap
+        createdAt: new Date(),
       })
       .returning();
     if (!newRegulation) {
@@ -122,15 +123,15 @@ const update = publicProcedure // hapus line ini kalo auth udah siap
   .input(
     z.object({
       id: z.string(),
-      judul: z.string().optional(),
-      nomor_peraturan: z.string().optional(),
-      tingkat_peraturan: z.string().optional(),
-      deskripsi: z.string().optional(),
+      title: z.string().optional(),
+      number: z.string().optional(),
+      level: z.string().optional(),
+      description: z.string().optional(),
       file: z.string().optional(),
-      berlaku_sejak: z.string().optional(),
+      effectiveBy: z.string().optional(),
     }),
   )
-  .output(peraturanSchema)
+  .output(regulationSchema)
   .handler(async ({ input, errors }) => {
     if (input.file) {
       const [fileExists] = await db
@@ -142,16 +143,16 @@ const update = publicProcedure // hapus line ini kalo auth udah siap
       if (!fileExists) throw errors.NOT_FOUND({ message: "File not found" });
     }
     const [updatedRegulation] = await db
-      .update(peraturan)
+      .update(regulation)
       .set({
-        judul: input.judul,
-        nomor_peraturan: input.nomor_peraturan,
-        tingkat_peraturan: input.tingkat_peraturan,
-        deskripsi: input.deskripsi,
+        title: input.title,
+        number: input.number,
+        level: input.level,
+        description: input.description,
         file: input.file,
-        berlaku_sejak: input.berlaku_sejak,
+        effectiveBy: input.effectiveBy,
       })
-      .where(eq(peraturan.id, input.id))
+      .where(eq(regulation.id, input.id))
       .returning();
 
     if (!updatedRegulation) {
@@ -172,8 +173,8 @@ const remove = publicProcedure // hapus line ini kalo auth udah siap
   .output(z.object({ message: z.string() }))
   .handler(async ({ input, errors }) => {
     const [deletedRegulation] = await db
-      .delete(peraturan)
-      .where(eq(peraturan.id, input.id))
+      .delete(regulation)
+      .where(eq(regulation.id, input.id))
       .returning();
 
     if (!deletedRegulation) {
@@ -189,13 +190,13 @@ const upload = publicProcedure // hapus line ini kalo auth udah siap
   .route({
     method: "POST",
     path: "/files/upload",
-    summary: "Upload file peraturan",
+    summary: "Upload file regulation",
     tags: ["File"],
   })
   .input(
     z.object({
-      nama_file: z.string(),
-      file_path: z.string(),
+      name: z.string(),
+      path: z.string(),
     }),
   )
   .output(fileSchema)
@@ -218,7 +219,7 @@ const upload = publicProcedure // hapus line ini kalo auth udah siap
     return uploadedFile;
   });
 
-export const peraturanRouter = {
+export const regulationRouter = {
   list,
   find,
   create,
