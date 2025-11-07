@@ -17,10 +17,14 @@ export const assetRemovalRequest = pgTable("asset_removal_request", {
     .notNull(),
   reason: text().notNull(),
   status: statusEnum(),
-  decisionLetter: text("decision_letter").references(() => file.id),
-  reportedBy: text("reported_by").references(() => user.id).notNull(),
+  decisionLetter: uuid("decision_letter").references(() => file.id),
+  reportedBy: text("reported_by")
+    .references(() => user.id)
+    .notNull(),
   decidedBy: text("decided_by").references(() => user.id),
 });
 
-export const assetRemovalRequestSelectSchema = createSelectSchema(assetRemovalRequest);
-export const assetRemovalRequestInsertSchema = createInsertSchema(assetRemovalRequest);
+export const assetRemovalRequestSelectSchema =
+  createSelectSchema(assetRemovalRequest);
+export const assetRemovalRequestInsertSchema =
+  createInsertSchema(assetRemovalRequest);
