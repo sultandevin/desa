@@ -1,9 +1,9 @@
 "use client";
+import { useQuery } from "@tanstack/react-query";
+import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/data-table";
 import { orpc } from "@/utils/orpc";
-import type { ColumnDef } from "@tanstack/react-table";
 import { DashboardSection } from "../../components/dashboard";
-import { useQuery } from "@tanstack/react-query";
 
 const AssetTable = () => {
   const assets = useQuery(

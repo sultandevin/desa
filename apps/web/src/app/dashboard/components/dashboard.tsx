@@ -22,7 +22,7 @@ const DashboardTitle = (props: {
   className?: string;
   children: React.ReactNode;
 }) => (
-  <h1 className={cn("text-2xl font-bold", props.className)}>
+  <h1 className={cn("font-bold text-2xl", props.className)}>
     {props.children}
   </h1>
 );
@@ -42,7 +42,7 @@ const DashboardSection = (props: {
 }) => (
   <section
     className={cn(
-      "*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card flex flex-col gap-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:shadow-xs",
+      "flex flex-col gap-4 *:data-[slot=card]:bg-linear-to-t *:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card *:data-[slot=card]:shadow-xs dark:*:data-[slot=card]:bg-card",
       props.className,
     )}
   >

@@ -8,10 +8,10 @@ import {
   damageReport,
   damageReportSelectSchema,
 } from "@desa/db/schema/damage-report";
+import { ORPCError } from "@orpc/client";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
-import { ORPCError } from "@orpc/client";
 
 const list = publicProcedure
   .route({
@@ -119,7 +119,7 @@ const remove = protectedProcedure
     }
 
     return {
-      message: "Successfully deleted asset with ID " + deletedAsset.id,
+      message: `Successfully deleted asset with ID ${deletedAsset.id}`,
     };
   });
 

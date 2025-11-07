@@ -1,9 +1,9 @@
 import { reset, seed } from "drizzle-seed";
+import { db } from ".";
 import { asset } from "./schema/asset";
 import { user } from "./schema/auth";
-import { regulation } from "./schema/regulation";
 import { file } from "./schema/file";
-import { db } from ".";
+import { regulation } from "./schema/regulation";
 
 async function main() {
   await addDummyData();

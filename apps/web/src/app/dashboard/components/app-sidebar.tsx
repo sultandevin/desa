@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  Bot,
+  Home,
+  MessageCircleWarning,
+  Skull,
+  SquareTerminal,
+  SquareTerminalIcon,
+  Text,
+} from "lucide-react";
+import type * as React from "react";
 import { NavMain } from "@/app/dashboard/components/nav-main";
 import { NavOthers } from "@/app/dashboard/components/nav-others";
 import { NavUser } from "@/app/dashboard/components/nav-user";
@@ -13,18 +23,6 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import {
-  Bot,
-  BotIcon,
-  Home,
-  MessageCircleWarning,
-  Skull,
-  SquareTerminal,
-  SquareTerminalIcon,
-  Text,
-} from "lucide-react";
-import { title } from "process";
-import * as React from "react";
 
 const data = {
   navMain: [
@@ -64,7 +62,7 @@ const data = {
       ],
     },
     {
-      title: "peraturan di Desa",
+      title: "Peraturan",
       items: [
         {
           title: "Peraturan Desa",
@@ -93,7 +91,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <Skull className="size-4" />
               </div>
 

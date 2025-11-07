@@ -70,12 +70,8 @@
           "name": "asset_audit_assest_id_asset_id_fk",
           "tableFrom": "asset_audit",
           "tableTo": "asset",
-          "columnsFrom": [
-            "assest_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["assest_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -83,12 +79,8 @@
           "name": "asset_audit_user_id_user_id_fk",
           "tableFrom": "asset_audit",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -154,12 +146,8 @@
           "name": "asset_removal_request_assetId_asset_id_fk",
           "tableFrom": "asset_removal_request",
           "tableTo": "asset",
-          "columnsFrom": [
-            "assetId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["assetId"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -167,12 +155,8 @@
           "name": "asset_removal_request_decision_letter_file_id_fk",
           "tableFrom": "asset_removal_request",
           "tableTo": "file",
-          "columnsFrom": [
-            "decision_letter"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["decision_letter"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -180,12 +164,8 @@
           "name": "asset_removal_request_reported_by_user_id_fk",
           "tableFrom": "asset_removal_request",
           "tableTo": "user",
-          "columnsFrom": [
-            "reported_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["reported_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -193,12 +173,8 @@
           "name": "asset_removal_request_decided_by_user_id_fk",
           "tableFrom": "asset_removal_request",
           "tableTo": "user",
-          "columnsFrom": [
-            "decided_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["decided_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -313,12 +289,8 @@
           "name": "asset_proof_of_ownership_file_id_fk",
           "tableFrom": "asset",
           "tableTo": "file",
-          "columnsFrom": [
-            "proof_of_ownership"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["proof_of_ownership"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -326,12 +298,8 @@
           "name": "asset_created_by_user_id_fk",
           "tableFrom": "asset",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -437,12 +405,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -513,12 +477,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -528,9 +488,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -594,9 +552,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -710,12 +666,8 @@
           "name": "damage_report_asset_id_asset_id_fk",
           "tableFrom": "damage_report",
           "tableTo": "asset",
-          "columnsFrom": [
-            "asset_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["asset_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -723,12 +675,8 @@
           "name": "damage_report_reported_by_user_id_fk",
           "tableFrom": "damage_report",
           "tableTo": "user",
-          "columnsFrom": [
-            "reported_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["reported_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -736,12 +684,8 @@
           "name": "damage_report_verified_by_user_id_fk",
           "tableFrom": "damage_report",
           "tableTo": "user",
-          "columnsFrom": [
-            "verified_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["verified_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -830,12 +774,8 @@
           "name": "keputusan_file_file_id_fk",
           "tableFrom": "keputusan",
           "tableTo": "file",
-          "columnsFrom": [
-            "file"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["file"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -843,12 +783,8 @@
           "name": "keputusan_created_by_user_id_fk",
           "tableFrom": "keputusan",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -901,12 +837,8 @@
           "name": "file_uploaded_by_user_id_fk",
           "tableFrom": "file",
           "tableTo": "user",
-          "columnsFrom": [
-            "uploaded_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["uploaded_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -983,12 +915,8 @@
           "name": "regulation_file_file_id_fk",
           "tableFrom": "regulation",
           "tableTo": "file",
-          "columnsFrom": [
-            "file"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["file"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -996,12 +924,8 @@
           "name": "regulation_created_by_user_id_fk",
           "tableFrom": "regulation",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1017,29 +941,17 @@
     "public.transaction": {
       "name": "transaction",
       "schema": "public",
-      "values": [
-        "INSERT",
-        "UPDATE",
-        "DELETE"
-      ]
+      "values": ["INSERT", "UPDATE", "DELETE"]
     },
     "public.asset_removal_status": {
       "name": "asset_removal_status",
       "schema": "public",
-      "values": [
-        "PENDING",
-        "APPROVED",
-        "REJECTED"
-      ]
+      "values": ["PENDING", "APPROVED", "REJECTED"]
     },
     "public.damage_status": {
       "name": "damage_status",
       "schema": "public",
-      "values": [
-        "SEVERE",
-        "MILD",
-        "MINIMAL"
-      ]
+      "values": ["SEVERE", "MILD", "MINIMAL"]
     }
   },
   "schemas": {},

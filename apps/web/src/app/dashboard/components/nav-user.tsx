@@ -1,3 +1,13 @@
+import {
+  Check,
+  EllipsisVertical,
+  LogOut,
+  Monitor,
+  Moon,
+  Sun,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -15,16 +25,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
-import {
-  Check,
-  EllipsisVertical,
-  LogOut,
-  Monitor,
-  Moon,
-  Sun,
-} from "lucide-react";
-import { useTheme } from "next-themes";
-import { useRouter } from "next/navigation";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
@@ -94,21 +94,21 @@ export function NavUser() {
                 <Sun />
                 Light
                 {theme === "light" && (
-                  <Check className="text-primary ml-auto size-4" />
+                  <Check className="ml-auto size-4 text-primary" />
                 )}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme("dark")}>
                 <Moon />
                 Dark
                 {theme === "dark" && (
-                  <Check className="text-primary ml-auto size-4" />
+                  <Check className="ml-auto size-4 text-primary" />
                 )}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme("system")}>
                 <Monitor />
                 System
                 {theme === "system" && (
-                  <Check className="text-primary ml-auto size-4" />
+                  <Check className="ml-auto size-4 text-primary" />
                 )}
               </DropdownMenuItem>
             </DropdownMenuGroup>

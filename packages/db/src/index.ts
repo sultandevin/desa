@@ -9,5 +9,5 @@ export const db = drizzle({
   },
 });
 
-export { eq, DrizzleQueryError, DrizzleError } from "drizzle-orm";
+export { DrizzleError, DrizzleQueryError, eq } from "drizzle-orm";
 export { DatabaseError } from "pg";

@@ -14,4 +14,3 @@ export const file = pgTable("file", {
 
 export const fileSelectSchema = createSelectSchema(file);
 export const fileInsertSchema = createInsertSchema(file);
-

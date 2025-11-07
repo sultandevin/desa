@@ -1,5 +1,10 @@
 "use client";
-import { cn } from "@/lib/utils";
+import { useForm } from "@tanstack/react-form";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import * as z from "zod";
+import Loader from "@/components/loader";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -9,13 +14,8 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useForm } from "@tanstack/react-form";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import * as z from "zod";
-import Link from "next/link";
-import Loader from "@/components/loader";
+import { cn } from "@/lib/utils";
 
 export function LoginForm({
   className,
@@ -49,7 +49,9 @@ export function LoginForm({
     validators: {
       onSubmit: z.object({
         email: z.email("Alamat email tidak valid"),
-        password: z.string().min(8, "Password harus terdiri dari minimal 8 karakter"),
+        password: z
+          .string()
+          .min(8, "Password harus terdiri dari minimal 8 karakter"),
       }),
     },
   });
@@ -70,8 +72,8 @@ export function LoginForm({
     >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
-          <h1 className="text-2xl font-bold">Login to your account</h1>
-          <p className="text-muted-foreground text-sm text-balance">
+          <h1 className="font-bold text-2xl">Login to your account</h1>
+          <p className="text-balance text-muted-foreground text-sm">
             Enter your email below to login to your account
           </p>
         </div>

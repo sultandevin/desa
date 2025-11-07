@@ -6,7 +6,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-
+import { Search } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -22,7 +22,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "./ui/empty";
-import { Search } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

@@ -1,3 +1,5 @@
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetClose,
@@ -14,8 +16,6 @@ import {
   DashboardTitle,
 } from "../components/dashboard";
 import AssetTable from "./components/asset-table";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 export default function AssetsPage() {
   return (

@@ -1,5 +1,8 @@
-import { Card } from "@/components/ui/card";
+import { auth } from "@desa/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { Card } from "@/components/ui/card";
 import Client from "./components/client";
 import {
   Dashboard,
@@ -9,9 +12,6 @@ import {
   DashboardTitle,
 } from "./components/dashboard";
 import Server from "./components/server";
-import { auth } from "@desa/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({

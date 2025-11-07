@@ -1,8 +1,8 @@
-import { pgTable, varchar, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import * as z from "zod";
 import { user } from "./auth";
 import { file } from "./file";
-import * as z from "zod";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 export const regulation = pgTable("regulation", {
   id: uuid().primaryKey().defaultRandom(),

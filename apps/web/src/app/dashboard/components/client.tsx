@@ -1,5 +1,7 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import { LoaderCircle, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,8 +12,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { orpc } from "@/utils/orpc";
-import { useQuery } from "@tanstack/react-query";
-import { LoaderCircle, RotateCcw } from "lucide-react";
 
 const Client = () => {
   const data = useQuery(

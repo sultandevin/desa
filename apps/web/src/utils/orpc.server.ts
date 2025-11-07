@@ -1,8 +1,8 @@
 import "server-only";
 
-import { createRouterClient } from "@orpc/server";
 import { appRouter } from "@desa/api/routers/index";
 import { auth } from "@desa/auth";
+import { createRouterClient } from "@orpc/server";
 import { headers } from "next/headers";
 
 globalThis.$client = createRouterClient(appRouter, {

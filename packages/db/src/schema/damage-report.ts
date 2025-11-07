@@ -1,8 +1,8 @@
 import { pgEnum, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
-import { asset } from "./asset";
-import { user } from "./auth";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import * as z from "zod";
+import { asset } from "./asset";
+import { user } from "./auth";
 
 export const damageStatusEnum = pgEnum("damage_status", [
   "SEVERE",

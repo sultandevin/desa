@@ -1,6 +1,10 @@
 import { db, eq } from "@desa/db";
-import { regulation, regulationInsertSchema, regulationSelectSchema } from "@desa/db/schema/regulation";
 import { file } from "@desa/db/schema/file";
+import {
+  regulation,
+  regulationInsertSchema,
+  regulationSelectSchema,
+} from "@desa/db/schema/regulation";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
@@ -62,7 +66,9 @@ const create = protectedProcedure
     summary: "Create a new regulation",
     tags: ["Regulations"],
   })
-  .input(regulationInsertSchema.omit({ id: true, createdBy: true, createdAt: true }))
+  .input(
+    regulationInsertSchema.omit({ id: true, createdBy: true, createdAt: true }),
+  )
   .output(regulationSelectSchema)
   .handler(async ({ input, errors, context }) => {
     if (input.file) {
@@ -95,7 +101,12 @@ const update = publicProcedure // hapus line ini kalo auth udah siap
     summary: "Update regulation by ID",
     tags: ["Regulations"],
   })
-  .input(regulationInsertSchema.omit({ createdBy: true, createdAt: true }).partial().required({ id: true }))
+  .input(
+    regulationInsertSchema
+      .omit({ createdBy: true, createdAt: true })
+      .partial()
+      .required({ id: true }),
+  )
   .output(regulationSelectSchema)
   .handler(async ({ input, errors }) => {
     if (input.file) {
@@ -145,7 +156,6 @@ const remove = publicProcedure // hapus line ini kalo auth udah siap
     };
   });
 
-
 export const regulationRouter = {
   list,
   find,
@@ -153,4 +163,3 @@ export const regulationRouter = {
   update,
   remove,
 };
-

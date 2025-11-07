@@ -1,5 +1,5 @@
-import { DatabaseError } from "pg";
 import { DrizzleQueryError } from "drizzle-orm";
+import { DatabaseError } from "pg";
 
 export const isUniqueConstraintError = (error: unknown): boolean => {
   /** https://github.com/porsager/postgres/pull/901 */

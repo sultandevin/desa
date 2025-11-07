@@ -1,8 +1,8 @@
 import { pgEnum, pgTable, text, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { asset } from "./asset";
-import { file } from "./file";
 import { user } from "./auth";
+import { file } from "./file";
 
 export const statusEnum = pgEnum("asset_removal_status", [
   "PENDING",

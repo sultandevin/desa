@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import Loader from "@/components/loader";
 import {
   Dashboard,
   DashboardDescription,
@@ -6,7 +7,6 @@ import {
   DashboardTitle,
 } from "../components/dashboard";
 import PeraturanTable from "./components/peraturan-table";
-import Loader from "@/components/loader";
 
 export default function AssetsPage() {
   return (

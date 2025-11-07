@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, date, uuid } from "drizzle-orm/pg-core";
+import { date, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { user } from "./auth";
 import { file } from "./file";

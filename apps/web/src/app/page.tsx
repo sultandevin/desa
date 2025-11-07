@@ -1,9 +1,9 @@
+import Link from "next/link";
 import { Suspense } from "react";
-import ApiStatusClient from "./components/api-status-client";
-import ApiStatusServer from "./components/api-status-server";
 import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import ApiStatusClient from "./components/api-status-client";
+import ApiStatusServer from "./components/api-status-server";
 
 const TITLE_TEXT = `
 

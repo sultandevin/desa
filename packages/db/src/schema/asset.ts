@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   check,
   decimal,
@@ -6,11 +7,10 @@ import {
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
-import { user } from "./auth";
-import { sql } from "drizzle-orm";
-import { file } from "./file";
-import * as z from "zod";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import * as z from "zod";
+import { user } from "./auth";
+import { file } from "./file";
 
 export const asset = pgTable(
   "asset",

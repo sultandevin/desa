@@ -9,12 +9,8 @@
   "orm": "drizzle",
   "backend": "self",
   "runtime": "none",
-  "frontend": [
-    "next"
-  ],
-  "addons": [
-    "turborepo"
-  ],
+  "frontend": ["next"],
+  "addons": ["turborepo"],
   "examples": [],
   "auth": "better-auth",
   "packageManager": "bun",
