@@ -7,7 +7,7 @@ import { regulation } from "./schema/regulation";
 
 async function main() {
   await addDummyData();
-  await addDummyRegData();
+  // await addDummyRegData();
 }
 
 async function addDummyData() {
@@ -19,7 +19,6 @@ async function addDummyData() {
     return;
   }
 
-  await reset(db, { asset });
   await seed(db, { asset }).refine((funcs) => ({
     asset: {
       count: 100,

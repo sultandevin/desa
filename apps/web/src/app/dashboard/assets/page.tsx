@@ -6,6 +6,8 @@ import {
   SheetContent,
   SheetFooter,
   SheetHeader,
+  SheetInnerContent,
+  SheetInnerSection,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
@@ -38,7 +40,10 @@ export default function AssetsPage() {
           <SheetHeader>
             <SheetTitle>Tambah Aset Baru</SheetTitle>
           </SheetHeader>
-          <div className="p-4 font-normal">content here later</div>
+          <SheetInnerContent>
+            <SheetInnerSection>form goes ehre</SheetInnerSection>
+            <SheetInnerSection>more component form goes here</SheetInnerSection>
+          </SheetInnerContent>
           <SheetFooter className="grid grid-cols-1 border-t sm:grid-cols-2">
             <Button>
               <Plus />
