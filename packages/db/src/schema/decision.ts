@@ -12,7 +12,7 @@ export const decision = pgTable("decision", {
   reportNumber: text("report_number").notNull(),
   reportDate: date("report_date").notNull(),
   notes: text("notes"),
-  file: text("file").references(() => file.id),
+  file: uuid("file").references(() => file.id),
   createdBy: text("created_by")
     .notNull()
     .references(() => user.id),

@@ -10,7 +10,7 @@ export const regulation = pgTable("regulation", {
   number: varchar().notNull(),
   level: varchar().notNull(),
   description: text(),
-  file: text().references(() => file.id),
+  file: uuid().references(() => file.id),
   effectiveBy: timestamp("effective_by"),
   createdBy: text("created_by")
     .notNull()
