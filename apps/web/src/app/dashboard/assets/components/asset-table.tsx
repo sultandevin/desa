@@ -35,7 +35,7 @@ const AssetTable = () => {
   ];
 
   return (
-    <DashboardSection className="">
+    <>
       {assets.isPending ? (
         <>
           <Skeleton className="h-8 w-full" />
@@ -45,7 +45,7 @@ const AssetTable = () => {
       ) : (
         <DataTable columns={columns} data={assets.data ?? []} />
       )}
-    </DashboardSection>
+    </>
   );
 };
 
