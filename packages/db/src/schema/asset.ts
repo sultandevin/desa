@@ -32,7 +32,9 @@ export const asset = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
     deletedAt: timestamp("deleted_at"),
-    createdBy: text("created_by").references(() => user.id),
+    createdBy: text("created_by")
+      .references(() => user.id)
+      .notNull(),
   },
   (t) => [check("price_check", sql`${t.valueRp} >= 0`)],
 );
@@ -41,4 +43,11 @@ export const assetSelectSchema = createSelectSchema(asset, {
   id: z.string(),
 });
 
-export const assetInsertSchema = createInsertSchema(asset);
+export const assetInsertSchema = createInsertSchema(asset).omit({
+  id: true,
+  proofOfOwnership: true,
+  createdBy: true,
+  createdAt: true,
+  updatedAt: true,
+  deletedAt: true,
+});

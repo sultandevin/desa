@@ -1,4 +1,5 @@
-import { db, eq } from "@desa/db";
+import { db, desc, eq } from "@desa/db";
+import { isForeignKeyError } from "@desa/db/lib/errors";
 import {
   asset,
   assetInsertSchema,
@@ -27,7 +28,8 @@ const list = publicProcedure
       .select()
       .from(asset)
       .limit(input.limit)
-      .offset(input.offset);
+      .offset(input.offset)
+      .orderBy(desc(asset.updatedAt));
 
     if (!assets) {
       throw errors.NOT_FOUND();
@@ -72,23 +74,33 @@ const create = protectedProcedure
     summary: "Create a new asset",
     tags: ["Assets"],
   })
-  .input(assetInsertSchema.omit({ id: true, createdBy: true, createdAt: true }))
+  .input(assetInsertSchema)
   .output(assetSelectSchema)
   .handler(async ({ input, context }) => {
-    const [newAsset] = await db
-      .insert(asset)
-      .values({
-        ...input,
-        valueRp: input.valueRp?.toString(),
-        createdBy: context.session.user.id,
-      })
-      .returning();
+    try {
+      const [newAsset] = await db
+        .insert(asset)
+        .values({
+          ...input,
+          valueRp:
+            input.valueRp && input.valueRp.trim() !== ""
+              ? input.valueRp.toString()
+              : null,
+          proofOfOwnership: input.proofOfOwnership || null,
+          createdBy: context.session.user.id,
+        })
+        .returning();
 
-    if (!newAsset) {
-      throw new ORPCError("BAD_REQUEST");
+      if (!newAsset) {
+        throw new ORPCError("BAD_REQUEST");
+      }
+
+      return newAsset;
+    } catch (err) {
+      if (isForeignKeyError(err)) throw new ORPCError("UNAUTHORIZED");
+      console.error("Asset creation error:", err);
+      throw new ORPCError("INTERNAL_SERVER_ERROR");
     }
-
-    return newAsset;
   });
 
 const remove = protectedProcedure

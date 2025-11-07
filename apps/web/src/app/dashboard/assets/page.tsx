@@ -6,8 +6,6 @@ import {
   SheetContent,
   SheetFooter,
   SheetHeader,
-  SheetInnerContent,
-  SheetInnerSection,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
@@ -18,6 +16,7 @@ import {
   DashboardTitle,
 } from "../components/dashboard";
 import AssetTable from "./components/asset-table";
+import { AssetCreateForm } from "./components/asset-create-form";
 
 export default function AssetsPage() {
   return (
@@ -40,19 +39,7 @@ export default function AssetsPage() {
           <SheetHeader>
             <SheetTitle>Tambah Aset Baru</SheetTitle>
           </SheetHeader>
-          <SheetInnerContent>
-            <SheetInnerSection>form goes ehre</SheetInnerSection>
-            <SheetInnerSection>more component form goes here</SheetInnerSection>
-          </SheetInnerContent>
-          <SheetFooter className="grid grid-cols-1 border-t sm:grid-cols-2">
-            <Button>
-              <Plus />
-              Tambah
-            </Button>
-            <SheetClose asChild>
-              <Button variant={`outline`}>Tutup</Button>
-            </SheetClose>
-          </SheetFooter>
+          <AssetCreateForm />
         </SheetContent>
       </Sheet>
 

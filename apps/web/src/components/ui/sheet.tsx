@@ -57,7 +57,7 @@ function SheetContent({
       <SheetPrimitive.Content
         data-slot="sheet-content"
         className={cn(
-          "fixed z-50 flex flex-col gap-4 bg-background shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:duration-300 data-[state=open]:duration-500",
+          "fixed z-50 flex h-full flex-col bg-background shadow-lg transition ease-in-out data-[state=closed]:animate-out data-[state=open]:animate-in data-[state=closed]:duration-300 data-[state=open]:duration-500",
           side === "right" &&
           "data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right inset-y-0 right-0 h-full w-full border-l sm:max-w-xl",
           side === "left" &&
@@ -100,7 +100,10 @@ function SheetInnerContent({
   return (
     <div
       data-slot="sheet-inner-content"
-      className={cn("flex flex-1 flex-col overflow-y-auto", className)}
+      className={cn(
+        "flex h-full max-h-full flex-col overflow-y-auto",
+        className,
+      )}
       {...props}
     />
   );
@@ -113,7 +116,7 @@ function SheetInnerSection({
   return (
     <div
       data-slot="sheet-inner-section"
-      className={cn("border-b p-4", className)}
+      className={cn("flex flex-col gap-4 border-b p-4", className)}
       {...props}
     />
   );

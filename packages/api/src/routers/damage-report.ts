@@ -58,8 +58,8 @@ const create = protectedProcedure
   .route({
     method: "POST",
     path: "/damage-reports",
-    summary: "Create a new Damage Report for an Asset",
-    tags: ["Damage Reports", "Assets"],
+    summary: "Create a new Damage Report",
+    tags: ["Damage Reports"],
   })
   .input(damageReportInsertSchema)
   .output(damageReportSelectSchema)
