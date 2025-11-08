@@ -1,15 +1,6 @@
 import { auth } from "@desa/auth";
-import { Plus } from "lucide-react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import {
   Dashboard,
   DashboardDescription,
@@ -17,7 +8,6 @@ import {
   DashboardSection,
   DashboardTitle,
 } from "../components/dashboard";
-import { AssetCreateForm } from "./components/asset-create-form";
 import AssetTable from "./components/asset-table";
 
 export default async function AssetsPage() {
@@ -39,21 +29,6 @@ export default async function AssetsPage() {
       </DashboardHeader>
 
       <DashboardSection>
-        <Sheet>
-          <SheetTrigger asChild className="ml-auto">
-            <Button size={`sm`}>
-              <Plus />
-              Tambah
-            </Button>
-          </SheetTrigger>
-          <SheetContent className="overflow-y-auto">
-            <SheetHeader>
-              <SheetTitle>Tambah Aset Baru</SheetTitle>
-            </SheetHeader>
-            <AssetCreateForm />
-          </SheetContent>
-        </Sheet>
-
         <AssetTable />
       </DashboardSection>
     </Dashboard>

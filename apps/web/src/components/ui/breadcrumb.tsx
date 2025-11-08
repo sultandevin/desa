@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/a11y/useFocusableInteractive: shadcn defaults */
+/** biome-ignore-all lint/a11y/useSemanticElements: shadcn defaults */
 import { Slot } from "@radix-ui/react-slot";
 import { ChevronRight, MoreHorizontal } from "lucide-react";
 import type * as React from "react";
@@ -13,7 +15,7 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
     <ol
       data-slot="breadcrumb-list"
       className={cn(
-        "flex flex-wrap items-center gap-1.5 break-words text-muted-foreground text-sm sm:gap-2.5",
+        "wrap-break-word flex flex-wrap items-center gap-1.5 text-muted-foreground text-sm sm:gap-2.5",
         className,
       )}
       {...props}
