@@ -80,7 +80,13 @@ const create = protectedProcedure
   })
   .input(
     assetInsertSchema.extend({
-      name: z.string().min(3, "Name must be at least 3 characters long"),
+      name: z.string().min(3, "Nama aset minimal 3 karakter"),
+      code: z.string().min(3, "Kode aset minimal 3 karakter").optional(),
+      nup: z.string().min(3, "Kode aset minimal 3 karakter").optional(),
+      valueRp: z
+        .number()
+        .min(0, "Nilai aset harus lebih dari atau sama dengan 0")
+        .optional(),
     }),
   )
   .output(assetSelectSchema)
@@ -90,6 +96,7 @@ const create = protectedProcedure
         .insert(asset)
         .values({
           ...input,
+          valueRp: input.valueRp ? String(input.valueRp) : null,
           createdBy: context.session.user.id,
         })
         .returning();

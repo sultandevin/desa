@@ -4,7 +4,6 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { Loader, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -46,30 +45,17 @@ const AssetCreateForm = () => {
       valueRp: 0,
       acquiredAt: new Date().toISOString().split("T")[0],
     },
-    validators: {
-      onSubmit: z.object({
-        name: z.string().min(3, "Nama aset minimal 3 karakter"),
-        code: z.string(),
-        nup: z.string(),
-        brandType: z.string(),
-        condition: z.string(),
-        status: z.string(),
-        note: z.string(),
-        valueRp: z.number(),
-        acquiredAt: z.string(),
-      }),
-    },
-    onSubmit: async ({ value }) => {
+    onSubmit: ({ value }) => {
       assetMutation.mutate({
         name: value.name,
-        code: value.code || undefined,
-        nup: value.nup || undefined,
-        brandType: value.brandType || undefined,
-        condition: value.condition || undefined,
-        status: value.status || undefined,
-        valueRp: value.valueRp ? String(value.valueRp) : undefined,
-        note: value.note || undefined,
-        acquiredAt: value.acquiredAt ? new Date(value.acquiredAt) : undefined,
+        code: value.code || null,
+        nup: value.nup || null,
+        brandType: value.brandType || null,
+        condition: value.condition || null,
+        status: value.status || null,
+        valueRp: value.valueRp ? String(value.valueRp) : null,
+        note: value.note || null,
+        acquiredAt: value.acquiredAt ? new Date(value.acquiredAt) : null,
       });
     },
   });
@@ -84,8 +70,9 @@ const AssetCreateForm = () => {
     >
       <SheetInnerContent className="min-w-0 flex-1 overflow-y-auto">
         <SheetInnerSection>
-          <form.Field name="name">
-            {(field) => {
+          <form.Field
+            name="name"
+            children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
@@ -108,9 +95,10 @@ const AssetCreateForm = () => {
                 </Field>
               );
             }}
-          </form.Field>
-          <form.Field name="nup">
-            {(field) => {
+          />
+          <form.Field
+            name="nup"
+            children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
@@ -130,10 +118,11 @@ const AssetCreateForm = () => {
                 </Field>
               );
             }}
-          </form.Field>
+          />
 
-          <form.Field name="code">
-            {(field) => {
+          <form.Field
+            name="code"
+            children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
@@ -153,10 +142,11 @@ const AssetCreateForm = () => {
                 </Field>
               );
             }}
-          </form.Field>
+          />
 
-          <form.Field name="brandType">
-            {(field) => {
+          <form.Field
+            name="brandType"
+            children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
@@ -176,11 +166,12 @@ const AssetCreateForm = () => {
                 </Field>
               );
             }}
-          </form.Field>
+          />
         </SheetInnerSection>
         <SheetInnerSection>
-          <form.Field name="condition">
-            {(field) => {
+          <form.Field
+            name="condition"
+            children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
@@ -206,10 +197,11 @@ const AssetCreateForm = () => {
                 </Field>
               );
             }}
-          </form.Field>
+          />
 
-          <form.Field name="valueRp">
-            {(field) => {
+          <form.Field
+            name="valueRp"
+            children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
@@ -233,10 +225,11 @@ const AssetCreateForm = () => {
                 </Field>
               );
             }}
-          </form.Field>
+          />
 
-          <form.Field name="acquiredAt">
-            {(field) => {
+          <form.Field
+            name="acquiredAt"
+            children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
@@ -257,10 +250,11 @@ const AssetCreateForm = () => {
                 </Field>
               );
             }}
-          </form.Field>
+          />
 
-          <form.Field name="note">
-            {(field) => {
+          <form.Field
+            name="note"
+            children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
@@ -283,7 +277,7 @@ const AssetCreateForm = () => {
                 </Field>
               );
             }}
-          </form.Field>
+          />
         </SheetInnerSection>
       </SheetInnerContent>
 
