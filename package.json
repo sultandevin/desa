@@ -8,7 +8,7 @@
       "packages/*"
     ],
     "catalog": {
-      "next": "16.0.0",
+      "next": "^16.0.1",
       "zod": "^4.1.12",
       "@orpc/server": "^1.10.0",
       "@orpc/client": "^1.10.0",
@@ -39,9 +39,9 @@
     "db:stop": "turbo -F @desa/db db:stop",
     "db:down": "turbo -F @desa/db db:down",
     "db:down:v": "turbo -F @desa/db db:down:v",
-    "lint": "bun run biome lint",
-    "format": "bun run biome format --write",
-    "format:check": "bun run biome check --write"
+    "lint": "biome lint",
+    "format": "biome format --write",
+    "format:check": "biome check --write"
   },
   "dependencies": {
     "dotenv": "^17.2.2",

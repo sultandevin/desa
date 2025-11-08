@@ -4,6 +4,7 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { Loader, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -18,8 +19,8 @@ import {
   SheetInnerContent,
   SheetInnerSection,
 } from "@/components/ui/sheet";
-import { orpc, queryClient } from "@/utils/orpc";
 import { Textarea } from "@/components/ui/textarea";
+import { orpc, queryClient } from "@/utils/orpc";
 
 const AssetCreateForm = () => {
   const assetMutation = useMutation(
@@ -40,20 +41,35 @@ const AssetCreateForm = () => {
       nup: "",
       brandType: "",
       condition: "",
+      status: "",
       note: "",
-      acquiredAt: new Date().toString(),
-      valueRp: "",
+      valueRp: 0,
+      acquiredAt: new Date().toISOString().split("T")[0],
+    },
+    validators: {
+      onSubmit: z.object({
+        name: z.string().min(3, "Nama aset minimal 3 karakter"),
+        code: z.string(),
+        nup: z.string(),
+        brandType: z.string(),
+        condition: z.string(),
+        status: z.string(),
+        note: z.string(),
+        valueRp: z.number(),
+        acquiredAt: z.string(),
+      }),
     },
     onSubmit: async ({ value }) => {
       assetMutation.mutate({
         name: value.name,
-        code: value.code,
-        nup: value.nup,
-        brandType: value.brandType,
-        condition: value.condition,
-        valueRp: value.valueRp,
-        note: value.note,
-        acquiredAt: value.acquiredAt ? new Date(value.acquiredAt) : null,
+        code: value.code || undefined,
+        nup: value.nup || undefined,
+        brandType: value.brandType || undefined,
+        condition: value.condition || undefined,
+        status: value.status || undefined,
+        valueRp: value.valueRp ? String(value.valueRp) : undefined,
+        note: value.note || undefined,
+        acquiredAt: value.acquiredAt ? new Date(value.acquiredAt) : undefined,
       });
     },
   });
@@ -68,6 +84,31 @@ const AssetCreateForm = () => {
     >
       <SheetInnerContent className="min-w-0 flex-1 overflow-y-auto">
         <SheetInnerSection>
+          <form.Field name="name">
+            {(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    <span className="text-destructive">*</span>
+                    Nama Aset
+                  </FieldLabel>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    aria-invalid={isInvalid}
+                    placeholder="Sikil Bau"
+                    autoComplete="off"
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          </form.Field>
           <form.Field name="nup">
             {(field) => {
               const isInvalid =
@@ -85,31 +126,6 @@ const AssetCreateForm = () => {
                     placeholder="XXXXXX"
                     autoComplete="off"
                   />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
-          </form.Field>
-          <form.Field name="name">
-            {(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Nama Aset</FieldLabel>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={isInvalid}
-                    placeholder="Sikil Bau"
-                    autoComplete="off"
-                  />
-                  <FieldDescription>
-                    Nama aset yang ingin anda catat
-                  </FieldDescription>
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
@@ -169,7 +185,10 @@ const AssetCreateForm = () => {
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Kondisi</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>
+                    <span className="text-destructive">*</span>
+                    Kondisi
+                  </FieldLabel>
                   <Input
                     id={field.name}
                     name={field.name}
@@ -202,7 +221,7 @@ const AssetCreateForm = () => {
                     type="number"
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(e.target.valueAsNumber)}
                     aria-invalid={isInvalid}
                     placeholder="1000000"
                     autoComplete="off"
@@ -246,7 +265,10 @@ const AssetCreateForm = () => {
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Catatan</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>
+                    Catatan
+                    <span className="font-normal">(opsional)</span>
+                  </FieldLabel>
                   <Textarea
                     id={field.name}
                     name={field.name}
@@ -254,7 +276,7 @@ const AssetCreateForm = () => {
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     aria-invalid={isInvalid}
-                    placeholder="Catatan tambahan tentang aset"
+                    placeholder="Catatan tamabahan mengenai aset jika ada"
                     autoComplete="off"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -275,7 +297,7 @@ const AssetCreateForm = () => {
           ) : (
             <>
               <Plus />
-              Tambah
+              Catat Aset
             </>
           )}
         </Button>

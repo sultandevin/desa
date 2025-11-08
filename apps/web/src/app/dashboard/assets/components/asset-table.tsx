@@ -4,7 +4,6 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/data-table";
 import { orpc } from "@/utils/orpc";
 import { DashboardSection } from "../../components/dashboard";
-import { Skeleton } from "@/components/ui/skeleton";
 
 const AssetTable = () => {
   const assets = useQuery(
@@ -17,10 +16,6 @@ const AssetTable = () => {
       header: "Kode",
     },
     {
-      accessorKey: "nup",
-      header: "NUP",
-    },
-    {
       accessorKey: "name",
       header: "Nama",
     },
@@ -29,23 +24,15 @@ const AssetTable = () => {
       header: "Tipe Merek",
     },
     {
-      accessorKey: "condition",
+      accessorKey: "status",
       header: "Status",
     },
   ];
 
   return (
-    <>
-      {assets.isPending ? (
-        <>
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-8 w-1/2" />
-        </>
-      ) : (
-        <DataTable columns={columns} data={assets.data ?? []} />
-      )}
-    </>
+    <DashboardSection className="">
+      <DataTable columns={columns} data={assets.data ?? []} />
+    </DashboardSection>
   );
 };
 

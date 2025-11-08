@@ -14,6 +14,10 @@ import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
 
+const healthcheck = publicProcedure.handler(() => {
+  return "OK";
+});
+
 const list = publicProcedure
   .route({
     method: "GET",
@@ -74,7 +78,11 @@ const create = protectedProcedure
     summary: "Create a new asset",
     tags: ["Assets"],
   })
-  .input(assetInsertSchema)
+  .input(
+    assetInsertSchema.extend({
+      name: z.string().min(3, "Name must be at least 3 characters long"),
+    }),
+  )
   .output(assetSelectSchema)
   .handler(async ({ input, context }) => {
     try {
@@ -82,11 +90,6 @@ const create = protectedProcedure
         .insert(asset)
         .values({
           ...input,
-          valueRp:
-            input.valueRp && input.valueRp.trim() !== ""
-              ? input.valueRp.toString()
-              : null,
-          proofOfOwnership: input.proofOfOwnership || null,
           createdBy: context.session.user.id,
         })
         .returning();
@@ -161,6 +164,7 @@ const listDamageReports = publicProcedure
   });
 
 export const assetRouter = {
+  healthcheck,
   list,
   find,
   create,

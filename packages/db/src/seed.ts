@@ -1,9 +1,7 @@
-import { reset, seed } from "drizzle-seed";
+import { seed } from "drizzle-seed";
 import { db } from ".";
 import { asset } from "./schema/asset";
 import { user } from "./schema/auth";
-import { file } from "./schema/file";
-import { regulation } from "./schema/regulation";
 
 async function main() {
   await addDummyData();
@@ -29,34 +27,6 @@ async function addDummyData() {
     },
   }));
   console.log("✨ 'asset' table data successfully seeded!");
-}
-
-async function addDummyRegData() {
-  const [regInstance] = await db.select().from(regulation).limit(1);
-  if (!regInstance) {
-    const [userInstance] = await db.select().from(user);
-    const [fileInstances] = await db.select().from(file);
-
-    if (!userInstance) {
-      console.error(
-        "Table 'regulation' data seed function failed due to no user instances found.",
-      );
-      return;
-    }
-
-    await reset(db, { regulation });
-    await seed(db, { regulation }).refine((funcs) => ({
-      regulation: {
-        count: 100,
-        columns: {
-          effectiveBy: funcs.date(),
-          createdBy: funcs.valuesFromArray({ values: [userInstance.id] }),
-          file: funcs.valuesFromArray({ values: [fileInstances?.id] }),
-        },
-      },
-    }));
-    console.log("✨ 'regulation' table data successfully seeded!");
-  }
 }
 
 main();
