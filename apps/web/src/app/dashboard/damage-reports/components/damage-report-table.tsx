@@ -31,7 +31,7 @@ import { DamageReportCreateForm } from "./damage-report-create-form";
 
 const DamageReportTable = () => {
   const [addReportDialogOpen, setAddReportDialogOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const [, setQuery] = useState("");
   const [queryInputValue, setQueryInputValue] = useState("");
 
   const damageReports = useQuery(

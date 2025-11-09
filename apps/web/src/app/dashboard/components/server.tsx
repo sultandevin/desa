@@ -24,7 +24,9 @@ const Server = async () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="mt-auto">
-        {assets && assets.data.length > 0 && <p>Found: {assets.data[0]?.name}</p>}
+        {assets && assets.data.length > 0 && (
+          <p>Found: {assets.data[0]?.name}</p>
+        )}
       </CardContent>
     </Card>
   );

@@ -43,7 +43,7 @@ const find = publicProcedure
   .input(
     z.object({
       id: z.string(),
-    })
+    }),
   )
   .output(regulationSelectSchema)
   .handler(async ({ input, errors }) => {
@@ -68,7 +68,7 @@ const create = protectedProcedure
     tags: ["Regulations"],
   })
   .input(
-    regulationInsertSchema.omit({ id: true, createdBy: true, createdAt: true })
+    regulationInsertSchema.omit({ id: true, createdBy: true, createdAt: true }),
   )
   .output(regulationSelectSchema)
   .handler(async ({ input, errors, context }) => {
@@ -106,7 +106,7 @@ const update = publicProcedure // hapus line ini kalo auth udah siap
     regulationInsertSchema
       .omit({ createdBy: true, createdAt: true })
       .partial()
-      .required({ id: true })
+      .required({ id: true }),
   )
   .output(regulationSelectSchema)
   .handler(async ({ input, errors }) => {

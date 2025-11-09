@@ -1,13 +1,25 @@
 "use client";
 
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Plus, Trash, MoreHorizontal, Loader, SearchIcon } from "lucide-react";
+import { Loader, MoreHorizontal, Plus, SearchIcon, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
-import { orpc, queryClient } from "@/utils/orpc";
+import LoaderSkeleton from "@/components/loader-skeleton";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import {
   Sheet,
   SheetContent,
@@ -15,19 +27,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupInput,
-} from "@/components/ui/input-group";
-import LoaderSkeleton from "@/components/loader-skeleton";
+import { orpc, queryClient } from "@/utils/orpc";
 import { DashboardSection } from "../../components/dashboard";
 import { RegulationCreateForm } from "./regulation-create-form";
 
@@ -37,7 +37,7 @@ const PeraturanTable = () => {
   const peraturan = useQuery(
     orpc.regulation.list.queryOptions({
       input: { offset: 0, limit: 10, query },
-    })
+    }),
   );
 
   // === Delete Mutation ===
@@ -52,7 +52,7 @@ const PeraturanTable = () => {
       onError: () => {
         toast.error("Gagal menghapus peraturan, coba lagi.");
       },
-    })
+    }),
   );
 
   const handleDelete = (id: string) => {
