@@ -19,7 +19,7 @@ export function NavOthers({
 }) {
   return (
     <SidebarGroup className="mt-auto">
-      <SidebarGroupLabel>Others</SidebarGroupLabel>
+      <SidebarGroupLabel>Lainnya</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((link) => (
           <SidebarMenuItem key={link.title}>
