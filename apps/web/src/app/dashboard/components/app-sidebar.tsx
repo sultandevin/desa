@@ -52,16 +52,6 @@ const data = {
       ],
     },
     {
-      title: "Keputusan Kepala Desa",
-      items: [
-        {
-          title: "Reyhan",
-          icon: Bot,
-          url: "#",
-        },
-      ],
-    },
-    {
       title: "Peraturan",
       items: [
         {

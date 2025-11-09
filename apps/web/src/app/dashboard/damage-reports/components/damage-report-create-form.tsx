@@ -31,11 +31,13 @@ interface DamageReportCreateFormProps {
   onSuccess?: () => void;
 }
 
-const DamageReportCreateForm = ({ onSuccess }: DamageReportCreateFormProps = {}) => {
+const DamageReportCreateForm = ({
+  onSuccess,
+}: DamageReportCreateFormProps = {}) => {
   // Fetch assets for the dropdown
   const assets = useQuery(
     orpc.asset.list.queryOptions({
-      input: { pageSize: 100, query: "" }
+      input: { pageSize: 100, query: "" },
     }),
   );
 
@@ -124,7 +126,9 @@ const DamageReportCreateForm = ({ onSuccess }: DamageReportCreateFormProps = {})
               );
             }}
           />
+        </SheetInnerSection>
 
+        <SheetInnerSection>
           <form.Field
             name="description"
             children={(field) => {
@@ -169,7 +173,9 @@ const DamageReportCreateForm = ({ onSuccess }: DamageReportCreateFormProps = {})
                   </FieldLabel>
                   <Select
                     value={field.state.value}
-                    onValueChange={(value) => field.handleChange(value as typeof field.state.value)}
+                    onValueChange={(value) =>
+                      field.handleChange(value as typeof field.state.value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih tingkat kerusakan" />
@@ -180,9 +186,7 @@ const DamageReportCreateForm = ({ onSuccess }: DamageReportCreateFormProps = {})
                       <SelectItem value="SEVERE">Parah</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FieldDescription>
-                    Tingkat kerusakan aset
-                  </FieldDescription>
+                  <FieldDescription>Tingkat kerusakan aset</FieldDescription>
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );

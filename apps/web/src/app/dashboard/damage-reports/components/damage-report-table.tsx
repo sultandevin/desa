@@ -1,11 +1,10 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Copy, MoreHorizontal, Plus, Trash } from "lucide-react";
+import { Check, MoreHorizontal, Plus, SearchIcon, Trash } from "lucide-react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
-import LoaderSkeleton from "@/components/loader-skeleton";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import {
   Sheet,
   SheetContent,
@@ -28,32 +31,24 @@ import { DamageReportCreateForm } from "./damage-report-create-form";
 
 const DamageReportTable = () => {
   const [addReportDialogOpen, setAddReportDialogOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [queryInputValue, setQueryInputValue] = useState("");
 
   const damageReports = useQuery(
     orpc.damageReport.list.queryOptions({ input: { offset: 0, limit: 10 } }),
   );
 
-  const columns: ColumnDef<
-    NonNullable<typeof damageReports.data>[number]
-  >[] = [
+  const columns: ColumnDef<NonNullable<typeof damageReports.data>[number]>[] = [
     {
-      accessorKey: "assetId",
-      header: "ID Aset",
-      cell: ({ row }) => {
-        const assetId = row.getValue("assetId") as string;
-        return <span className="font-mono text-xs">{assetId.slice(0, 8)}...</span>;
-      },
+      accessorKey: "assetName",
+      header: "Nama Aset",
     },
     {
       accessorKey: "description",
       header: "Deskripsi",
       cell: ({ row }) => {
         const description = row.getValue("description") as string;
-        return (
-          <span className="line-clamp-2 max-w-md">
-            {description}
-          </span>
-        );
+        return <span className="line-clamp-2 max-w-md">{description}</span>;
       },
     },
     {
@@ -74,22 +69,18 @@ const DamageReportTable = () => {
       },
     },
     {
-      accessorKey: "reportedBy",
-      header: "Dilaporkan Oleh",
-      cell: ({ row }) => {
-        const reportedBy = row.getValue("reportedBy") as string;
-        return <span className="font-mono text-xs">{reportedBy.slice(0, 8)}...</span>;
-      },
-    },
-    {
       accessorKey: "verifiedBy",
       header: "Diverifikasi Oleh",
       cell: ({ row }) => {
         const verifiedBy = row.getValue("verifiedBy") as string | null;
         if (!verifiedBy) {
-          return <span className="text-muted-foreground">Belum diverifikasi</span>;
+          return (
+            <span className="text-muted-foreground">Belum diverifikasi</span>
+          );
         }
-        return <span className="font-mono text-xs">{verifiedBy.slice(0, 8)}...</span>;
+        return (
+          <span className="font-mono text-xs">{verifiedBy.slice(0, 8)}...</span>
+        );
       },
     },
     {
@@ -110,7 +101,7 @@ const DamageReportTable = () => {
     },
     {
       id: "aksi",
-      cell: ({ row }) => {
+      cell: () => {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -121,22 +112,12 @@ const DamageReportTable = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => {
-                  const assetId = row.getValue("assetId") as string;
-                  if (!assetId) {
-                    toast.error("ID aset tidak tersedia untuk disalin");
-                    return;
-                  }
-                  navigator.clipboard.writeText(assetId);
-                  toast.success("ID aset disalin ke clipboard");
-                }}
-              >
-                <Copy />
-                Salin ID Aset
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
+                <Check />
+                Verifikasi Laporan
+              </DropdownMenuItem>
+              <DropdownMenuItem variant="destructive">
                 <Trash />
                 Hapus Laporan
               </DropdownMenuItem>
@@ -148,42 +129,63 @@ const DamageReportTable = () => {
   ];
 
   return (
-    <>
-      {damageReports.isPending ? (
-        <LoaderSkeleton />
-      ) : (
-        <DataTable
-          columns={columns}
-          data={damageReports.data ?? []}
-          isFetching={damageReports.isFetching}
-          configButtons={
-            <>
-              <Sheet open={addReportDialogOpen} onOpenChange={setAddReportDialogOpen}>
-                <SheetTrigger asChild>
-                  <Button size={`sm`}>
-                    <Plus />
-                    Tambah Laporan
-                  </Button>
-                </SheetTrigger>
-                <SheetContent className="overflow-y-auto">
-                  <SheetHeader>
-                    <SheetTitle>Tambah Laporan Kerusakan</SheetTitle>
-                  </SheetHeader>
-                  <DamageReportCreateForm
-                    onSuccess={() => setAddReportDialogOpen(false)}
-                  />
-                </SheetContent>
-              </Sheet>
+    <DataTable
+      columns={columns}
+      data={damageReports.data ?? []}
+      isFetching={damageReports.isPending}
+      configButtons={
+        <>
+          <InputGroup className="w-full sm:max-w-sm ">
+            <InputGroupInput
+              id="query"
+              className="min-w-60 w-fit"
+              value={queryInputValue}
+              onChange={(e) => setQueryInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  // reset cursor when searching
+                  // setCursor(undefined);
+                  setQuery(queryInputValue);
+                }
+              }}
+              disabled={damageReports.isPending}
+              placeholder="Cari..."
+            />
+            <InputGroupAddon>
+              <SearchIcon />
+            </InputGroupAddon>
+            {damageReports.data && (
+              <InputGroupAddon
+                align={`inline-end`}
+                className={`max-[400px]:sr-only ${damageReports.isPending && "animate-pulse"}`}
+              >
+                {damageReports.data.length} hasil
+              </InputGroupAddon>
+            )}
+          </InputGroup>
 
-              <Button size={`sm`} variant="outline">
-                <Trash />
-                Config Tambahan
+          <Sheet
+            open={addReportDialogOpen}
+            onOpenChange={setAddReportDialogOpen}
+          >
+            <SheetTrigger asChild>
+              <Button size={`sm`}>
+                <Plus />
+                Tambah Laporan
               </Button>
-            </>
-          }
-        />
-      )}
-    </>
+            </SheetTrigger>
+            <SheetContent className="overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Tambah Laporan Kerusakan</SheetTitle>
+              </SheetHeader>
+              <DamageReportCreateForm
+                onSuccess={() => setAddReportDialogOpen(false)}
+              />
+            </SheetContent>
+          </Sheet>
+        </>
+      }
+    />
   );
 };
 

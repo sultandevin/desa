@@ -6,10 +6,11 @@ import {
   damageReportSelectSchema,
 } from "@desa/db/schema/damage-report";
 import { ORPCError } from "@orpc/client";
-import { eq } from "drizzle-orm";
+import { eq, getTableColumns } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
+import { asset } from "@desa/db/schema/asset";
 
 const list = publicProcedure
   .route({
@@ -19,11 +20,18 @@ const list = publicProcedure
     tags: ["Damage Reports"],
   })
   .input(paginationSchema)
-  .output(z.array(damageReportSelectSchema))
+  .output(
+    z.array(
+      damageReportSelectSchema.extend({
+        assetName: z.string().nullable(),
+      }),
+    ),
+  )
   .handler(async ({ input, errors }) => {
     const reports = await db
-      .select()
+      .select({ ...getTableColumns(damageReport), assetName: asset.name })
       .from(damageReport)
+      .leftJoin(asset, eq(damageReport.assetId, asset.id))
       .limit(input.limit)
       .offset(input.offset);
 

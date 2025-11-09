@@ -22,7 +22,7 @@ const DashboardTitle = (props: {
   className?: string;
   children: React.ReactNode;
 }) => (
-  <h1 className={cn("font-bold text-2xl", props.className)}>
+  <h1 className={cn("font-medium text-2xl", props.className)}>
     {props.children}
   </h1>
 );
