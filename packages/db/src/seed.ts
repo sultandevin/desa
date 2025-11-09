@@ -17,17 +17,25 @@ async function addDummyData() {
     return;
   }
 
-  await seed(db, { asset }).refine((funcs) => ({
-    asset: {
-      count: 100,
-      columns: {
-        valueRp: funcs.number({ minValue: 0 }),
-        createdBy: funcs.valuesFromArray({ values: [userInstance.id] }),
-        deletedAt: funcs.boolean(),
+  await seed(db, { asset })
+    .refine((funcs) => ({
+      asset: {
+        count: 100,
+        columns: {
+          id: funcs.uuid(),
+          valueRp: funcs.number({ minValue: 1_000_000 }),
+          brandType: funcs.companyName(),
+          createdBy: funcs.valuesFromArray({ values: [userInstance.id] }),
+          // leave null for these values below:
+          proofOfOwnership: funcs.default({ defaultValue: undefined }),
+          status: funcs.default({ defaultValue: undefined }),
+          deletedAt: funcs.default({ defaultValue: undefined }),
+        },
       },
-    },
-  }));
-  console.log("✨ 'asset' table data successfully seeded!");
+    }))
+    .then(() => {
+      console.log("✨ 'asset' table data successfully seeded!");
+    });
 }
 
 main();
