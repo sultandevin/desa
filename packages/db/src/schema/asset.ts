@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
   check,
   decimal,
+  index,
   pgTable,
   text,
   timestamp,
@@ -36,7 +37,10 @@ export const asset = pgTable(
       .references(() => user.id)
       .notNull(),
   },
-  (t) => [check("price_check", sql`${t.valueRp} >= 0`)],
+  (t) => [
+    check("price_check", sql`${t.valueRp} >= 0`),
+    index("updated_at_index").on(t.updatedAt),
+  ],
 );
 
 export const assetSelectSchema = createSelectSchema(asset, {

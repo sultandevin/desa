@@ -8,7 +8,7 @@ import {
 import { client } from "@/utils/orpc";
 
 const Server = async () => {
-  const assets = await client.asset.list({ limit: 1, offset: 0 });
+  const assets = await client.asset.list({ pageSize: 1 });
 
   return (
     <Card>
@@ -24,7 +24,7 @@ const Server = async () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="mt-auto">
-        {assets && assets.length > 0 && <p>Found: {assets[0].name}</p>}
+        {assets && assets.data.length > 0 && <p>Found: {assets.data[0]?.name}</p>}
       </CardContent>
     </Card>
   );

@@ -14,8 +14,8 @@ import {
 import { orpc } from "@/utils/orpc";
 
 const Client = () => {
-  const data = useQuery(
-    orpc.asset.list.queryOptions({ input: { limit: 1, offset: 1 } }),
+  const req = useQuery(
+    orpc.asset.list.queryOptions({ input: { pageSize: 1 } }),
   );
 
   return (
@@ -23,21 +23,20 @@ const Client = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <div
-            className={`h-2 w-2 animate-pulse rounded-full ${data.error ? "bg-red-500" : "bg-green-500"}`}
+            className={`h-2 w-2 animate-pulse rounded-full ${req.error ? "bg-red-500" : "bg-green-500"}`}
           />
           Client Side
         </CardTitle>
         <CardDescription>
-          Fetching data dari komponen yang ada direktif{" "}
-          <code>'use client'</code>
+          Fetching req dari komponen yang ada direktif <code>'use client'</code>
         </CardDescription>
         <CardAction>
           <Button
             size={"sm"}
-            onClick={() => data.refetch()}
-            disabled={data.isFetching}
+            onClick={() => req.refetch()}
+            disabled={req.isFetching}
           >
-            {data.isFetching ? (
+            {req.isFetching ? (
               <>
                 <LoaderCircle className="animate-spin" />
                 Fetching...
@@ -53,8 +52,10 @@ const Client = () => {
       </CardHeader>
 
       <CardContent>
-        {data.isPending && <p className="animate-pulse">Loading...</p>}
-        {data.data && data.data.length > 0 && <p>Found: {data.data[0].name}</p>}
+        {req.isPending && <p className="animate-pulse">Loading...</p>}
+        {req.data && req.data.data.length > 0 && (
+          <p>Found: {req.data.data[0]?.name}</p>
+        )}
       </CardContent>
     </Card>
   );

@@ -25,7 +25,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { pascalToWords } from "@/lib/utils";
-import LoaderSkeleton from "./loader-skeleton";
 import {
   Empty,
   EmptyDescription,
@@ -33,6 +32,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "./ui/empty";
+import { Skeleton } from "./ui/skeleton";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -93,68 +93,65 @@ export function DataTable<TData, TValue>({
         </DropdownMenu>
         {configButtons && <>{configButtons}</>}
       </div>
-      {isFetching ? (
-        <LoaderSkeleton />
-      ) : (
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
                       )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  <Empty>
-                    <EmptyHeader>
-                      <EmptyMedia variant="icon">
-                        <Search />
-                      </EmptyMedia>
-                      <EmptyTitle>Tidak ada hasil yang ditemukan</EmptyTitle>
-                      <EmptyDescription>
-                        Coba ubah kata kuncimu
-                      </EmptyDescription>
-                    </EmptyHeader>
-                  </Empty>
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {isFetching ? (
+            Array.from({ length: 10 }).map((_, index) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: cant use other unique value
+              <TableRow key={index} className="animate-pulse p-2">
+                <TableCell colSpan={columns.length}>
+                  <Skeleton className="h-7.5 w-full" />
                 </TableCell>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      )}
+            ))
+          ) : table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                <Empty>
+                  <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                      <Search />
+                    </EmptyMedia>
+                    <EmptyTitle>Tidak ada hasil yang ditemukan</EmptyTitle>
+                    <EmptyDescription>Coba ubah kata kuncimu</EmptyDescription>
+                  </EmptyHeader>
+                </Empty>
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </>
   );
 }
