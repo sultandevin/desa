@@ -2,6 +2,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Copy, MoreHorizontal, Plus, Trash } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
 import LoaderSkeleton from "@/components/loader-skeleton";
@@ -15,9 +16,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { orpc } from "@/utils/orpc";
+import { DamageReportCreateForm } from "./damage-report-create-form";
 
 const DamageReportTable = () => {
+  const [addReportDialogOpen, setAddReportDialogOpen] = useState(false);
+
   const damageReports = useQuery(
     orpc.damageReport.list.queryOptions({ input: { offset: 0, limit: 10 } }),
   );
@@ -144,12 +155,25 @@ const DamageReportTable = () => {
         <DataTable
           columns={columns}
           data={damageReports.data ?? []}
+          isFetching={damageReports.isFetching}
           configButtons={
             <>
-              <Button size={`sm`}>
-                <Plus />
-                Tambah Laporan
-              </Button>
+              <Sheet open={addReportDialogOpen} onOpenChange={setAddReportDialogOpen}>
+                <SheetTrigger asChild>
+                  <Button size={`sm`}>
+                    <Plus />
+                    Tambah Laporan
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle>Tambah Laporan Kerusakan</SheetTitle>
+                  </SheetHeader>
+                  <DamageReportCreateForm
+                    onSuccess={() => setAddReportDialogOpen(false)}
+                  />
+                </SheetContent>
+              </Sheet>
 
               <Button size={`sm`} variant="outline">
                 <Trash />
