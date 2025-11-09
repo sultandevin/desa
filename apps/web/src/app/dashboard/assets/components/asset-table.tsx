@@ -29,6 +29,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,6 +53,7 @@ import {
 import { copyToClipboard, formatCurrency } from "@/lib/utils";
 import { orpc, queryClient } from "@/utils/orpc";
 import { AssetCreateForm } from "./asset-create-form";
+import { AssetDamageReportFormDialog } from "./asset-damage-report-form-dialog";
 
 const AssetTable = () => {
   const [query, setQuery] = useState("");
@@ -60,7 +62,7 @@ const AssetTable = () => {
   const [cursor, setCursor] = useState<Date | undefined>(undefined);
 
   const assets = useQuery(
-    orpc.asset.list.queryOptions({ input: { query, cursor } })
+    orpc.asset.list.queryOptions({ input: { query, cursor } }),
   );
 
   const removeAssetOptions = useMutation(
@@ -72,7 +74,7 @@ const AssetTable = () => {
       onError: () => {
         toast.error("Gagal mengirim permintaan penghapusan aset");
       },
-    })
+    }),
   );
 
   const columns: ColumnDef<NonNullable<typeof assets.data>["data"][number]>[] =
@@ -124,69 +126,85 @@ const AssetTable = () => {
 
           return (
             <AlertDialog>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <span className="sr-only">Open menu</span>
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                  <DropdownMenuItem
-                    onClick={() => {
-                      const code: string = row.getValue("code");
-                      copyToClipboard({ text: code });
-                    }}
-                  >
-                    <Copy />
-                    Salin Kode Aset
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <InfoIcon />
-                    Informasi
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem variant="destructive">
-                    <FileWarning />
-                    Laporkan Kerusakan
-                  </DropdownMenuItem>
-                  <AlertDialogTrigger asChild>
-                    <DropdownMenuItem variant="destructive">
-                      <Trash />
-                      Hapus Aset
-                    </DropdownMenuItem>
-                  </AlertDialogTrigger>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Konfirmasi Hapus Aset</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Dengan mengeklik "Hapus", permintaan penghapusan aset anda
-                    akan dikirimkan kepada Kepala Desa
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogAction asChild>
-                    <Button
-                      onClick={handleRemove}
-                      disabled={removeAssetOptions.isPending}
-                      variant={"destructive"}
-                    >
-                      {removeAssetOptions.isPending ? (
-                        "Menghapus..."
-                      ) : (
-                        <>
-                          <Trash />
-                          Hapus
-                        </>
-                      )}
+              <Dialog
+              >
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <span className="sr-only">Open menu</span>
+                      <MoreHorizontal className="h-4 w-4" />
                     </Button>
-                  </AlertDialogAction>
-                  <AlertDialogCancel>Batal</AlertDialogCancel>
-                </AlertDialogFooter>
-              </AlertDialogContent>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        const code: string = row.getValue("code");
+                        copyToClipboard({ text: code });
+                      }}
+                    >
+                      <Copy />
+                      Salin Kode Aset
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem>
+                      <InfoIcon />
+                      Informasi
+                    </DropdownMenuItem>
+
+                    <DropdownMenuSeparator />
+
+                    <DialogTrigger asChild>
+                      <DropdownMenuItem variant="destructive">
+                        <FileWarning />
+                        Laporkan Kerusakan
+                      </DropdownMenuItem>
+                    </DialogTrigger>
+
+                    <AlertDialogTrigger asChild>
+                      <DropdownMenuItem variant="destructive">
+                        <Trash />
+                        Hapus Aset
+                      </DropdownMenuItem>
+                    </AlertDialogTrigger>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Konfirmasi Hapus Aset</AlertDialogTitle>
+
+                    <AlertDialogDescription>
+                      Dengan mengeklik "Hapus", permintaan penghapusan aset anda
+                      akan dikirimkan kepada Kepala Desa
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogAction asChild>
+                      <Button
+                        onClick={handleRemove}
+                        disabled={removeAssetOptions.isPending}
+                        variant={"destructive"}
+                      >
+                        {removeAssetOptions.isPending ? (
+                          "Menghapus..."
+                        ) : (
+                          <>
+                            <Trash />
+                            Hapus
+                          </>
+                        )}
+                      </Button>
+                    </AlertDialogAction>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+
+                <AssetDamageReportFormDialog
+                  assetId={row.original.id}
+                  assetName={row.original.name}
+                />
+              </Dialog>
             </AlertDialog>
           );
         },
@@ -200,7 +218,7 @@ const AssetTable = () => {
       isFetching={assets.isPending}
       configButtons={
         <>
-          <InputGroup className="w-fit w-full max-w-sm ">
+          <InputGroup className="w-full sm:max-w-sm ">
             <InputGroupInput
               id="query"
               className="min-w-60 w-fit"
@@ -222,7 +240,7 @@ const AssetTable = () => {
             {assets.data && (
               <InputGroupAddon
                 align={`inline-end`}
-                className={`${assets.isPending && "animate-pulse"}`}
+                className={`max-[400px]:sr-only ${assets.isPending && "animate-pulse"}`}
               >
                 {assets.data.data.length} hasil
               </InputGroupAddon>
@@ -244,27 +262,28 @@ const AssetTable = () => {
             </SheetContent>
           </Sheet>
 
-          <Button
-            size={`icon`}
-            variant="outline"
-            onClick={() => {
-              setCursor(undefined);
-            }}
-            disabled={cursor === undefined}
-            className="ml-auto"
-          >
-            <ChevronsLeft />
-          </Button>
-          <Button
-            size={`icon`}
-            variant="outline"
-            onClick={() => {
-              setCursor(assets.data?.nextCursor ?? undefined);
-            }}
-            disabled={!assets.data?.nextCursor}
-          >
-            <ChevronRight />
-          </Button>
+          <div className="flex ml-auto items-center gap-2">
+            <Button
+              size={`icon`}
+              variant="outline"
+              onClick={() => {
+                setCursor(undefined);
+              }}
+              disabled={cursor === undefined}
+            >
+              <ChevronsLeft />
+            </Button>
+            <Button
+              size={`icon`}
+              variant="outline"
+              onClick={() => {
+                setCursor(assets.data?.nextCursor ?? undefined);
+              }}
+              disabled={!assets.data?.nextCursor}
+            >
+              <ChevronRight />
+            </Button>
+          </div>
         </>
       }
     />

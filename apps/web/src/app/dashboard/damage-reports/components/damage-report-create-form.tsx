@@ -35,7 +35,7 @@ const DamageReportCreateForm = ({ onSuccess }: DamageReportCreateFormProps = {})
   // Fetch assets for the dropdown
   const assets = useQuery(
     orpc.asset.list.queryOptions({
-      input: { offset: 0, limit: 100, query: "" }
+      input: { pageSize: 100, query: "" }
     }),
   );
 
@@ -109,7 +109,7 @@ const DamageReportCreateForm = ({ onSuccess }: DamageReportCreateFormProps = {})
                       <SelectValue placeholder="Pilih aset yang rusak" />
                     </SelectTrigger>
                     <SelectContent>
-                      {assets.data?.map((asset) => (
+                      {assets.data?.data.map((asset) => (
                         <SelectItem key={asset.id} value={asset.id}>
                           {asset.name} {asset.code ? `(${asset.code})` : ""}
                         </SelectItem>

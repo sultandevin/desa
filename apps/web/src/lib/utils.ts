@@ -41,6 +41,6 @@ export function copyToClipboard(input: {
 
   navigator.clipboard.writeText(input.text).then(() => {
     if (input.onSuccess) input.onSuccess();
-    toast.success("Teks disalin ke clipboard");
+    toast.success(`Teks "${input.text}" berhasil disalin ke clipboard`);
   });
 }
