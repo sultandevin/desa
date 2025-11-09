@@ -3,6 +3,7 @@ import { protectedProcedure, publicProcedure } from "../index";
 import { assetRouter } from "./asset";
 import { damageReportRouter } from "./damage-report";
 import { regulationRouter } from "./regulation";
+import { decisionRouter } from "./decision";
 
 export const appRouter = {
   healthCheck: publicProcedure.handler(() => {
@@ -17,6 +18,7 @@ export const appRouter = {
   asset: assetRouter,
   regulation: regulationRouter,
   damageReport: damageReportRouter,
+  decision: decisionRouter,
 };
 
 export type AppRouter = typeof appRouter;
