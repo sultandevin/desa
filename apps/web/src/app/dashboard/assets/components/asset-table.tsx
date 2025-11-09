@@ -1,9 +1,10 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   Copy,
   FileWarning,
+  InfoIcon,
   MoreHorizontal,
   Plus,
   SearchIcon,
@@ -11,7 +12,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { DataTable } from "@/components/data-table";
-import LoaderSkeleton from "@/components/loader-skeleton";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -34,14 +34,39 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { copyToClipboard, formatCurrency } from "@/lib/utils";
-import { orpc } from "@/utils/orpc";
+import { orpc, queryClient } from "@/utils/orpc";
 import { AssetCreateForm } from "./asset-create-form";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const AssetTable = () => {
   const [query, setQuery] = useState("");
   const [queryInputValue, setQueryInputValue] = useState("");
+  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
+
   const assets = useQuery(
     orpc.asset.list.queryOptions({ input: { offset: 0, limit: 10, query } }),
+  );
+  const removeAssetOptions = useMutation(
+    orpc.asset.remove.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: orpc.asset.key() });
+        toast.success("Permintaan penghapusan aset berhasil dikirim");
+      },
+      onError: () => {
+        toast.error("Gagal mengirim permintaan penghapusan aset");
+      },
+    }),
   );
 
   const columns: ColumnDef<NonNullable<typeof assets.data>[number]>[] = [
@@ -77,36 +102,78 @@ const AssetTable = () => {
     {
       id: "aksi",
       cell: ({ row }) => {
+        function handleRemove() {
+          removeAssetOptions.mutate({
+            id: row.original.id,
+          });
+        }
+
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => {
-                  const code: string = row.getValue("code");
-                  copyToClipboard({ text: code });
-                }}
-              >
-                <Copy />
-                Salin Kode Aset
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <FileWarning />
-                Laporkan Kerusakan
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Trash />
-                Hapus Aset
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <AlertDialog>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => {
+                    const code: string = row.getValue("code");
+                    copyToClipboard({ text: code });
+                  }}
+                >
+                  <Copy />
+                  Salin Kode Aset
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <InfoIcon />
+                  Informasi
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive">
+                  <FileWarning />
+                  Laporkan Kerusakan
+                </DropdownMenuItem>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem variant="destructive">
+                    <Trash />
+                    Hapus Aset
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Konfirmasi Hapus Aset</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Dengan mengeklik "Hapus", permintaan penghapusan aset anda
+                  akan dikirimkan kepada Kepala Desa
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogAction asChild>
+                  <Button
+                    onClick={handleRemove}
+                    disabled={removeAssetOptions.isPending}
+                    variant={"destructive"}
+                  >
+                    {removeAssetOptions.isPending ? (
+                      "Menghapus..."
+                    ) : (
+                      <>
+                        <Trash />
+                        Hapus
+                      </>
+                    )}
+                  </Button>
+                </AlertDialogAction>
+                <AlertDialogCancel>Batal</AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         );
       },
     },
@@ -141,7 +208,7 @@ const AssetTable = () => {
             </InputGroupAddon>
           </InputGroup>
 
-          <Sheet>
+          <Sheet open={isCreateFormOpen} onOpenChange={setIsCreateFormOpen}>
             <SheetTrigger asChild className="">
               <Button size={`sm`}>
                 <Plus />
@@ -152,7 +219,7 @@ const AssetTable = () => {
               <SheetHeader>
                 <SheetTitle>Tambah Aset Baru</SheetTitle>
               </SheetHeader>
-              <AssetCreateForm />
+              <AssetCreateForm onSuccess={() => setIsCreateFormOpen(false)} />
             </SheetContent>
           </Sheet>
 

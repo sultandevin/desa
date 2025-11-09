@@ -21,14 +21,14 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { orpc, queryClient } from "@/utils/orpc";
 
-const AssetCreateForm = () => {
+const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const assetMutation = useMutation(
     orpc.asset.create.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: orpc.asset.key(),
         });
-        toast("success!");
+        toast.success("Berhasil mencatat aset baru!");
       },
     }),
   );
@@ -57,6 +57,7 @@ const AssetCreateForm = () => {
         note: value.note || null,
         acquiredAt: value.acquiredAt ? new Date(value.acquiredAt) : null,
       });
+      assetMutation.isSuccess && onSuccess?.();
     },
   });
 
