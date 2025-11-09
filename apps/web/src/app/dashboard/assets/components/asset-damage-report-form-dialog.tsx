@@ -2,16 +2,21 @@
 
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { Loader, Plus } from "lucide-react";
+import { Loader } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldLabel,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -19,26 +24,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  SheetClose,
-  SheetFooter,
-  SheetInnerContent,
-  SheetInnerSection,
-} from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { orpc, queryClient } from "@/utils/orpc";
 
 interface AssetDamageReportFormProps {
   assetId: string;
   assetName: string;
-  assetCode?: string;
   onSuccess?: () => void;
 }
 
-const AssetDamageReportForm = ({
+const AssetDamageReportFormDialog = ({
   assetId,
   assetName,
-  assetCode,
   onSuccess,
 }: AssetDamageReportFormProps) => {
   const form = useForm({
@@ -68,10 +65,8 @@ const AssetDamageReportForm = ({
         });
         toast.success("Laporan kerusakan berhasil ditambahkan!");
 
-        // Reset form
         form.reset();
 
-        // Call onSuccess callback to close dialog
         onSuccess?.();
       },
       onError: (error) => {
@@ -82,27 +77,18 @@ const AssetDamageReportForm = ({
   );
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        form.handleSubmit();
-      }}
-      className="flex min-h-0 min-w-0 flex-1 flex-col"
-    >
-      <SheetInnerContent className="min-w-0 flex-1 overflow-y-auto">
-        <SheetInnerSection>
-          <Field>
-            <FieldLabel>Aset</FieldLabel>
-            <Input
-              value={`${assetName}${assetCode ? ` (${assetCode})` : ""}`}
-              disabled
-              className="bg-muted"
-            />
-            <FieldDescription>
-              Aset yang akan dilaporkan kerusakannya
-            </FieldDescription>
-          </Field>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Laporkan Kerusakan "{assetName}"</DialogTitle>
+      </DialogHeader>
 
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          form.handleSubmit();
+        }}
+      >
+        <div className="overflow-y-auto overflow-visible flex flex-col gap-4 py-4">
           <form.Field
             name="description"
             children={(field) => {
@@ -123,7 +109,7 @@ const AssetDamageReportForm = ({
                     aria-invalid={isInvalid}
                     placeholder="Jelaskan detail kerusakan yang terjadi..."
                     autoComplete="off"
-                    rows={5}
+                    rows={3}
                   />
                   <FieldDescription>
                     Jelaskan kondisi kerusakan dengan detail
@@ -147,7 +133,9 @@ const AssetDamageReportForm = ({
                   </FieldLabel>
                   <Select
                     value={field.state.value}
-                    onValueChange={(value) => field.handleChange(value as typeof field.state.value)}
+                    onValueChange={(value) =>
+                      field.handleChange(value as typeof field.state.value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih tingkat kerusakan" />
@@ -158,37 +146,28 @@ const AssetDamageReportForm = ({
                       <SelectItem value="SEVERE">Parah</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FieldDescription>
-                    Tingkat kerusakan aset
-                  </FieldDescription>
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
             }}
           />
-        </SheetInnerSection>
-      </SheetInnerContent>
+        </div>
 
-      <SheetFooter className="grid shrink-0 grid-cols-1 gap-2 border-t bg-background p-4 sm:grid-cols-2">
-        <Button type="submit" disabled={damageReportMutation.isPending}>
-          {damageReportMutation.isPending ? (
-            <>
-              <Loader className="animate-spin" />
-              Memuat...
-            </>
-          ) : (
-            <>
-              <Plus />
-              Laporkan Kerusakan
-            </>
-          )}
-        </Button>
-        <SheetClose asChild>
-          <Button variant="outline">Tutup</Button>
-        </SheetClose>
-      </SheetFooter>
-    </form>
+        <DialogFooter className="">
+          <Button type="submit" disabled={damageReportMutation.isPending}>
+            {damageReportMutation.isPending ? (
+              <>
+                <Loader className="animate-spin" />
+                Memuat...
+              </>
+            ) : (
+              "Lapor"
+            )}
+          </Button>
+        </DialogFooter>
+      </form>
+    </DialogContent>
   );
 };
 
-export { AssetDamageReportForm };
+export { AssetDamageReportFormDialog };

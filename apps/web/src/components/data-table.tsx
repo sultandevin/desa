@@ -7,7 +7,7 @@ import {
   useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { FilterIcon, Search, } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -65,9 +65,8 @@ export function DataTable<TData, TValue>({
       <div className="flex flex-wrap items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="">
-              <SlidersHorizontal />
-              Atur Kolom
+            <Button size={"icon"} variant="outline" className="">
+              <FilterIcon />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">

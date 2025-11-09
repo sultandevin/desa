@@ -86,9 +86,14 @@ const find = publicProcedure
   .input(
     z.object({
       id: z.string(),
+      includeDamageReports: z.boolean().optional().default(false),
     }),
   )
-  .output(assetSelectSchema)
+  .output(
+    assetSelectSchema.extend({
+      damageReports: z.array(damageReportSelectSchema).optional(),
+    }),
+  )
   .handler(async ({ input, errors }) => {
     const id = input.id;
 
@@ -100,6 +105,18 @@ const find = publicProcedure
 
     if (!assetItem) {
       throw errors.NOT_FOUND();
+    }
+
+    if (input.includeDamageReports) {
+      const reports = await db
+        .select()
+        .from(damageReport)
+        .where(eq(damageReport.assetId, id));
+
+      return {
+        ...assetItem,
+        damageReports: reports,
+      };
     }
 
     return assetItem;
@@ -180,36 +197,10 @@ const remove = protectedProcedure
     };
   });
 
-const listDamageReports = publicProcedure
-  .route({
-    method: "GET",
-    path: "/assets/{id}/damage-reports",
-    summary: "List Damage Reports related to an Asset",
-    tags: ["Assets", "Damage Reports"],
-  })
-  .input(
-    z.object({
-      id: z.string(),
-    }),
-  )
-  .output(damageReportSelectSchema)
-  .handler(async ({ input, errors }) => {
-    const [report] = await db
-      .select()
-      .from(damageReport)
-      .where(eq(damageReport.assetId, input.id))
-      .limit(1);
-
-    if (!report) throw errors.NOT_FOUND;
-
-    return report;
-  });
-
 export const assetRouter = {
   healthcheck,
   list,
   find,
   create,
   remove,
-  listDamageReports,
 };
