@@ -1,4 +1,5 @@
 "use client";
+
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
@@ -48,15 +49,23 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { AssetDamageReportForm } from "./asset-damage-report-form";
 
 const AssetTable = () => {
   const [query, setQuery] = useState("");
   const [queryInputValue, setQueryInputValue] = useState("");
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
+  const [damageReportDialogOpen, setDamageReportDialogOpen] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState<{
+    id: string;
+    name: string;
+    code?: string;
+  } | null>(null);
 
   const assets = useQuery(
     orpc.asset.list.queryOptions({ input: { offset: 0, limit: 10, query } }),
   );
+
   const removeAssetOptions = useMutation(
     orpc.asset.remove.mutationOptions({
       onSuccess: () => {
@@ -91,7 +100,6 @@ const AssetTable = () => {
       header: "Nilai (Rp)",
       cell: ({ row }) => {
         const value = Number(row.getValue("valueRp"));
-
         return <span>{formatCurrency(value)}</span>;
       },
     },
@@ -102,11 +110,11 @@ const AssetTable = () => {
     {
       id: "aksi",
       cell: ({ row }) => {
-        function handleRemove() {
+        const handleRemove = () => {
           removeAssetOptions.mutate({
             id: row.original.id,
           });
-        }
+        };
 
         return (
           <AlertDialog>
@@ -125,26 +133,36 @@ const AssetTable = () => {
                     copyToClipboard({ text: code });
                   }}
                 >
-                  <Copy />
+                  <Copy className="mr-2 h-4 w-4" />
                   Salin Kode Aset
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <InfoIcon />
+                  <InfoIcon className="mr-2 h-4 w-4" />
                   Informasi
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive">
-                  <FileWarning />
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSelectedAsset({
+                      id: row.original.id,
+                      name: row.original.name,
+                      code: row.original.code || undefined,
+                    });
+                    setDamageReportDialogOpen(true);
+                  }}
+                >
+                  <FileWarning className="mr-2 h-4 w-4" />
                   Laporkan Kerusakan
                 </DropdownMenuItem>
                 <AlertDialogTrigger asChild>
                   <DropdownMenuItem variant="destructive">
-                    <Trash />
+                    <Trash className="mr-2 h-4 w-4" />
                     Hapus Aset
                   </DropdownMenuItem>
                 </AlertDialogTrigger>
               </DropdownMenuContent>
             </DropdownMenu>
+
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Konfirmasi Hapus Aset</AlertDialogTitle>
@@ -158,13 +176,13 @@ const AssetTable = () => {
                   <Button
                     onClick={handleRemove}
                     disabled={removeAssetOptions.isPending}
-                    variant={"destructive"}
+                    variant="destructive"
                   >
                     {removeAssetOptions.isPending ? (
                       "Menghapus..."
                     ) : (
                       <>
-                        <Trash />
+                        <Trash className="mr-2 h-4 w-4" />
                         Hapus
                       </>
                     )}
@@ -180,55 +198,79 @@ const AssetTable = () => {
   ];
 
   return (
-    <DataTable
-      columns={columns}
-      data={assets.data ?? []}
-      isFetching={assets.isFetching}
-      configButtons={
-        <>
-          <InputGroup className="w-fit min-w-60">
-            <InputGroupInput
-              id="query"
-              className="min-w-60 w-fit"
-              value={queryInputValue}
-              onChange={(e) => setQueryInputValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  setQuery(queryInputValue);
-                }
+    <>
+      <DataTable
+        columns={columns}
+        data={assets.data ?? []}
+        isFetching={assets.isFetching}
+        configButtons={
+          <>
+            <InputGroup className="w-fit min-w-60">
+              <InputGroupInput
+                id="query"
+                className="min-w-60 w-fit"
+                value={queryInputValue}
+                onChange={(e) => setQueryInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    setQuery(queryInputValue);
+                  }
+                }}
+                disabled={assets.isPending}
+                placeholder="Cari..."
+              />
+              <InputGroupAddon>
+                <SearchIcon />
+              </InputGroupAddon>
+              <InputGroupAddon align="inline-end">
+                {assets.data?.length} hasil
+              </InputGroupAddon>
+            </InputGroup>
+
+            <Sheet open={isCreateFormOpen} onOpenChange={setIsCreateFormOpen}>
+              <SheetTrigger asChild>
+                <Button size="sm">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Tambah
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle>Tambah Aset Baru</SheetTitle>
+                </SheetHeader>
+                <AssetCreateForm onSuccess={() => setIsCreateFormOpen(false)} />
+              </SheetContent>
+            </Sheet>
+
+            <Button size="sm" variant="outline">
+              Config Tambahan
+            </Button>
+          </>
+        }
+      />
+
+      <Sheet
+        open={damageReportDialogOpen}
+        onOpenChange={setDamageReportDialogOpen}
+      >
+        <SheetContent className="overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Laporkan Kerusakan Aset</SheetTitle>
+          </SheetHeader>
+          {selectedAsset && (
+            <AssetDamageReportForm
+              assetId={selectedAsset.id}
+              assetName={selectedAsset.name}
+              assetCode={selectedAsset.code}
+              onSuccess={() => {
+                setDamageReportDialogOpen(false);
+                setSelectedAsset(null);
               }}
-              disabled={assets.isPending}
-              placeholder="Cari..."
             />
-            <InputGroupAddon>
-              <SearchIcon />
-            </InputGroupAddon>
-            <InputGroupAddon align={`inline-end`}>
-              {assets.data?.length} hasil
-            </InputGroupAddon>
-          </InputGroup>
-
-          <Sheet open={isCreateFormOpen} onOpenChange={setIsCreateFormOpen}>
-            <SheetTrigger asChild className="">
-              <Button size={`sm`}>
-                <Plus />
-                Tambah
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle>Tambah Aset Baru</SheetTitle>
-              </SheetHeader>
-              <AssetCreateForm onSuccess={() => setIsCreateFormOpen(false)} />
-            </SheetContent>
-          </Sheet>
-
-          <Button size={`sm`} variant="outline">
-            Config Tambahan
-          </Button>
-        </>
-      }
-    />
+          )}
+        </SheetContent>
+      </Sheet>
+    </>
   );
 };
 
