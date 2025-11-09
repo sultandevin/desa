@@ -1,5 +1,4 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Copy, FileWarning, MoreHorizontal, Plus, Trash } from "lucide-react";
 import { toast } from "sonner";
@@ -24,6 +23,7 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import { orpc } from "@/utils/orpc";
 import { AssetCreateForm } from "./asset-create-form";
+import { useQuery } from "@tanstack/react-query";
 
 const AssetTable = () => {
   const assets = useQuery(
@@ -129,7 +129,6 @@ const AssetTable = () => {
               </Sheet>
 
               <Button size={`sm`} variant="outline">
-                <Trash />
                 Config Tambahan
               </Button>
             </>

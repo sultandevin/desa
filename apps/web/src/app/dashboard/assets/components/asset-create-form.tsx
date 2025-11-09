@@ -48,12 +48,12 @@ const AssetCreateForm = () => {
     onSubmit: ({ value }) => {
       assetMutation.mutate({
         name: value.name,
-        code: value.code || null,
-        nup: value.nup || null,
+        code: value.code.length === 0 ? undefined : value.code,
+        nup: value.nup.length === 0 ? undefined : value.nup,
         brandType: value.brandType || null,
         condition: value.condition || null,
         status: value.status || null,
-        valueRp: value.valueRp ? String(value.valueRp) : null,
+        valueRp: value.valueRp || undefined,
         note: value.note || null,
         acquiredAt: value.acquiredAt ? new Date(value.acquiredAt) : null,
       });

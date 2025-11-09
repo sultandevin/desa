@@ -6,7 +6,8 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false
+    "ignoreUnknown": true,
+    "includes": ["**", "!node_modules", "!.next", "!dist", "!build"]
   },
   "formatter": {
     "enabled": true,
@@ -16,17 +17,17 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "nursery": {
-        "useSortedClasses": "warn"
+      "recommended": true,
+      "suspicious": {
+        "noUnknownAtRules": "off"
       },
       "correctness": {
         "noChildrenProp": "off"
       }
-    }
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "double"
+    },
+    "domains": {
+      "next": "recommended",
+      "react": "recommended"
     }
   },
   "css": {
@@ -35,7 +36,6 @@
     }
   },
   "assist": {
-    "enabled": true,
     "actions": {
       "source": {
         "organizeImports": "on"
