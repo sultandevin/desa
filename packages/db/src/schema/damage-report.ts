@@ -14,13 +14,14 @@ export const damageReport = pgTable("damage_report", {
   id: uuid().primaryKey().defaultRandom(),
   assetId: uuid("asset_id")
     .notNull()
-    .references(() => asset.id),
+    .references(() => asset.id, { onDelete: "cascade" }),
   description: text().notNull(),
   status: damageStatusEnum().notNull(),
   reportedBy: text("reported_by")
     .notNull()
     .references(() => user.id),
   verifiedBy: text("verified_by").references(() => user.id),
+  verifiedAt: timestamp("verified_at"),
   reportedAt: timestamp("reported_at").defaultNow().notNull(),
 });
 

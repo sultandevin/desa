@@ -1,5 +1,6 @@
 import { db } from "@desa/db";
 import { isForeignKeyError } from "@desa/db/lib/errors";
+import { asset } from "@desa/db/schema/asset";
 import {
   damageReport,
   damageReportInsertSchema,
@@ -10,7 +11,6 @@ import { eq, getTableColumns } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
-import { asset } from "@desa/db/schema/asset";
 
 const list = publicProcedure
   .route({
@@ -106,8 +106,44 @@ const create = protectedProcedure
     }
   });
 
+const verify = protectedProcedure
+  .route({
+    method: "POST",
+    path: "/damage-reports/{id}/verify",
+    summary: "Verify a Damage Report",
+    tags: ["Damage Reports"],
+  })
+  .input(
+    z.object({
+      id: z.string(),
+    }),
+  )
+  .handler(async ({ input, context, errors }) => {
+    const [report] = await db
+      .update(damageReport)
+      .set({
+        verifiedBy: context.session.user.id,
+        verifiedAt: new Date(),
+      })
+      .where(eq(damageReport.id, input.id))
+      .returning();
+
+    if (!report) throw errors.NOT_FOUND();
+
+    await db
+      .update(asset)
+      .set({
+        status: report.status,
+      })
+      .where(eq(asset.id, report.assetId))
+      .returning();
+
+    return report;
+  });
+
 export const damageReportRouter = {
   list,
   find,
   create,
+  verify,
 };

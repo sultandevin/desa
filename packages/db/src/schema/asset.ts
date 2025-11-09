@@ -12,6 +12,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import * as z from "zod";
 import { user } from "./auth";
 import { file } from "./file";
+import { damageStatusEnum } from "./damage-report";
 
 export const asset = pgTable(
   "asset",
@@ -24,8 +25,8 @@ export const asset = pgTable(
     valueRp: decimal("value_rp"),
     condition: text(),
     proofOfOwnership: uuid("proof_of_ownership").references(() => file.id),
-    status: text(),
     note: text(),
+    status: damageStatusEnum(),
     acquiredAt: timestamp("acquisition_year"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
