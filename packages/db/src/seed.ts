@@ -23,6 +23,7 @@ async function addDummyData() {
       columns: {
         valueRp: funcs.number({ minValue: 0 }),
         createdBy: funcs.valuesFromArray({ values: [userInstance.id] }),
+        deletedAt: funcs.boolean(),
       },
     },
   }));

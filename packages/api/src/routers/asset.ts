@@ -10,10 +10,10 @@ import {
   damageReportSelectSchema,
 } from "@desa/db/schema/damage-report";
 import { ORPCError } from "@orpc/client";
-import { desc, eq, ilike, or } from "drizzle-orm";
+import { and, desc, eq, ilike, isNull, lt, or } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
-import { paginationSchema } from "../schemas";
+import { cursorOutputSchema, cursorPaginationSchema } from "../schemas";
 
 const healthcheck = publicProcedure.handler(() => {
   return "OK";
@@ -27,38 +27,53 @@ const list = publicProcedure
     tags: ["Assets"],
   })
   .input(
-    paginationSchema.extend({
-      query: z.string(),
+    cursorPaginationSchema.extend({
+      query: z.string().optional().default(""),
     }),
   )
-  .output(z.array(assetSelectSchema))
+  .output(
+    cursorOutputSchema.extend({
+      data: z.array(assetSelectSchema),
+    }),
+  )
   .handler(async ({ input, errors }) => {
     const assets = await db
       .select()
       .from(asset)
-      .limit(input.limit)
       .where(
-        input.query.length > 0
-          ? or(
-            ilike(asset.name, `%${input.query}%`),
-            or(
-              ilike(asset.code, `%${input.query}%`),
-              or(
-                ilike(asset.nup, `%${input.query}%`),
-                ilike(asset.brandType, `%${input.query}%`),
-              ),
-            ),
-          )
-          : undefined,
+        and(
+          isNull(asset.deletedAt),
+          and(
+            input.query.length > 0
+              ? or(
+                ilike(asset.name, `%${input.query}%`),
+                or(
+                  ilike(asset.code, `%${input.query}%`),
+                  or(
+                    ilike(asset.nup, `%${input.query}%`),
+                    ilike(asset.brandType, `%${input.query}%`),
+                  ),
+                ),
+              )
+              : undefined,
+            input.cursor ? lt(asset.updatedAt, input.cursor) : undefined,
+          ),
+        ),
       )
-      .offset(input.offset)
+      .limit(input.pageSize)
       .orderBy(desc(asset.updatedAt));
 
     if (!assets) {
       throw errors.NOT_FOUND();
     }
 
-    return assets;
+    return {
+      data: assets,
+      nextCursor:
+        assets.length === input.pageSize
+          ? (assets.at(-1)?.updatedAt ?? null)
+          : null,
+    };
   });
 
 const find = publicProcedure
@@ -151,7 +166,8 @@ const remove = protectedProcedure
   )
   .handler(async ({ input, errors }) => {
     const [deletedAsset] = await db
-      .delete(asset)
+      .update(asset)
+      .set({ deletedAt: new Date() })
       .where(eq(asset.id, input.id))
       .returning();
 
