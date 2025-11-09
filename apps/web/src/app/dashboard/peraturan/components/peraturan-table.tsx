@@ -1,45 +1,150 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
+
+import { useQuery, useMutation } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
+import {
+  Plus,
+  Trash,
+  Copy,
+  FileWarning,
+  MoreHorizontal,
+  Loader,
+} from "lucide-react";
+import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
-import { orpc } from "@/utils/orpc";
+import { orpc, queryClient } from "@/utils/orpc";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import LoaderSkeleton from "@/components/loader-skeleton";
 import { DashboardSection } from "../../components/dashboard";
+import { RegulationCreateForm } from "./regulation-create-form";
 
 const PeraturanTable = () => {
   const peraturan = useQuery(
-    orpc.regulation.list.queryOptions({ input: { offset: 0, limit: 10 } }),
+    orpc.regulation.list.queryOptions({ input: { offset: 0, limit: 10 } })
   );
 
+  // === Delete Mutation ===
+  const deleteMutation = useMutation(
+    orpc.regulation.remove.mutationOptions({
+      onSuccess: (_, variables) => {
+        queryClient.invalidateQueries({
+          queryKey: orpc.regulation.key(),
+        });
+        toast.success(`Peraturan dengan ID ${variables.id} berhasil dihapus!`);
+      },
+      onError: () => {
+        toast.error("Gagal menghapus peraturan, coba lagi.");
+      },
+    })
+  );
+
+  const handleDelete = (id: string) => {
+    if (confirm("Yakin ingin menghapus peraturan ini?")) {
+      deleteMutation.mutate({ id });
+    }
+  };
+
   const columns: ColumnDef<NonNullable<typeof peraturan.data>[number]>[] = [
+    { accessorKey: "id", header: "ID" },
+    { accessorKey: "title", header: "Peraturan" },
+    { accessorKey: "number", header: "No. Peraturan" },
+    { accessorKey: "level", header: "Tingkat" },
+    { accessorKey: "description", header: "Deskripsi" },
+    { accessorKey: "effectiveBy", header: "Tanggal Ditetapkan" },
     {
-      accessorKey: "id",
-      header: "ID",
-    },
-    {
-      accessorKey: "judul",
-      header: "Peraturan",
-    },
-    {
-      accessorKey: "nomor_peraturan",
-      header: "No. Peraturan",
-    },
-    {
-      accessorKey: "tingkat_peraturan",
-      header: "Tingkat",
-    },
-    {
-      accessorKey: "deskripsi",
-      header: "Deskripsi",
-    },
-    {
-      accessorKey: "berlaku_sejak",
-      header: "Tanggal DItetapkan",
+      id: "aksi",
+      cell: ({ row }) => {
+        const id = row.getValue("id") as string;
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => handleDelete(id)}
+                disabled={deleteMutation.isPending}
+                className="text-destructive focus:text-destructive"
+              >
+                {deleteMutation.isPending ? (
+                  <>
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                    Menghapus...
+                  </>
+                ) : (
+                  <>
+                    <Trash />
+                    Hapus Peraturan
+                  </>
+                )}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
     },
   ];
 
   return (
-    <DashboardSection className="">
-      <DataTable columns={columns} data={peraturan.data ?? []} />
+    <DashboardSection>
+      {peraturan.isPending ? (
+        <LoaderSkeleton />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={peraturan.data ?? []}
+          configButtons={
+            <>
+              {/* Tombol tambah (pakai Sheet popup form) */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button size="sm">
+                    <Plus />
+                    Tambah
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle>Tambah Peraturan Baru</SheetTitle>
+                  </SheetHeader>
+                  <RegulationCreateForm />
+                </SheetContent>
+              </Sheet>
+
+              {/* Tombol Config Tambahan */}
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  toast.info("Fitur config tambahan belum diimplementasikan")
+                }
+              >
+                <Trash />
+                Config Tambahan
+              </Button>
+            </>
+          }
+        />
+      )}
     </DashboardSection>
   );
 };
