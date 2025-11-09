@@ -26,7 +26,7 @@ export default async function RegulationPage() {
       <DashboardHeader>
         <DashboardTitle>Peraturan Desa</DashboardTitle>
         <DashboardDescription>
-          Kelola Peraturan oleh {session.user.name || "Administrator"}
+          Kelola Peraturan oleh {session?.user.name || "Administrator"}
         </DashboardDescription>
       </DashboardHeader>
 
