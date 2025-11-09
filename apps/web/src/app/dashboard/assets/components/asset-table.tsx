@@ -126,8 +126,7 @@ const AssetTable = () => {
 
           return (
             <AlertDialog>
-              <Dialog
-              >
+              <Dialog>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
@@ -145,11 +144,6 @@ const AssetTable = () => {
                     >
                       <Copy />
                       Salin Kode Aset
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem>
-                      <InfoIcon />
-                      Informasi
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator />

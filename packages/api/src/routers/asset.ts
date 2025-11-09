@@ -100,7 +100,7 @@ const find = publicProcedure
     const [assetItem] = await db
       .select()
       .from(asset)
-      .where(eq(asset.id, id))
+      .where(and(eq(asset.id, id), isNull(asset.deletedAt)))
       .limit(1);
 
     if (!assetItem) {
@@ -185,7 +185,7 @@ const remove = protectedProcedure
     const [deletedAsset] = await db
       .update(asset)
       .set({ deletedAt: new Date() })
-      .where(eq(asset.id, input.id))
+      .where(and(eq(asset.id, input.id), isNull(asset.deletedAt)))
       .returning();
 
     if (!deletedAsset) {

@@ -5,17 +5,17 @@ import { JetBrains_Mono, Outfit, Playfair_Display } from "next/font/google";
 import "../index.css";
 
 const outfit = Outfit({
-  variable: "--font-outfit",
+  variable: "--font-sans",
   subsets: ["latin"],
 });
 
 const playfairDisplay = Playfair_Display({
-  variable: "--font-playfair-display",
+  variable: "--font-serif",
   subsets: ["latin"],
 });
 
 const jetbrains = JetBrains_Mono({
-  variable: "--font-jetbrains",
+  variable: "--font-mono",
   subsets: ["latin"],
 });
 
