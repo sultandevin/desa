@@ -2,14 +2,8 @@
 
 import { useQuery, useMutation } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
-import {
-  Plus,
-  Trash,
-  Copy,
-  FileWarning,
-  MoreHorizontal,
-  Loader,
-} from "lucide-react";
+import { Plus, Trash, MoreHorizontal, Loader, SearchIcon } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
 import { orpc, queryClient } from "@/utils/orpc";
@@ -27,15 +21,23 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import LoaderSkeleton from "@/components/loader-skeleton";
 import { DashboardSection } from "../../components/dashboard";
 import { RegulationCreateForm } from "./regulation-create-form";
 
 const PeraturanTable = () => {
+  const [query, setQuery] = useState("");
+  const [queryInputValue, setQueryInputValue] = useState("");
   const peraturan = useQuery(
-    orpc.regulation.list.queryOptions({ input: { offset: 0, limit: 10 } })
+    orpc.regulation.list.queryOptions({
+      input: { offset: 0, limit: 10, query },
+    })
   );
 
   // === Delete Mutation ===
@@ -112,9 +114,31 @@ const PeraturanTable = () => {
         <DataTable
           columns={columns}
           data={peraturan.data ?? []}
+          isFetching={peraturan.isFetching}
           configButtons={
             <>
-              {/* Tombol tambah (pakai Sheet popup form) */}
+              <InputGroup className="w-fit min-w-60">
+                <InputGroupInput
+                  id="query"
+                  className="min-w-60 w-fit"
+                  value={queryInputValue}
+                  onChange={(e) => setQueryInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      setQuery(queryInputValue);
+                    }
+                  }}
+                  disabled={peraturan.isPending}
+                  placeholder="Cari..."
+                />
+                <InputGroupAddon>
+                  <SearchIcon />
+                </InputGroupAddon>
+                <InputGroupAddon align={`inline-end`}>
+                  {peraturan.data?.length} hasil
+                </InputGroupAddon>
+              </InputGroup>
+
               <Sheet>
                 <SheetTrigger asChild>
                   <Button size="sm">
@@ -130,7 +154,6 @@ const PeraturanTable = () => {
                 </SheetContent>
               </Sheet>
 
-              {/* Tombol Config Tambahan */}
               <Button
                 size="sm"
                 variant="outline"
