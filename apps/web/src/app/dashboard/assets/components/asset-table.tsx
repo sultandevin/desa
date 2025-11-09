@@ -1,7 +1,15 @@
 "use client";
+import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Copy, FileWarning, MoreHorizontal, Plus, Trash } from "lucide-react";
-import { toast } from "sonner";
+import {
+  Copy,
+  FileWarning,
+  MoreHorizontal,
+  Plus,
+  SearchIcon,
+  Trash,
+} from "lucide-react";
+import { useState } from "react";
 import { DataTable } from "@/components/data-table";
 import LoaderSkeleton from "@/components/loader-skeleton";
 import { Button } from "@/components/ui/button";
@@ -14,20 +22,26 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { formatCurrency } from "@/lib/utils";
+import { copyToClipboard, formatCurrency } from "@/lib/utils";
 import { orpc } from "@/utils/orpc";
 import { AssetCreateForm } from "./asset-create-form";
-import { useQuery } from "@tanstack/react-query";
 
 const AssetTable = () => {
+  const [query, setQuery] = useState("");
+  const [queryInputValue, setQueryInputValue] = useState("");
   const assets = useQuery(
-    orpc.asset.list.queryOptions({ input: { offset: 0, limit: 10 } }),
+    orpc.asset.list.queryOptions({ input: { offset: 0, limit: 10, query } }),
   );
 
   const columns: ColumnDef<NonNullable<typeof assets.data>[number]>[] = [
@@ -76,12 +90,7 @@ const AssetTable = () => {
               <DropdownMenuItem
                 onClick={() => {
                   const code: string = row.getValue("code");
-                  if (code === "" || !code) {
-                    toast.error("Kode aset tidak tersedia untuk disalin");
-                    return;
-                  }
-                  navigator.clipboard.writeText(row.getValue("code"));
-                  toast.success("Kode aset disalin ke clipboard");
+                  copyToClipboard({ text: code });
                 }}
               >
                 <Copy />
@@ -104,38 +113,55 @@ const AssetTable = () => {
   ];
 
   return (
-    <>
-      {assets.isPending ? (
-        <LoaderSkeleton />
-      ) : (
-        <DataTable
-          columns={columns}
-          data={assets.data ?? []}
-          configButtons={
-            <>
-              <Sheet>
-                <SheetTrigger asChild className="">
-                  <Button size={`sm`}>
-                    <Plus />
-                    Tambah
-                  </Button>
-                </SheetTrigger>
-                <SheetContent className="overflow-y-auto">
-                  <SheetHeader>
-                    <SheetTitle>Tambah Aset Baru</SheetTitle>
-                  </SheetHeader>
-                  <AssetCreateForm />
-                </SheetContent>
-              </Sheet>
+    <DataTable
+      columns={columns}
+      data={assets.data ?? []}
+      isFetching={assets.isFetching}
+      configButtons={
+        <>
+          <InputGroup className="w-fit min-w-60">
+            <InputGroupInput
+              id="query"
+              className="min-w-60 w-fit"
+              value={queryInputValue}
+              onChange={(e) => setQueryInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setQuery(queryInputValue);
+                }
+              }}
+              disabled={assets.isPending}
+              placeholder="Cari..."
+            />
+            <InputGroupAddon>
+              <SearchIcon />
+            </InputGroupAddon>
+            <InputGroupAddon align={`inline-end`}>
+              {assets.data?.length} hasil
+            </InputGroupAddon>
+          </InputGroup>
 
-              <Button size={`sm`} variant="outline">
-                Config Tambahan
+          <Sheet>
+            <SheetTrigger asChild className="">
+              <Button size={`sm`}>
+                <Plus />
+                Tambah
               </Button>
-            </>
-          }
-        />
-      )}
-    </>
+            </SheetTrigger>
+            <SheetContent className="overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Tambah Aset Baru</SheetTitle>
+              </SheetHeader>
+              <AssetCreateForm />
+            </SheetContent>
+          </Sheet>
+
+          <Button size={`sm`} variant="outline">
+            Config Tambahan
+          </Button>
+        </>
+      }
+    />
   );
 };
 

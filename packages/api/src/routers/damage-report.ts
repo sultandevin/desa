@@ -1,4 +1,4 @@
-import { db, eq } from "@desa/db";
+import { db } from "@desa/db";
 import { isForeignKeyError } from "@desa/db/lib/errors";
 import {
   damageReport,
@@ -6,6 +6,7 @@ import {
   damageReportSelectSchema,
 } from "@desa/db/schema/damage-report";
 import { ORPCError } from "@orpc/client";
+import { eq } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";

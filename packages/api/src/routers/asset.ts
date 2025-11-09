@@ -1,4 +1,4 @@
-import { db, desc, eq } from "@desa/db";
+import { db } from "@desa/db";
 import { isForeignKeyError } from "@desa/db/lib/errors";
 import {
   asset,
@@ -10,6 +10,7 @@ import {
   damageReportSelectSchema,
 } from "@desa/db/schema/damage-report";
 import { ORPCError } from "@orpc/client";
+import { desc, eq, ilike, or } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
@@ -25,13 +26,25 @@ const list = publicProcedure
     summary: "List All Assets",
     tags: ["Assets"],
   })
-  .input(paginationSchema)
+  .input(
+    paginationSchema.extend({
+      query: z.string(),
+    }),
+  )
   .output(z.array(assetSelectSchema))
   .handler(async ({ input, errors }) => {
     const assets = await db
       .select()
       .from(asset)
       .limit(input.limit)
+      .where(
+        input.query.length > 0
+          ? or(
+            ilike(asset.name, `%${input.query}%`),
+            ilike(asset.code, `%${input.query}%`),
+          )
+          : undefined,
+      )
       .offset(input.offset)
       .orderBy(desc(asset.updatedAt));
 

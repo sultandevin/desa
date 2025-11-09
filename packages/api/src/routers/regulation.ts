@@ -1,10 +1,11 @@
-import { db, eq } from "@desa/db";
+import { db } from "@desa/db";
 import { file } from "@desa/db/schema/file";
 import {
   regulation,
   regulationInsertSchema,
   regulationSelectSchema,
 } from "@desa/db/schema/regulation";
+import { eq } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
