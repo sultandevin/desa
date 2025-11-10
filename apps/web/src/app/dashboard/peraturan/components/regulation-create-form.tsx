@@ -25,7 +25,7 @@ const RegulationCreateForm = () => {
         });
         toast.success("Peraturan berhasil ditambahkan!");
       },
-    })
+    }),
   );
 
   const form = useForm({

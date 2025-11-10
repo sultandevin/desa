@@ -40,7 +40,6 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       nup: "",
       brandType: "",
       condition: "",
-      status: "",
       note: "",
       valueRp: 0,
       acquiredAt: new Date().toISOString().split("T")[0],
@@ -52,7 +51,6 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         nup: value.nup.length === 0 ? undefined : value.nup,
         brandType: value.brandType || null,
         condition: value.condition || null,
-        status: value.status || null,
         valueRp: value.valueRp || undefined,
         note: value.note || null,
         acquiredAt: value.acquiredAt ? new Date(value.acquiredAt) : null,
@@ -170,36 +168,6 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           />
         </SheetInnerSection>
         <SheetInnerSection>
-          <form.Field
-            name="condition"
-            children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    <span className="text-destructive">*</span>
-                    Kondisi
-                  </FieldLabel>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={isInvalid}
-                    placeholder="Baik, Rusak Ringan, Rusak Berat"
-                    autoComplete="off"
-                  />
-                  <FieldDescription>
-                    Kondisi fisik aset saat ini
-                  </FieldDescription>
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
-          />
-
           <form.Field
             name="valueRp"
             children={(field) => {

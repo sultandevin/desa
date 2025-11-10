@@ -11,8 +11,8 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import * as z from "zod";
 import { user } from "./auth";
-import { file } from "./file";
 import { damageStatusEnum } from "./damage-report";
+import { file } from "./file";
 
 export const asset = pgTable(
   "asset",

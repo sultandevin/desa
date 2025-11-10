@@ -12,4 +12,4 @@ export const cursorPaginationSchema = z.object({
 
 export const cursorOutputSchema = z.object({
   nextCursor: z.date().nullable(),
-})
+});

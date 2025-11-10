@@ -32,7 +32,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${outfit.variable} ${outfit.className} ${playfairDisplay.variable} ${jetbrains.variable} antialiased`}>
+        className={`${outfit.variable} ${outfit.className} ${playfairDisplay.variable} ${jetbrains.variable} antialiased`}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>
