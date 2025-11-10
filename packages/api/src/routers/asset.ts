@@ -46,15 +46,15 @@ const list = publicProcedure
           and(
             input.query.length > 0
               ? or(
-                ilike(asset.name, `%${input.query}%`),
-                or(
-                  ilike(asset.code, `%${input.query}%`),
+                  ilike(asset.name, `%${input.query}%`),
                   or(
-                    ilike(asset.nup, `%${input.query}%`),
-                    ilike(asset.brandType, `%${input.query}%`),
+                    ilike(asset.code, `%${input.query}%`),
+                    or(
+                      ilike(asset.nup, `%${input.query}%`),
+                      ilike(asset.brandType, `%${input.query}%`),
+                    ),
                   ),
-                ),
-              )
+                )
               : undefined,
             input.cursor ? lt(asset.updatedAt, input.cursor) : undefined,
           ),

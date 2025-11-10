@@ -7,7 +7,6 @@ import {
   ChevronsLeft,
   Copy,
   FileWarning,
-  InfoIcon,
   MoreHorizontal,
   NotebookIcon,
   Plus,

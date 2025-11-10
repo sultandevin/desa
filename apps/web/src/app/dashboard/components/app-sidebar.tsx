@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Bot,
   Home,
   MessageCircleWarning,
   Skull,

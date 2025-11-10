@@ -1,12 +1,13 @@
 import { db } from "@desa/db";
 import { isForeignKeyError } from "@desa/db/lib/errors";
+import { asset } from "@desa/db/schema/asset";
 import {
   damageReport,
   damageReportInsertSchema,
   damageReportSelectSchema,
 } from "@desa/db/schema/damage-report";
 import { ORPCError } from "@orpc/client";
-import { eq } from "drizzle-orm";
+import { eq, getTableColumns } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
@@ -19,11 +20,18 @@ const list = publicProcedure
     tags: ["Damage Reports"],
   })
   .input(paginationSchema)
-  .output(z.array(damageReportSelectSchema))
+  .output(
+    z.array(
+      damageReportSelectSchema.extend({
+        assetName: z.string().nullable(),
+      }),
+    ),
+  )
   .handler(async ({ input, errors }) => {
     const reports = await db
-      .select()
+      .select({ ...getTableColumns(damageReport), assetName: asset.name })
       .from(damageReport)
+      .leftJoin(asset, eq(damageReport.assetId, asset.id))
       .limit(input.limit)
       .offset(input.offset);
 
@@ -98,8 +106,44 @@ const create = protectedProcedure
     }
   });
 
+const verify = protectedProcedure
+  .route({
+    method: "POST",
+    path: "/damage-reports/{id}/verify",
+    summary: "Verify a Damage Report",
+    tags: ["Damage Reports"],
+  })
+  .input(
+    z.object({
+      id: z.string(),
+    }),
+  )
+  .handler(async ({ input, context, errors }) => {
+    const [report] = await db
+      .update(damageReport)
+      .set({
+        verifiedBy: context.session.user.id,
+        verifiedAt: new Date(),
+      })
+      .where(eq(damageReport.id, input.id))
+      .returning();
+
+    if (!report) throw errors.NOT_FOUND();
+
+    await db
+      .update(asset)
+      .set({
+        status: report.status,
+      })
+      .where(eq(asset.id, report.assetId))
+      .returning();
+
+    return report;
+  });
+
 export const damageReportRouter = {
   list,
   find,
   create,
+  verify,
 };
