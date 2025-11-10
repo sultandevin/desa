@@ -1,9 +1,19 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Check, MoreHorizontal, Plus, SearchIcon, Trash } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +46,14 @@ const DamageReportTable = () => {
 
   const damageReports = useQuery(
     orpc.damageReport.list.queryOptions({ input: { offset: 0, limit: 10 } }),
+  );
+
+  const damageReportVerifyMutation = useMutation(
+    orpc.damageReport.verify.mutationOptions({
+      onSuccess: () => {
+        toast.success("Laporan berhasil diverifikasi");
+      },
+    }),
   );
 
   const columns: ColumnDef<NonNullable<typeof damageReports.data>[number]>[] = [
@@ -101,28 +119,64 @@ const DamageReportTable = () => {
     },
     {
       id: "aksi",
-      cell: () => {
+      cell: ({ row }) => {
+        function handleVerifyReport() {
+          damageReportVerifyMutation.mutate({
+            id: row.original.id,
+          });
+        }
+
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Check />
-                Verifikasi Laporan
-              </DropdownMenuItem>
-              <DropdownMenuItem variant="destructive">
-                <Trash />
-                Hapus Laporan
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <AlertDialog>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem>
+                    <Check />
+                    Verifikasi Laporan
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <DropdownMenuItem variant="destructive">
+                  <Trash />
+                  Hapus Laporan
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Verifikasi Laporan Kerusakan
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  Apakah Anda yakin ingin memverifikasi laporan kerusakan ini?
+                  Tindakan ini tidak dapat dibatalkan.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <Button
+                  variant="default"
+                  onClick={handleVerifyReport}
+                  disabled={damageReportVerifyMutation.isPending}
+                >
+                  {damageReportVerifyMutation.isPending
+                    ? "Memverifikasi..."
+                    : "Ya, Verifikasi"}
+                </Button>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline">Batal</Button>
+                </AlertDialogTrigger>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         );
       },
     },
