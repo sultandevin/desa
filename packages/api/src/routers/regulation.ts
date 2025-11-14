@@ -80,6 +80,7 @@ const search = publicProcedure
       .from(regulation)
       .where(
         or(
+          like(regulation.title, ("%" + query + "%")),
           like(regulation.number, ("%" + query + "%")),
           like(regulation.level, ("%" + query + "%")),
           like(regulation.description, ("%" + query + "%")),

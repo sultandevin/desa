@@ -34,10 +34,18 @@ import { RegulationCreateForm } from "./regulation-create-form";
 const PeraturanTable = () => {
   const [query, setQuery] = useState("");
   const [queryInputValue, setQueryInputValue] = useState("");
+  
+  /*
   const peraturan = useQuery(
     orpc.regulation.list.queryOptions({
       input: { offset: 0, limit: 10, query },
-    }),
+    })
+  );
+  */
+  const peraturan = useQuery(
+    orpc.regulation.search.queryOptions({
+      input: { "query": query },
+    })
   );
 
   // === Delete Mutation ===
