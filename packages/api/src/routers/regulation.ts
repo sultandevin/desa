@@ -5,7 +5,7 @@ import {
   regulationInsertSchema,
   regulationSelectSchema,
 } from "@desa/db/schema/regulation";
-import { eq } from "drizzle-orm";
+import { eq, like, or } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
@@ -58,6 +58,39 @@ const find = publicProcedure
       throw errors.NOT_FOUND();
     }
     return regulationItem;
+  });
+
+const search = publicProcedure
+  .route({
+    method: "POST",
+    path: "/regulationsearch",
+    summary: "Search regulations",
+    tags: ["Regulations"],
+  })
+  .input(
+    z.object({
+      query: z.string(),
+    }),
+  )
+  .output(z.array(regulationSelectSchema))
+  .handler(async ({ input, errors, context }) => {
+    const query = input.query;
+    const regulations = await db
+      .select()
+      .from(regulation)
+      .where(
+        or(
+          like(regulation.number, ("%" + query + "%")),
+          like(regulation.level, ("%" + query + "%")),
+          like(regulation.description, ("%" + query + "%")),
+          like(String(regulation.effectiveBy), ("%" + query + "%")),
+        )
+      );
+
+    if (!regulations) {
+      throw errors.NOT_FOUND();
+    }
+    return regulations;
   });
 
 const create = protectedProcedure
@@ -159,6 +192,7 @@ const remove = publicProcedure // hapus line ini kalo auth udah siap
 export const regulationRouter = {
   list,
   find,
+  search,
   create,
   update,
   remove,
