@@ -48,7 +48,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { orpc, queryClient } from "@/utils/orpc";
-// import { KeputusanCreateForm } from "./keputusan-create-form";
+import { KeputusanCreateForm } from "./keputusan-create-form";
 // import { KeputusanEditForm } from "./keputusan-edit-form";
 
 const KeputusanTable = () => {
@@ -254,11 +254,12 @@ const KeputusanTable = () => {
                 Tambah
               </Button>
             </SheetTrigger>
-            <SheetContent className="overflow-y-auto">
+            <SheetContent className="overflow-y-auto min-w-[400px] sm:min-w-[540px]">
               <SheetHeader>
                 <SheetTitle>Tambah Keputusan Baru</SheetTitle>
               </SheetHeader>
-              {/* <KeputusanCreateForm onSuccess={() => setIsCreateFormOpen(false)} /> */}
+              {/* UNCOMMENT dan gunakan komponen form di sini */}
+              <KeputusanCreateForm onSuccess={() => setIsCreateFormOpen(false)} />
             </SheetContent>
           </Sheet>
 
