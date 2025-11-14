@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Loader, MoreHorizontal, Plus, SearchIcon, Trash } from "lucide-react";
+import { Loader, MoreHorizontal, Plus, SearchIcon, Trash, Pencil } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
@@ -30,6 +30,7 @@ import {
 import { orpc, queryClient } from "@/utils/orpc";
 import { DashboardSection } from "../../components/dashboard";
 import { RegulationCreateForm } from "./regulation-create-form";
+import { RegulationUpdateForm } from "./regulation-update-form";
 
 const PeraturanTable = () => {
   const [query, setQuery] = useState("");
@@ -81,34 +82,57 @@ const PeraturanTable = () => {
       cell: ({ row }) => {
         const id = row.getValue("id") as string;
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => handleDelete(id)}
-                disabled={deleteMutation.isPending}
-                className="text-destructive focus:text-destructive"
-              >
-                {deleteMutation.isPending ? (
-                  <>
-                    <Loader className="mr-2 h-4 w-4 animate-spin" />
-                    Menghapus...
-                  </>
-                ) : (
-                  <>
-                    <Trash />
-                    Hapus Peraturan
-                  </>
-                )}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <section>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button size="sm">
+                  <Pencil />
+                  Perbarui
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle>Perbarui Peraturan</SheetTitle>
+                </SheetHeader>
+                <RegulationUpdateForm
+                  id={row.getValue("id")}
+                  title={row.getValue("title")}
+                  number={row.getValue("number")}
+                  level={row.getValue("level")}
+                  description={row.getValue("description")}
+                  effectiveBy={row.getValue("effectiveBy")}
+                />
+              </SheetContent>
+            </Sheet>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => handleDelete(id)}
+                  disabled={deleteMutation.isPending}
+                  className="text-destructive focus:text-destructive"
+                >
+                  {deleteMutation.isPending ? (
+                    <>
+                      <Loader className="mr-2 h-4 w-4 animate-spin" />
+                      Menghapus...
+                    </>
+                  ) : (
+                    <>
+                      <Trash />
+                      Hapus Peraturan
+                    </>
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </section>
         );
       },
     },
