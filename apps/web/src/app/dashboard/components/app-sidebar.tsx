@@ -51,6 +51,16 @@ const data = {
       ],
     },
     {
+      title: "Keputusan Kepala Desa",
+      items: [
+        {
+          title: "Daftar Keputusan",
+          icon: Text,
+          url: "/dashboard/keputusan",
+        },
+      ],
+    },
+    {
       title: "Peraturan",
       items: [
         {
