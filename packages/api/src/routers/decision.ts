@@ -1,18 +1,14 @@
 import { db } from "@desa/db";
-import { file } from "@desa/db/schema/file";
 import {
   decision,
   decisionInsertSchema,
   decisionSelectSchema,
 } from "@desa/db/schema/decision";
+import { file } from "@desa/db/schema/file";
 import { eq, like, or } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
-
-const healthcheck = publicProcedure.handler(() => {
-  return "OK";
-});
 
 const list = publicProcedure
   .route({
@@ -89,8 +85,6 @@ const search = publicProcedure
           like(decision.shortDescription, `%${query}%`),
           like(decision.reportNumber, `%${query}%`),
           like(decision.notes, `%${query}%`),
-          like(String(decision.date), `%${query}%`),
-          like(String(decision.reportDate), `%${query}%`),
         ),
       );
 
@@ -139,7 +133,7 @@ const create = protectedProcedure
 const update = protectedProcedure
   .route({
     method: "PUT",
-    path: "/decisions/{id}",
+    // path: "/decisions/{id}",
     summary: "Update decision by ID",
     tags: ["Decisions"],
   })
@@ -204,7 +198,6 @@ const remove = protectedProcedure
   });
 
 export const decisionRouter = {
-  healthcheck,
   list,
   find,
   search,

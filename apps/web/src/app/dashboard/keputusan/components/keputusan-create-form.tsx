@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Loader, Plus, UploadCloud } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Field, FieldLabel, FieldDescription } from "@/components/ui/field";
+import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   SheetClose,
@@ -33,7 +33,7 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
       onError: (error) => {
         toast.error(`Gagal menambahkan keputusan: ${error.message}`);
       },
-    })
+    }),
   );
 
   const form = useForm({
@@ -60,7 +60,9 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
         regarding: value.regarding,
         shortDescription: value.shortDescription || null,
         reportNumber: value.reportNumber || null,
-        reportDate: value.reportDate ? new Date(value.reportDate).toISOString() : null,
+        reportDate: value.reportDate
+          ? new Date(value.reportDate).toISOString()
+          : null,
         notes: value.notes || null,
         file: value.file, // Kirim file ke backend
       });
@@ -157,7 +159,8 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
                   />
                 </div>
                 <FieldDescription>
-                  Format yang didukung: PDF, CSV, Word. Maksimal ukuran file tergantung server.
+                  Format yang didukung: PDF, CSV, Word. Maksimal ukuran file
+                  tergantung server.
                 </FieldDescription>
               </Field>
             )}

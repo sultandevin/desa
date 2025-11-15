@@ -7,12 +7,12 @@ import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
 import {
   AlertDialog,
-  AlertDialogTrigger,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogHeader,
   AlertDialogFooter,
+  AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -125,6 +125,7 @@ const DamageReportTable = () => {
             id: row.original.id,
           });
         }
+        const isVerified = !!row.original.verifiedAt;
 
         return (
           <AlertDialog>
@@ -138,12 +139,14 @@ const DamageReportTable = () => {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <AlertDialogTrigger asChild>
-                  <DropdownMenuItem>
-                    <Check />
-                    Verifikasi Laporan
-                  </DropdownMenuItem>
-                </AlertDialogTrigger>
+                {!isVerified && (
+                  <AlertDialogTrigger asChild>
+                    <DropdownMenuItem>
+                      <Check />
+                      Verifikasi Laporan
+                    </DropdownMenuItem>
+                  </AlertDialogTrigger>
+                )}
                 <DropdownMenuItem variant="destructive">
                   <Trash />
                   Hapus Laporan
@@ -189,10 +192,10 @@ const DamageReportTable = () => {
       isFetching={damageReports.isPending}
       configButtons={
         <>
-          <InputGroup className="w-full sm:max-w-sm ">
+          <InputGroup className="w-full sm:max-w-sm">
             <InputGroupInput
               id="query"
-              className="min-w-60 w-fit"
+              className="w-fit min-w-60"
               value={queryInputValue}
               onChange={(e) => setQueryInputValue(e.target.value)}
               onKeyDown={(e) => {

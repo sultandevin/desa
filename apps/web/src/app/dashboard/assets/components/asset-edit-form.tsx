@@ -93,10 +93,7 @@ const AssetEditForm = ({
       form.setFieldValue("brandType", asset.brandType ?? "");
       form.setFieldValue("condition", asset.condition ?? "");
       form.setFieldValue("note", asset.note ?? "");
-      form.setFieldValue(
-        "valueRp",
-        asset.valueRp ? Number(asset.valueRp) : 0,
-      );
+      form.setFieldValue("valueRp", asset.valueRp ? Number(asset.valueRp) : 0);
       form.setFieldValue(
         "acquiredAt",
         asset.acquiredAt
@@ -104,12 +101,12 @@ const AssetEditForm = ({
           : new Date().toISOString().split("T")[0],
       );
     }
-  }, [assetQuery.data]);
+  }, [assetQuery.data, form.setFieldValue]);
 
   if (assetQuery.isPending) {
     return (
       <div className="flex items-center justify-center p-8">
-        <Loader className="animate-spin size-6" />
+        <Loader className="size-6 animate-spin" />
       </div>
     );
   }
@@ -135,7 +132,7 @@ const AssetEditForm = ({
       <SheetInnerContent className="min-w-0 flex-1 overflow-y-auto">
         {/* Metadata Section */}
         <SheetInnerSection>
-          <div className="text-sm space-y-1">
+          <div className="space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Dibuat pada:</span>
               <span className="font-medium">

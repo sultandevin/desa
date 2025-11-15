@@ -39,7 +39,9 @@ export default function Home() {
               {DESA_ASCII}
             </pre>
 
-            <p className="text-lg">Nilai jelek ditanggung Muhammad Natha Ulinnuha</p>
+            <p className="text-lg">
+              Nilai jelek ditanggung Muhammad Natha Ulinnuha
+            </p>
 
             <div className="flex items-center justify-center gap-2">
               <Button asChild>

@@ -15,10 +15,6 @@ import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { cursorOutputSchema, cursorPaginationSchema } from "../schemas";
 
-const healthcheck = publicProcedure.handler(() => {
-  return "OK";
-});
-
 const list = publicProcedure
   .route({
     method: "GET",
@@ -43,21 +39,15 @@ const list = publicProcedure
       .where(
         and(
           isNull(asset.deletedAt),
-          and(
-            input.query.length > 0
-              ? or(
-                  ilike(asset.name, `%${input.query}%`),
-                  or(
-                    ilike(asset.code, `%${input.query}%`),
-                    or(
-                      ilike(asset.nup, `%${input.query}%`),
-                      ilike(asset.brandType, `%${input.query}%`),
-                    ),
-                  ),
-                )
-              : undefined,
-            input.cursor ? lt(asset.updatedAt, input.cursor) : undefined,
-          ),
+          input.query.length > 0
+            ? or(
+              ilike(asset.name, `%${input.query}%`),
+              ilike(asset.code, `%${input.query}%`),
+              ilike(asset.nup, `%${input.query}%`),
+              ilike(asset.brandType, `%${input.query}%`),
+            )
+            : undefined,
+          input.cursor ? lt(asset.updatedAt, input.cursor) : undefined,
         ),
       )
       .limit(input.pageSize)
@@ -241,7 +231,6 @@ const remove = protectedProcedure
   });
 
 export const assetRouter = {
-  healthcheck,
   list,
   find,
   create,

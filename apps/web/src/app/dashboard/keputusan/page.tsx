@@ -26,7 +26,8 @@ export default async function KeputusanPage() {
       <DashboardHeader>
         <DashboardTitle>Keputusan Kepala Desa</DashboardTitle>
         <DashboardDescription>
-          Kelola Keputusan Kepala Desa oleh {session.user.name || "Administrator"}
+          Kelola Keputusan Kepala Desa oleh{" "}
+          {session.user.name || "Administrator"}
         </DashboardDescription>
       </DashboardHeader>
 

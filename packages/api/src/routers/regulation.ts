@@ -73,19 +73,18 @@ const search = publicProcedure
     }),
   )
   .output(z.array(regulationSelectSchema))
-  .handler(async ({ input, errors, context }) => {
+  .handler(async ({ input, errors }) => {
     const query = input.query;
     const regulations = await db
       .select()
       .from(regulation)
       .where(
         or(
-          like(regulation.title, ("%" + query + "%")),
-          like(regulation.number, ("%" + query + "%")),
-          like(regulation.level, ("%" + query + "%")),
-          like(regulation.description, ("%" + query + "%")),
-          like(String(regulation.effectiveBy), ("%" + query + "%")),
-        )
+          like(regulation.title, `%${query}%`),
+          like(regulation.number, `%${query}%`),
+          like(regulation.level, `%${query}%`),
+          like(regulation.description, `%${query}%`),
+        ),
       );
 
     if (!regulations) {

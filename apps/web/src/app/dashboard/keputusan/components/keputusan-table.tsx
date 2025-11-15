@@ -3,8 +3,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
-  ChevronRight,
   ChevronLeft,
+  ChevronRight,
   ChevronsLeft,
   Edit,
   MoreHorizontal,
@@ -28,27 +28,28 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { orpc, queryClient } from "@/utils/orpc";
 import { KeputusanCreateForm } from "./keputusan-create-form";
+
 // import { KeputusanEditForm } from "./keputusan-edit-form";
 
 const KeputusanTable = () => {
@@ -62,7 +63,7 @@ const KeputusanTable = () => {
   const keputusan = useQuery(
     orpc.decision.list.queryOptions({
       input: { offset, limit: 10, query },
-    })
+    }),
   );
 
   const deleteMutation = useMutation(
@@ -76,7 +77,7 @@ const KeputusanTable = () => {
       onError: () => {
         toast.error("Gagal menghapus keputusan, coba lagi.");
       },
-    })
+    }),
   );
 
   const updateMutation = useMutation(
@@ -92,9 +93,9 @@ const KeputusanTable = () => {
       onError: () => {
         toast.error("Gagal memperbarui keputusan, coba lagi.");
       },
-    })
+    }),
   );
-  
+
   const columns: ColumnDef<NonNullable<typeof keputusan.data>[number]>[] = [
     {
       accessorKey: "id",
@@ -130,8 +131,8 @@ const KeputusanTable = () => {
         const reportDate = row.original.reportDate;
         return (
           <div>
-            <div className="font-medium">{reportNumber || '-'}</div>
-            <div className="text-sm text-gray-500">{reportDate || '-'}</div>
+            <div className="font-medium">{reportNumber || "-"}</div>
+            <div className="text-sm text-gray-500">{reportDate || "-"}</div>
           </div>
         );
       },
@@ -183,7 +184,8 @@ const KeputusanTable = () => {
               <AlertDialogHeader>
                 <AlertDialogTitle>Konfirmasi Hapus Keputusan</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Dengan mengeklik "Hapus", keputusan ini akan dihapus secara permanen.
+                  Dengan mengeklik "Hapus", keputusan ini akan dihapus secara
+                  permanen.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -259,7 +261,9 @@ const KeputusanTable = () => {
                 <SheetTitle>Tambah Keputusan Baru</SheetTitle>
               </SheetHeader>
               {/* UNCOMMENT dan gunakan komponen form di sini */}
-              <KeputusanCreateForm onSuccess={() => setIsCreateFormOpen(false)} />
+              <KeputusanCreateForm
+                onSuccess={() => setIsCreateFormOpen(false)}
+              />
             </SheetContent>
           </Sheet>
 
