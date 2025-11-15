@@ -6,9 +6,12 @@
       "mcp__shadcn__search_items_in_registries",
       "mcp__shadcn__get_add_command_for_items",
       "Bash(bunx shadcn@latest add:*)",
-      "Bash(bun:*)"
+      "Bash(bun:*)",
+      "Bash(cat:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["shadcn"]
+  "enabledMcpjsonServers": [
+    "shadcn"
+  ]
 }
