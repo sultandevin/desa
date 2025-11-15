@@ -45,7 +45,7 @@ const PeraturanTable = () => {
   const peraturan = useQuery(
     orpc.regulation.search.queryOptions({
       input: { query: query },
-    }),
+    })
   );
 
   // === Delete Mutation ===
@@ -60,7 +60,7 @@ const PeraturanTable = () => {
       onError: () => {
         toast.error("Gagal menghapus peraturan, coba lagi.");
       },
-    }),
+    })
   );
 
   const handleDelete = (id: string) => {
@@ -102,7 +102,7 @@ const PeraturanTable = () => {
                   </>
                 ) : (
                   <>
-                    <Trash />
+                    <Trash className="mr-2 h-4 w-4" />
                     Hapus Peraturan
                   </>
                 )}
@@ -121,7 +121,7 @@ const PeraturanTable = () => {
       ) : (
         <DataTable
           columns={columns}
-          data={peraturan.data ?? []}
+          data={Array.isArray(peraturan.data) ? peraturan.data : []}
           isFetching={peraturan.isFetching}
           configButtons={
             <>
@@ -143,7 +143,8 @@ const PeraturanTable = () => {
                   <SearchIcon />
                 </InputGroupAddon>
                 <InputGroupAddon align={`inline-end`}>
-                  {peraturan.data?.length} hasil
+                  {Array.isArray(peraturan.data) ? peraturan.data.length : 0}{" "}
+                  hasil
                 </InputGroupAddon>
               </InputGroup>
 
