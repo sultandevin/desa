@@ -1,6 +1,4 @@
-FROM oven/bun:1.3.2-alpine AS base
-RUN apk update
-RUN apk add --no-cache libc6-compat
+FROM oven/bun:1-debian AS base
 # Set working directory
 WORKDIR /app
  
@@ -8,18 +6,20 @@ WORKDIR /app
 FROM base AS prepare
 # Replace <your-major-version> with the major version installed in your repository. For example:
 # RUN bun global add turbo@^2
-RUN bun -g install turbo@^^2.5.4
+RUN bun install -g turbo@^2.5.4
 COPY . .
 # Add lockfile and package.json's of isolated subworkspace
 # Generate a partial monorepo with a pruned lockfile for a target workspace.
 # Assuming "web" is the name entered in the project's package.json: { name: "web" }
 RUN turbo prune web --docker
+# Ensure root tsconfig is in pruned output
+RUN cp tsconfig.base.json /app/out/full/tsconfig.base.json 2>/dev/null || true
  
 # ---
 FROM base AS builder
 # First install the dependencies (as they change less often)
 COPY --from=prepare /app/out/json/ .
-RUN bun install
+RUN bun install --frozen-lockfile
 # Build the project
 COPY --from=prepare /app/out/full/ .
  

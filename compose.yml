@@ -2,6 +2,7 @@ name: desa-prod
 
 services:
   web:
+    platform: linux/amd64
     build:
       context: .
       dockerfile: ./apps/web/Dockerfile
