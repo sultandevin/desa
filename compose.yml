@@ -3,7 +3,7 @@ name: desa-prod
 services:
   web:
     build:
-      context: ./apps/web
+      context: ./
       dockerfile: ./Dockerfile
     ports:
       - 3001:3001
