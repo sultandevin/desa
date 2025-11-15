@@ -1,54 +1,48 @@
-# -----------------------------------------------------------------------------
-# This Dockerfile.bun is specifically configured for projects using Bun
-# For npm/pnpm or yarn, refer to the Dockerfile instead
-# -----------------------------------------------------------------------------
-
-# Use Bun's official image
-FROM oven/bun:1-alpine AS base
-
+FROM oven/bun:1.3.2-alpine AS base
+RUN apk update
+RUN apk add --no-cache libc6-compat
+# Set working directory
 WORKDIR /app
-
-# Install dependencies with bun
-FROM base AS deps
-COPY package.json bun.lock* ./
-RUN bun install --no-save --frozen-lockfile
-
-# Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+ 
+# ---
+FROM base AS prepare
+# Replace <your-major-version> with the major version installed in your repository. For example:
+# RUN bun global add turbo@^2
+RUN bun -g install turbo@^^2.5.4
 COPY . .
-
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED=1
-
-RUN bun run build
-
-# Production image, copy all the files and run next
+# Add lockfile and package.json's of isolated subworkspace
+# Generate a partial monorepo with a pruned lockfile for a target workspace.
+# Assuming "web" is the name entered in the project's package.json: { name: "web" }
+RUN turbo prune web --docker
+ 
+# ---
+FROM base AS builder
+# First install the dependencies (as they change less often)
+COPY --from=prepare /app/out/json/ .
+RUN bun install
+# Build the project
+COPY --from=prepare /app/out/full/ .
+ 
+# Uncomment and use build args to enable remote caching
+# ARG TURBO_TEAM
+# ENV TURBO_TEAM=$TURBO_TEAM
+ 
+# ARG TURBO_TOKEN
+# ENV TURBO_TOKEN=$TURBO_TOKEN
+ 
+RUN bun turbo build
+ 
+# ---
 FROM base AS runner
-WORKDIR /app
-
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED=1
-
-ENV NODE_ENV=production \
-    PORT=3001 \
-    HOSTNAME="0.0.0.0"
-
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
-
-COPY --from=builder /app/public ./public
-
+# Don't run production as root for security reasons
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+USER nextjs
+ 
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-USER nextjs
-
-EXPOSE 3001
-
-CMD ["bun", "./server.js"]
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
+ 
+CMD ["bun", "apps/web/server.js"]
