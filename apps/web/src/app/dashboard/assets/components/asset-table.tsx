@@ -9,6 +9,7 @@ import {
   FileWarning,
   MoreHorizontal,
   NotebookIcon,
+  Pencil,
   Plus,
   SearchIcon,
   Trash,
@@ -53,11 +54,14 @@ import { copyToClipboard, formatCurrency } from "@/lib/utils";
 import { orpc, queryClient } from "@/utils/orpc";
 import { AssetCreateForm } from "./asset-create-form";
 import { AssetDamageReportFormDialog } from "./asset-damage-report-form-dialog";
+import { AssetEditForm } from "./asset-edit-form";
 
 const AssetTable = () => {
   const [query, setQuery] = useState("");
   const [queryInputValue, setQueryInputValue] = useState("");
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
+  const [isEditFormOpen, setIsEditFormOpen] = useState(false);
+  const [editingAssetId, setEditingAssetId] = useState<string | null>(null);
   const [cursor, setCursor] = useState<Date | undefined>(undefined);
 
   const assets = useQuery(
@@ -123,6 +127,11 @@ const AssetTable = () => {
             });
           }
 
+          function handleEdit() {
+            setEditingAssetId(row.original.id);
+            setIsEditFormOpen(true);
+          }
+
           return (
             <AlertDialog>
               <Dialog>
@@ -146,6 +155,11 @@ const AssetTable = () => {
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator />
+
+                    <DropdownMenuItem onClick={handleEdit}>
+                      <Pencil />
+                      Edit Aset
+                    </DropdownMenuItem>
 
                     <DialogTrigger asChild>
                       <DropdownMenuItem variant="destructive">
@@ -252,6 +266,20 @@ const AssetTable = () => {
                 <SheetTitle>Tambah Aset Baru</SheetTitle>
               </SheetHeader>
               <AssetCreateForm onSuccess={() => setIsCreateFormOpen(false)} />
+            </SheetContent>
+          </Sheet>
+
+          <Sheet open={isEditFormOpen} onOpenChange={setIsEditFormOpen}>
+            <SheetContent className="overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Edit Aset</SheetTitle>
+              </SheetHeader>
+              {editingAssetId && (
+                <AssetEditForm
+                  assetId={editingAssetId}
+                  onSuccess={() => setIsEditFormOpen(false)}
+                />
+              )}
             </SheetContent>
           </Sheet>
 

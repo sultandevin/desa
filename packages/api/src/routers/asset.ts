@@ -164,6 +164,49 @@ const create = protectedProcedure
     }
   });
 
+const update = protectedProcedure
+  .route({
+    method: "PUT",
+    path: "/assets/{id}",
+    summary: "Update an asset",
+    tags: ["Assets"],
+  })
+  .input(
+    z.object({
+      id: z.string(),
+      name: z.string().min(3, "Nama aset minimal 3 karakter").optional(),
+      code: z.string().min(3, "Kode aset minimal 3 karakter").optional(),
+      nup: z.string().min(3, "Kode aset minimal 3 karakter").optional(),
+      brandType: z.string().optional(),
+      condition: z.string().optional(),
+      valueRp: z
+        .number()
+        .min(0, "Nilai aset harus lebih dari atau sama dengan 0")
+        .optional(),
+      note: z.string().optional(),
+      acquiredAt: z.date().optional(),
+    }),
+  )
+  .output(assetSelectSchema)
+  .handler(async ({ input, errors }) => {
+    const { id, ...updateData } = input;
+
+    const [updatedAsset] = await db
+      .update(asset)
+      .set({
+        ...updateData,
+        valueRp: updateData.valueRp ? String(updateData.valueRp) : undefined,
+      })
+      .where(and(eq(asset.id, id), isNull(asset.deletedAt)))
+      .returning();
+
+    if (!updatedAsset) {
+      throw errors.NOT_FOUND();
+    }
+
+    return updatedAsset;
+  });
+
 const remove = protectedProcedure
   .route({
     method: "DELETE",
@@ -202,5 +245,6 @@ export const assetRouter = {
   list,
   find,
   create,
+  update,
   remove,
 };

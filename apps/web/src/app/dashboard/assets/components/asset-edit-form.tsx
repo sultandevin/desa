@@ -1,8 +1,9 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Loader, Save } from "lucide-react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,14 +29,30 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { orpc, queryClient } from "@/utils/orpc";
 
-const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
+const AssetEditForm = ({
+  assetId,
+  onSuccess,
+}: {
+  assetId: string;
+  onSuccess?: () => void;
+}) => {
+  const assetQuery = useQuery(
+    orpc.asset.find.queryOptions({
+      input: { id: assetId },
+    }),
+  );
+
   const assetMutation = useMutation(
-    orpc.asset.create.mutationOptions({
+    orpc.asset.update.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: orpc.asset.key(),
         });
-        toast.success("Berhasil mencatat aset baru!");
+        toast.success("Berhasil memperbarui aset!");
+        onSuccess?.();
+      },
+      onError: () => {
+        toast.error("Gagal memperbarui aset");
       },
     }),
   );
@@ -53,18 +70,59 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     },
     onSubmit: ({ value }) => {
       assetMutation.mutate({
+        id: assetId,
         name: value.name,
         code: value.code.length === 0 ? undefined : value.code,
         nup: value.nup.length === 0 ? undefined : value.nup,
-        brandType: value.brandType || null,
-        condition: value.condition || null,
+        brandType: value.brandType || undefined,
+        condition: value.condition || undefined,
         valueRp: value.valueRp || undefined,
-        note: value.note || null,
-        acquiredAt: value.acquiredAt ? new Date(value.acquiredAt) : null,
+        note: value.note || undefined,
+        acquiredAt: value.acquiredAt ? new Date(value.acquiredAt) : undefined,
       });
-      assetMutation.isSuccess && onSuccess?.();
     },
   });
+
+  // Populate form with existing asset data
+  useEffect(() => {
+    if (assetQuery.data) {
+      const asset = assetQuery.data;
+      form.setFieldValue("name", asset.name);
+      form.setFieldValue("code", asset.code ?? "");
+      form.setFieldValue("nup", asset.nup ?? "");
+      form.setFieldValue("brandType", asset.brandType ?? "");
+      form.setFieldValue("condition", asset.condition ?? "");
+      form.setFieldValue("note", asset.note ?? "");
+      form.setFieldValue(
+        "valueRp",
+        asset.valueRp ? Number(asset.valueRp) : 0,
+      );
+      form.setFieldValue(
+        "acquiredAt",
+        asset.acquiredAt
+          ? new Date(asset.acquiredAt).toISOString().split("T")[0]
+          : new Date().toISOString().split("T")[0],
+      );
+    }
+  }, [assetQuery.data]);
+
+  if (assetQuery.isPending) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader className="animate-spin size-6" />
+      </div>
+    );
+  }
+
+  if (assetQuery.isError || !assetQuery.data) {
+    return (
+      <div className="p-4 text-center text-destructive">
+        Gagal memuat data aset
+      </div>
+    );
+  }
+
+  const asset = assetQuery.data;
 
   return (
     <form
@@ -75,6 +133,33 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       className="flex min-h-0 min-w-0 flex-1 flex-col"
     >
       <SheetInnerContent className="min-w-0 flex-1 overflow-y-auto">
+        {/* Metadata Section */}
+        <SheetInnerSection>
+          <div className="text-sm space-y-1">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Dibuat pada:</span>
+              <span className="font-medium">
+                {new Date(asset.createdAt).toLocaleDateString("id-ID", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Terakhir diubah:</span>
+              <span className="font-medium">
+                {new Date(asset.updatedAt).toLocaleDateString("id-ID", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </div>
+          </div>
+        </SheetInnerSection>
+
+        {/* Editable Fields */}
         <SheetInnerSection>
           <form.Field
             name="name"
@@ -294,7 +379,7 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           ) : (
             <>
               <Save />
-              Simpan Aset
+              Simpan Perubahan
             </>
           )}
         </Button>
@@ -306,4 +391,4 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   );
 };
 
-export { AssetCreateForm };
+export { AssetEditForm };
