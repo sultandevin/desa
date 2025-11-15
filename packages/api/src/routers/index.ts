@@ -6,9 +6,16 @@ import { decisionRouter } from "./decision";
 import { regulationRouter } from "./regulation";
 
 export const appRouter = {
-  healthCheck: publicProcedure.handler(() => {
-    return "OK";
-  }),
+  healthCheck: publicProcedure
+    .route({
+      method: "GET",
+      path: "/healthcheck",
+      summary: "Check if API is healthy",
+      tags: ["Global"],
+    })
+    .handler(() => {
+      return "OK";
+    }),
   asset: assetRouter,
   regulation: regulationRouter,
   damageReport: damageReportRouter,
