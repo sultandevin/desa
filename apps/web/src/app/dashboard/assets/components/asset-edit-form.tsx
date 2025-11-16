@@ -60,7 +60,6 @@ const AssetEditForm = ({
   const form = useForm({
     defaultValues: {
       name: "",
-      code: "",
       nup: "",
       brandType: "",
       condition: "",
@@ -72,7 +71,6 @@ const AssetEditForm = ({
       assetMutation.mutate({
         id: assetId,
         name: value.name,
-        code: value.code.length === 0 ? undefined : value.code,
         nup: value.nup.length === 0 ? undefined : value.nup,
         brandType: value.brandType || undefined,
         condition: value.condition || undefined,
@@ -88,7 +86,6 @@ const AssetEditForm = ({
     if (assetQuery.data) {
       const asset = assetQuery.data;
       form.setFieldValue("name", asset.name);
-      form.setFieldValue("code", asset.code ?? "");
       form.setFieldValue("nup", asset.nup ?? "");
       form.setFieldValue("brandType", asset.brandType ?? "");
       form.setFieldValue("condition", asset.condition ?? "");
@@ -200,30 +197,6 @@ const AssetEditForm = ({
                     onChange={(e) => field.handleChange(e.target.value)}
                     aria-invalid={isInvalid}
                     placeholder="XXXXXX"
-                    autoComplete="off"
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
-          />
-
-          <form.Field
-            name="code"
-            children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Kode</FieldLabel>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={isInvalid}
-                    placeholder="9939443278"
                     autoComplete="off"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}

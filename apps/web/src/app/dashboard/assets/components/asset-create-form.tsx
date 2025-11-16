@@ -43,7 +43,6 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const form = useForm({
     defaultValues: {
       name: "",
-      code: "",
       nup: "",
       brandType: "",
       condition: "",
@@ -54,7 +53,6 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     onSubmit: ({ value }) => {
       assetMutation.mutate({
         name: value.name,
-        code: value.code.length === 0 ? undefined : value.code,
         nup: value.nup.length === 0 ? undefined : value.nup,
         brandType: value.brandType || null,
         condition: value.condition || null,
@@ -118,30 +116,6 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                     onChange={(e) => field.handleChange(e.target.value)}
                     aria-invalid={isInvalid}
                     placeholder="XXXXXX"
-                    autoComplete="off"
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
-          />
-
-          <form.Field
-            name="code"
-            children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Kode</FieldLabel>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={isInvalid}
-                    placeholder="9939443278"
                     autoComplete="off"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
