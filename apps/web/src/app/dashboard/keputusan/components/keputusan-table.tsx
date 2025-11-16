@@ -1,5 +1,6 @@
 "use client";
 
+import type { Decision } from "@desa/db/schema/decision";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
@@ -57,7 +58,9 @@ const KeputusanTable = () => {
   const [queryInputValue, setQueryInputValue] = useState("");
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
-  const [editingKeputusan, setEditingKeputusan] = useState<any>(null);
+  const [editingKeputusan, setEditingKeputusan] = useState<Decision | null>(
+    null,
+  );
   const [offset, setOffset] = useState(0);
 
   const keputusan = useQuery(
@@ -80,9 +83,9 @@ const KeputusanTable = () => {
     }),
   );
 
-  const updateMutation = useMutation(
+  const _updateMutation = useMutation(
     orpc.decision.update.mutationOptions({
-      onSuccess: (_, variables) => {
+      onSuccess: (_, _variables) => {
         queryClient.invalidateQueries({
           queryKey: orpc.decision.key(),
         });
@@ -110,7 +113,7 @@ const KeputusanTable = () => {
         return (
           <div>
             <div className="font-medium">{decisionNumber}</div>
-            <div className="text-sm text-gray-500">{decisionDate}</div>
+            <div className="text-gray-500 text-sm">{decisionDate}</div>
           </div>
         );
       },
@@ -132,7 +135,7 @@ const KeputusanTable = () => {
         return (
           <div>
             <div className="font-medium">{reportNumber || "-"}</div>
-            <div className="text-sm text-gray-500">{reportDate || "-"}</div>
+            <div className="text-gray-500 text-sm">{reportDate || "-"}</div>
           </div>
         );
       },
@@ -221,10 +224,10 @@ const KeputusanTable = () => {
       isFetching={keputusan.isPending}
       configButtons={
         <>
-          <InputGroup className="w-fit w-full max-w-sm ">
+          <InputGroup className="w-fit w-full max-w-sm">
             <InputGroupInput
               id="query"
-              className="min-w-60 w-fit"
+              className="w-fit min-w-60"
               value={queryInputValue}
               onChange={(e) => setQueryInputValue(e.target.value)}
               onKeyDown={(e) => {
@@ -256,7 +259,7 @@ const KeputusanTable = () => {
                 Tambah
               </Button>
             </SheetTrigger>
-            <SheetContent className="overflow-y-auto min-w-[400px] sm:min-w-[540px]">
+            <SheetContent className="min-w-[400px] overflow-y-auto sm:min-w-[540px]">
               <SheetHeader>
                 <SheetTitle>Tambah Keputusan Baru</SheetTitle>
               </SheetHeader>

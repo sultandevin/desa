@@ -45,7 +45,7 @@ const PeraturanTable = () => {
   const peraturan = useQuery(
     orpc.regulation.search.queryOptions({
       input: { query: query },
-    })
+    }),
   );
 
   // === Delete Mutation ===
@@ -60,7 +60,7 @@ const PeraturanTable = () => {
       onError: () => {
         toast.error("Gagal menghapus peraturan, coba lagi.");
       },
-    })
+    }),
   );
 
   const handleDelete = (id: string) => {
@@ -128,7 +128,7 @@ const PeraturanTable = () => {
               <InputGroup className="w-fit min-w-60">
                 <InputGroupInput
                   id="query"
-                  className="min-w-60 w-fit"
+                  className="w-fit min-w-60"
                   value={queryInputValue}
                   onChange={(e) => setQueryInputValue(e.target.value)}
                   onKeyDown={(e) => {

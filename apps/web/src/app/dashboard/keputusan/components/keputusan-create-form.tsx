@@ -2,7 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
-import { Loader, Plus, UploadCloud } from "lucide-react";
+import { Loader, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
@@ -185,7 +185,7 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
         </SheetInnerSection>
 
         <SheetInnerSection>
-          <h3 className="mb-2 font-semibold text-sm text-muted-foreground">
+          <h3 className="mb-2 font-semibold text-muted-foreground text-sm">
             Laporan (Opsional)
           </h3>
           <form.Field
@@ -244,7 +244,7 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
         <Button type="submit" disabled={mutation.isPending}>
           {mutation.isPending ? (
             <>
-              <Loader className="animate-spin mr-2 size-4" />
+              <Loader className="mr-2 size-4 animate-spin" />
               Menyimpan...
             </>
           ) : (

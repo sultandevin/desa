@@ -225,10 +225,10 @@ const AssetTable = () => {
       isFetching={assets.isPending}
       configButtons={
         <>
-          <InputGroup className="w-full sm:max-w-sm ">
+          <InputGroup className="w-full sm:max-w-sm">
             <InputGroupInput
               id="query"
-              className="min-w-60 w-fit"
+              className="w-fit min-w-60"
               value={queryInputValue}
               onChange={(e) => setQueryInputValue(e.target.value)}
               onKeyDown={(e) => {
@@ -283,7 +283,7 @@ const AssetTable = () => {
             </SheetContent>
           </Sheet>
 
-          <div className="flex ml-auto items-center gap-2">
+          <div className="ml-auto flex items-center gap-2">
             <Button
               size={`icon`}
               variant="outline"

@@ -1,5 +1,6 @@
 import { date, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import type { z } from "zod";
 import { user } from "./auth";
 import { file } from "./file";
 
@@ -21,3 +22,6 @@ export const decision = pgTable("decision", {
 
 export const decisionSelectSchema = createSelectSchema(decision);
 export const decisionInsertSchema = createInsertSchema(decision);
+
+export type Decision = z.infer<typeof decisionSelectSchema>;
+export type DecisionInsert = z.infer<typeof decisionInsertSchema>;

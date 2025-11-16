@@ -41,11 +41,11 @@ const list = publicProcedure
           isNull(asset.deletedAt),
           input.query.length > 0
             ? or(
-              ilike(asset.name, `%${input.query}%`),
-              ilike(asset.code, `%${input.query}%`),
-              ilike(asset.nup, `%${input.query}%`),
-              ilike(asset.brandType, `%${input.query}%`),
-            )
+                ilike(asset.name, `%${input.query}%`),
+                ilike(asset.code, `%${input.query}%`),
+                ilike(asset.nup, `%${input.query}%`),
+                ilike(asset.brandType, `%${input.query}%`),
+              )
             : undefined,
           input.cursor ? lt(asset.updatedAt, input.cursor) : undefined,
         ),

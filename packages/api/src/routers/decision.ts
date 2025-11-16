@@ -1,5 +1,6 @@
 import { db } from "@desa/db";
 import {
+  type DecisionInsert,
   decision,
   decisionInsertSchema,
   decisionSelectSchema,
@@ -158,7 +159,8 @@ const update = protectedProcedure
       if (!fileExists) throw errors.NOT_FOUND({ message: "File not found" });
     }
 
-    const { id, ...rest } = input as { id: string } & Record<string, any>;
+    type DecisionUpdate = { id: string } & Partial<DecisionInsert>;
+    const { id, ...rest }: DecisionUpdate = input;
 
     const [updatedDecision] = await db
       .update(decision)
