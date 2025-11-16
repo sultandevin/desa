@@ -2,7 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Loader, Edit } from "lucide-react";
+import { Edit, Loader } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,11 +26,14 @@ interface KeputusanEditFormProps {
   onSuccess?: () => void;
 }
 
-const KeputusanEditForm = ({ keputusanId, onSuccess }: KeputusanEditFormProps) => {
+const KeputusanEditForm = ({
+  keputusanId,
+  onSuccess,
+}: KeputusanEditFormProps) => {
   const keputusanQuery = useQuery(
     orpc.decision.find.queryOptions({
-      input: { id: keputusanId }
-    })
+      input: { id: keputusanId },
+    }),
   );
 
   const keputusanMutation = useMutation(
@@ -61,8 +64,13 @@ const KeputusanEditForm = ({ keputusanId, onSuccess }: KeputusanEditFormProps) =
       file: null as File | null,
     },
     onSubmit: ({ value }) => {
-      if (!value.number.trim() || !value.date || !value.regarding.trim() ||
-          !value.reportNumber.trim() || !value.reportDate) {
+      if (
+        !value.number.trim() ||
+        !value.date ||
+        !value.regarding.trim() ||
+        !value.reportNumber.trim() ||
+        !value.reportDate
+      ) {
         toast.error("Mohon lengkapi field bertanda bintang (*)");
         return;
       }
@@ -82,7 +90,7 @@ const KeputusanEditForm = ({ keputusanId, onSuccess }: KeputusanEditFormProps) =
   });
 
   return (
-      <form
+    <form
       onSubmit={(e) => {
         e.preventDefault();
         form.handleSubmit();
@@ -189,7 +197,7 @@ const KeputusanEditForm = ({ keputusanId, onSuccess }: KeputusanEditFormProps) =
                       const file = e.target.files?.[0] || null;
                       field.handleChange(file);
                     }}
-                    className="cursor-pointer file:cursor-pointer file:text-primary file:mr-4"
+                    className="cursor-pointer file:mr-4 file:cursor-pointer file:text-primary"
                   />
                 </div>
                 <FieldDescription>
@@ -221,8 +229,8 @@ const KeputusanEditForm = ({ keputusanId, onSuccess }: KeputusanEditFormProps) =
         </SheetInnerSection>
 
         <SheetInnerSection>
-          <h3 className="mb-2 font-semibold text-sm text-muted-foreground">
-            Laporan 
+          <h3 className="mb-2 font-semibold text-muted-foreground text-sm">
+            Laporan
           </h3>
           <form.Field
             name="reportNumber"
@@ -288,7 +296,10 @@ const KeputusanEditForm = ({ keputusanId, onSuccess }: KeputusanEditFormProps) =
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>
                     Keterangan
-                    <span className="font-normal text-gray-500"> (opsional)</span>
+                    <span className="font-normal text-gray-500">
+                      {" "}
+                      (opsional)
+                    </span>
                   </FieldLabel>
                   <Textarea
                     id={field.name}
@@ -308,11 +319,11 @@ const KeputusanEditForm = ({ keputusanId, onSuccess }: KeputusanEditFormProps) =
         </SheetInnerSection>
       </SheetInnerContent>
 
-    <SheetFooter className="grid shrink-0 grid-cols-1 gap-2 border-t bg-background p-4 sm:grid-cols-2">
+      <SheetFooter className="grid shrink-0 grid-cols-1 gap-2 border-t bg-background p-4 sm:grid-cols-2">
         <Button type="submit" disabled={keputusanMutation.isPending}>
           {keputusanMutation.isPending ? (
             <>
-              <Loader className="animate-spin mr-2 size-4" />
+              <Loader className="mr-2 size-4 animate-spin" />
               Menyimpan...
             </>
           ) : (

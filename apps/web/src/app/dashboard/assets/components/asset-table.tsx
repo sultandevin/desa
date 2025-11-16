@@ -50,12 +50,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { authClient } from "@/lib/auth-client";
 import { copyToClipboard, formatCurrency } from "@/lib/utils";
 import { orpc, queryClient } from "@/utils/orpc";
 import { AssetCreateForm } from "./asset-create-form";
 import { AssetDamageReportFormDialog } from "./asset-damage-report-form-dialog";
 import { AssetEditForm } from "./asset-edit-form";
-import { authClient } from "@/lib/auth-client";
 
 const AssetTable = () => {
   const [query, setQuery] = useState("");

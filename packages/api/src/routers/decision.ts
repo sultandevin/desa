@@ -1,13 +1,13 @@
 import { db } from "@desa/db";
+import { isForeignKeyError } from "@desa/db/lib/errors";
 import {
   decision,
   decisionInsertSchema,
   decisionSelectSchema,
 } from "@desa/db/schema/decision";
 import { ORPCError } from "@orpc/client";
-import { isForeignKeyError } from "@desa/db/lib/errors";
 // import { file } from "@desa/db/schema/file";
-import { eq, ilike, or, and, sql } from "drizzle-orm";
+import { and, eq, ilike, or, sql } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
@@ -22,10 +22,12 @@ const list = publicProcedure
   .input(
     paginationSchema.extend({
       query: z.string().optional().default(""),
-      year: z.string().optional()
-        .transform(val => val ? parseInt(val) : undefined)
+      year: z
+        .string()
+        .optional()
+        .transform((val) => (val ? parseInt(val, 10) : undefined))
         .refine((val) => !val || (val >= 1999 && val <= 2100), {
-          message: "Year must be between 1999 and 2100"
+          message: "Year must be between 1999 and 2100",
         }),
       category: z.enum(["anggaran", "personal", "infrastruktur"]).optional(),
     }),
@@ -34,44 +36,75 @@ const list = publicProcedure
   .handler(async ({ input }) => {
     try {
       const searchTerm = input.query?.trim() ? `%${input.query}%` : null;
-      
-      const categoryCondition = input.category ? (() => {
-        const categoryKeywords = {
-          // Contoh kategori dan kata kunci terkait
-          anggaran: ["anggaran", "dana", "budget", "keuangan", "biaya", "apbd", "rka"],
-          personal: ["pegawai", "staff", "personnel", "karyawan", "sdm", "cpns"],
-          infrastruktur: ["jalan", "bangunan", "infrastructure", "fasilitas", "gedung", "jembatan"],
-        };
 
-        const keywords = categoryKeywords[input.category as keyof typeof categoryKeywords] || [];
+      const categoryCondition = input.category
+        ? (() => {
+            const categoryKeywords = {
+              // Contoh kategori dan kata kunci terkait
+              anggaran: [
+                "anggaran",
+                "dana",
+                "budget",
+                "keuangan",
+                "biaya",
+                "apbd",
+                "rka",
+              ],
+              personal: [
+                "pegawai",
+                "staff",
+                "personnel",
+                "karyawan",
+                "sdm",
+                "cpns",
+              ],
+              infrastruktur: [
+                "jalan",
+                "bangunan",
+                "infrastructure",
+                "fasilitas",
+                "gedung",
+                "jembatan",
+              ],
+            };
 
-        const conditions = keywords.map(keyword =>
-          or(
-            ilike(decision.number, `%${keyword}%`),
-            ilike(decision.regarding, `%${keyword}%`),
-            ilike(decision.shortDescription, `%${keyword}%`),
-            ilike(decision.reportNumber, `%${keyword}%`),
-            ilike(decision.notes, `%${keyword}%`)
-          )
-        );
+            const keywords =
+              categoryKeywords[
+                input.category as keyof typeof categoryKeywords
+              ] || [];
 
-        return conditions.length > 0 ? or(...conditions) : undefined;
-      })() : undefined;
+            const conditions = keywords.map((keyword) =>
+              or(
+                ilike(decision.number, `%${keyword}%`),
+                ilike(decision.regarding, `%${keyword}%`),
+                ilike(decision.shortDescription, `%${keyword}%`),
+                ilike(decision.reportNumber, `%${keyword}%`),
+                ilike(decision.notes, `%${keyword}%`),
+              ),
+            );
+
+            return conditions.length > 0 ? or(...conditions) : undefined;
+          })()
+        : undefined;
 
       const decisions = await db
         .select()
         .from(decision)
         .where(
           and(
-            searchTerm ? or(
-              ilike(decision.number, searchTerm),
-              ilike(decision.regarding, searchTerm),
-              ilike(decision.shortDescription, searchTerm),
-              ilike(decision.reportNumber, searchTerm)
-            ) : undefined,
-            input.year ? sql`EXTRACT(YEAR FROM ${decision.date}) = ${input.year}` : undefined,
-            categoryCondition
-          )
+            searchTerm
+              ? or(
+                  ilike(decision.number, searchTerm),
+                  ilike(decision.regarding, searchTerm),
+                  ilike(decision.shortDescription, searchTerm),
+                  ilike(decision.reportNumber, searchTerm),
+                )
+              : undefined,
+            input.year
+              ? sql`EXTRACT(YEAR FROM ${decision.date}) = ${input.year}`
+              : undefined,
+            categoryCondition,
+          ),
         )
         .orderBy(sql`${decision.createdAt} DESC`)
         .limit(input.limit)
@@ -111,7 +144,6 @@ const find = publicProcedure
     return decisionItem;
   });
 
-
 const create = protectedProcedure
   .route({
     method: "POST",
@@ -139,7 +171,7 @@ const create = protectedProcedure
       //   }
       // }
 
-      // Temp set file 
+      // Temp set file
       const inputData = {
         ...input,
         file: undefined, // Enable when file upload is ready
@@ -157,9 +189,10 @@ const create = protectedProcedure
 
       return newDecision;
     } catch (err) {
-      if (isForeignKeyError(err)) throw new ORPCError("BAD_REQUEST", {
-        message: "Invalid foreign key reference"
-      });
+      if (isForeignKeyError(err))
+        throw new ORPCError("BAD_REQUEST", {
+          message: "Invalid foreign key reference",
+        });
       throw new ORPCError("INTERNAL_SERVER_ERROR");
     }
   });

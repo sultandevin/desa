@@ -1,6 +1,6 @@
 import { db } from "@desa/db";
 import * as schema from "@desa/db/schema/auth";
-import { type BetterAuthOptions, betterAuth } from "better-auth";
+import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import * as z from "zod";
@@ -37,4 +37,4 @@ export const auth = betterAuth({
   },
 });
 
-export type Session = typeof auth.$Infer.Session
+export type Session = typeof auth.$Infer.Session;

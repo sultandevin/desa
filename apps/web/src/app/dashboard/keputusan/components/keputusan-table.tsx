@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/a11y/noLabelWithoutControl: sudais */
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -35,12 +36,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Input } from "@/components/ui/input";
 import {
   Sheet,
   SheetContent,
@@ -57,7 +58,9 @@ const KeputusanTable = () => {
   const [queryInputValue, setQueryInputValue] = useState("");
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
-  const [editingKeputusanId, setEditingKeputusanId] = useState<string | null>(null);
+  const [editingKeputusanId, setEditingKeputusanId] = useState<string | null>(
+    null,
+  );
   const [offset, setOffset] = useState(0);
   const [year, setYear] = useState("");
   const [category, setCategory] = useState("");
@@ -70,7 +73,9 @@ const KeputusanTable = () => {
         limit: 10,
         query,
         year: year || undefined,
-        category: (category as "anggaran" | "personal" | "infrastruktur" | undefined) || undefined,
+        category:
+          (category as "anggaran" | "personal" | "infrastruktur" | undefined) ||
+          undefined,
       },
     }),
   );
@@ -248,7 +253,7 @@ const KeputusanTable = () => {
             onClick={() => setShowFilters(!showFilters)}
             className={showFilters ? "bg-primary text-primary-foreground" : ""}
           >
-            <SearchIcon className="w-4 h-4 mr-2" />
+            <SearchIcon className="mr-2 h-4 w-4" />
             Filter
           </Button>
 
@@ -263,14 +268,18 @@ const KeputusanTable = () => {
               <SheetHeader>
                 <SheetTitle>Tambah Keputusan Baru</SheetTitle>
               </SheetHeader>
-              <KeputusanCreateForm onSuccess={() => setIsCreateFormOpen(false)} />
+              <KeputusanCreateForm
+                onSuccess={() => setIsCreateFormOpen(false)}
+              />
             </SheetContent>
           </Sheet>
 
           {showFilters && (
-            <div className="flex flex-wrap gap-4 p-4 border rounded-lg bg-background w-full">
+            <div className="flex w-full flex-wrap gap-4 rounded-lg border bg-background p-4">
               <div className="flex flex-col space-y-2">
-                <label className="text-sm font-medium text-foreground">Tahun Keputusan</label>
+                <label className="font-medium text-foreground text-sm">
+                  Tahun Keputusan
+                </label>
                 <Input
                   type="number"
                   placeholder="2025"
@@ -287,25 +296,31 @@ const KeputusanTable = () => {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label className="text-sm font-medium text-foreground">Kategori</label>
+                <label className="font-medium text-foreground text-sm">
+                  Kategori
+                </label>
                 <select
                   value={category}
                   onChange={(e) => {
                     setCategory(e.target.value);
                     setOffset(0);
-                    setQuery(""); 
+                    setQuery("");
                   }}
-                  className="w-48 px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-48 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Semua Kategori</option>
                   <option value="anggaran">Anggaran & Keuangan</option>
                   <option value="personal">Personal & SDM</option>
-                  <option value="infrastruktur">Infrastruktur & Bangunan</option>
+                  <option value="infrastruktur">
+                    Infrastruktur & Bangunan
+                  </option>
                 </select>
               </div>
 
               <div className="flex flex-col space-y-2">
-                <label className="text-sm font-medium text-transparent">.</label>
+                <label className="font-medium text-sm text-transparent">
+                  .
+                </label>
                 <Button
                   variant="outline"
                   size="sm"

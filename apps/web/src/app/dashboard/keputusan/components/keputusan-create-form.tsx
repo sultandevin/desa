@@ -5,7 +5,12 @@ import { useMutation } from "@tanstack/react-query";
 import { Loader, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldDescription, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   SheetClose,
@@ -48,8 +53,13 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
       file: null as File | null, // Tambahkan state untuk file
     },
     onSubmit: ({ value }) => {
-      if (!value.number?.trim() || !value.date || !value.regarding?.trim() ||
-          !value.reportNumber?.trim() || !value.reportDate) {
+      if (
+        !value.number?.trim() ||
+        !value.date ||
+        !value.regarding?.trim() ||
+        !value.reportNumber?.trim() ||
+        !value.reportDate
+      ) {
         toast.error("Mohon lengkapi field bertanda bintang (*)");
         return;
       }
@@ -113,7 +123,8 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>
-                    <span className="text-destructive">*</span> Tanggal Keputusan
+                    <span className="text-destructive">*</span> Tanggal
+                    Keputusan
                   </FieldLabel>
                   <Input
                     id={field.name}
@@ -130,9 +141,8 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
                 </Field>
               );
             }}
-
           />
-          
+
           <form.Field
             name="regarding"
             children={(field) => {
@@ -176,12 +186,10 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
                       const file = e.target.files?.[0] || null;
                       field.handleChange(file);
                     }}
-                    className="cursor-pointer file:cursor-pointer file:text-primary file:mr-4"
+                    className="cursor-pointer file:mr-4 file:cursor-pointer file:text-primary"
                   />
                 </div>
-                <FieldDescription>
-                  Format yang didukung: PDF
-                </FieldDescription>
+                <FieldDescription>Format yang didukung: PDF</FieldDescription>
               </Field>
             )}
           />
@@ -278,7 +286,10 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>
                     Keterangan
-                    <span className="font-normal text-gray-500"> (opsional)</span>
+                    <span className="font-normal text-gray-500">
+                      {" "}
+                      (opsional)
+                    </span>
                   </FieldLabel>
                   <Textarea
                     id={field.name}
