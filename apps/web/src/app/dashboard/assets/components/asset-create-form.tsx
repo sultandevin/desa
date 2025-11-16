@@ -3,7 +3,8 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { Loader, Save } from "lucide-react";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -37,6 +38,11 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         });
         toast.success("Berhasil mencatat aset baru!");
       },
+      onError: ({ message }) => {
+        toast.error("Gagal mencatat aset baru", {
+          description: () => <p>{message}</p>,
+        });
+      },
     }),
   );
 
@@ -45,7 +51,7 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       name: "",
       nup: "",
       brandType: "",
-      condition: "",
+      condition: "Baik",
       note: "",
       valueRp: 0,
       acquiredAt: new Date().toISOString().split("T")[0],
@@ -76,6 +82,11 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         <SheetInnerSection>
           <form.Field
             name="name"
+            validators={{
+              onBlur: z
+                .string()
+                .min(3, "Nama aset harus lebih dari 3 karakter"),
+            }}
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
@@ -95,6 +106,35 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                     placeholder="Sikil Bau"
                     autoComplete="off"
                   />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          />
+          <form.Field
+            name="condition"
+            children={(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    <span className="text-destructive">*</span>
+                    Kondisi
+                  </FieldLabel>
+                  <Select
+                    value={field.state.value}
+                    onValueChange={(value) => field.handleChange(value)}
+                  >
+                    <SelectTrigger id={field.name} aria-invalid={isInvalid}>
+                      <SelectValue placeholder="Pilih kondisi aset" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Baik">Baik</SelectItem>
+                      <SelectItem value="Rusak Ringan">Rusak Ringan</SelectItem>
+                      <SelectItem value="Rusak Berat">Rusak Berat</SelectItem>
+                    </SelectContent>
+                  </Select>
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
@@ -139,7 +179,7 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     aria-invalid={isInvalid}
-                    placeholder="Toyota Avanza"
+                    placeholder="Toyota"
                     autoComplete="off"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -147,35 +187,35 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
               );
             }}
           />
-
+        </SheetInnerSection>
+        <SheetInnerSection>
           <form.Field
-            name="condition"
+            name="acquiredAt"
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Kondisi</FieldLabel>
-                  <Select
+                  <FieldLabel htmlFor={field.name}>
+                    <span className="text-destructive">*</span>
+                    Tanggal Perolehan
+                  </FieldLabel>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    type="date"
                     value={field.state.value}
-                    onValueChange={(value) => field.handleChange(value)}
-                  >
-                    <SelectTrigger id={field.name} aria-invalid={isInvalid}>
-                      <SelectValue placeholder="Pilih kondisi aset" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Baik">Baik</SelectItem>
-                      <SelectItem value="Rusak Ringan">Rusak Ringan</SelectItem>
-                      <SelectItem value="Rusak Berat">Rusak Berat</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    max={new Date().toISOString().split("T")[0]}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    aria-invalid={isInvalid}
+                  />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
             }}
           />
-        </SheetInnerSection>
-        <SheetInnerSection>
+
           <form.Field
             name="valueRp"
             children={(field) => {
@@ -205,41 +245,13 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           />
 
           <form.Field
-            name="acquiredAt"
-            children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Tanggal Perolehan
-                  </FieldLabel>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    type="date"
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={isInvalid}
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
-          />
-
-          <form.Field
             name="note"
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Catatan
-                    <span className="font-normal">(opsional)</span>
-                  </FieldLabel>
+                  <FieldLabel htmlFor={field.name}>Catatan</FieldLabel>
                   <Textarea
                     id={field.name}
                     name={field.name}
