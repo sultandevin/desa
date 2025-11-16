@@ -19,7 +19,6 @@ export const asset = pgTable(
   {
     id: uuid().primaryKey().defaultRandom(),
     name: text().notNull(),
-    code: text(),
     nup: text(),
     brandType: text("brand_type"),
     valueRp: decimal("value_rp"),

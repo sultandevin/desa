@@ -15,10 +15,6 @@ import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { cursorOutputSchema, cursorPaginationSchema } from "../schemas";
 
-const healthcheck = publicProcedure.handler(() => {
-  return "OK";
-});
-
 const list = publicProcedure
   .route({
     method: "GET",
@@ -43,21 +39,15 @@ const list = publicProcedure
       .where(
         and(
           isNull(asset.deletedAt),
-          and(
-            input.query.length > 0
-              ? or(
-                  ilike(asset.name, `%${input.query}%`),
-                  or(
-                    ilike(asset.code, `%${input.query}%`),
-                    or(
-                      ilike(asset.nup, `%${input.query}%`),
-                      ilike(asset.brandType, `%${input.query}%`),
-                    ),
-                  ),
-                )
-              : undefined,
-            input.cursor ? lt(asset.updatedAt, input.cursor) : undefined,
-          ),
+          input.query.length > 0
+            ? or(
+                ilike(asset.name, `%${input.query}%`),
+                ilike(asset.code, `%${input.query}%`),
+                ilike(asset.nup, `%${input.query}%`),
+                ilike(asset.brandType, `%${input.query}%`),
+              )
+            : undefined,
+          input.cursor ? lt(asset.updatedAt, input.cursor) : undefined,
         ),
       )
       .limit(input.pageSize)
@@ -164,6 +154,56 @@ const create = protectedProcedure
     }
   });
 
+const update = protectedProcedure
+  .route({
+    method: "PUT",
+    path: "/assets/{id}",
+    summary: "Update an asset",
+    tags: ["Assets"],
+  })
+  .input(
+    z.object({
+      id: z.string(),
+      name: z.string().min(3, "Nama aset minimal 3 karakter").optional(),
+      code: z.string().min(3, "Kode aset minimal 3 karakter").optional(),
+      nup: z.string().min(3, "Kode aset minimal 3 karakter").optional(),
+      brandType: z.string().optional(),
+      condition: z.string().optional(),
+      valueRp: z
+        .number()
+        .min(0, "Nilai aset harus lebih dari atau sama dengan 0")
+        .optional(),
+      note: z.string().optional(),
+      acquiredAt: z.date().optional(),
+    }),
+  )
+  .output(assetSelectSchema)
+  .handler(async ({ input, errors, context }) => {
+    const { id, ...updateData } = input;
+    const isKades = context.session.user.role === "kades";
+
+    const [updatedAsset] = await db
+      .update(asset)
+      .set({
+        ...updateData,
+        valueRp: updateData.valueRp ? String(updateData.valueRp) : undefined,
+      })
+      .where(
+        and(
+          eq(asset.id, id),
+          isNull(asset.deletedAt),
+          !isKades ? undefined : eq(asset.createdBy, context.session.user.id),
+        ),
+      )
+      .returning();
+
+    if (!updatedAsset) {
+      throw errors.NOT_FOUND();
+    }
+
+    return updatedAsset;
+  });
+
 const remove = protectedProcedure
   .route({
     method: "DELETE",
@@ -181,11 +221,18 @@ const remove = protectedProcedure
       message: z.string(),
     }),
   )
-  .handler(async ({ input, errors }) => {
+  .handler(async ({ input, errors, context }) => {
+    const isKades = context.session.user.id === "kades";
     const [deletedAsset] = await db
       .update(asset)
       .set({ deletedAt: new Date() })
-      .where(and(eq(asset.id, input.id), isNull(asset.deletedAt)))
+      .where(
+        and(
+          isKades ? undefined : eq(asset.id, context.session.user.id),
+          eq(asset.id, input.id),
+          isNull(asset.deletedAt),
+        ),
+      )
       .returning();
 
     if (!deletedAsset) {
@@ -198,9 +245,9 @@ const remove = protectedProcedure
   });
 
 export const assetRouter = {
-  healthcheck,
   list,
   find,
   create,
+  update,
   remove,
 };

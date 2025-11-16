@@ -9,6 +9,7 @@ import {
   FileWarning,
   MoreHorizontal,
   NotebookIcon,
+  Pencil,
   Plus,
   SearchIcon,
   Trash,
@@ -49,16 +50,22 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { authClient } from "@/lib/auth-client";
 import { copyToClipboard, formatCurrency } from "@/lib/utils";
 import { orpc, queryClient } from "@/utils/orpc";
 import { AssetCreateForm } from "./asset-create-form";
 import { AssetDamageReportFormDialog } from "./asset-damage-report-form-dialog";
+import { AssetEditForm } from "./asset-edit-form";
 
 const AssetTable = () => {
   const [query, setQuery] = useState("");
   const [queryInputValue, setQueryInputValue] = useState("");
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
+  const [isEditFormOpen, setIsEditFormOpen] = useState(false);
+  const [editingAssetId, setEditingAssetId] = useState<string | null>(null);
   const [cursor, setCursor] = useState<Date | undefined>(undefined);
+
+  const session = authClient.useSession();
 
   const assets = useQuery(
     orpc.asset.list.queryOptions({ input: { query, cursor } }),
@@ -70,8 +77,10 @@ const AssetTable = () => {
         queryClient.invalidateQueries({ queryKey: orpc.asset.key() });
         toast.success("Permintaan penghapusan aset berhasil dikirim");
       },
-      onError: () => {
-        toast.error("Gagal mengirim permintaan penghapusan aset");
+      onError: ({ message }) => {
+        toast.error("Gagal mengirim permintaan penghapusan aset", {
+          description: () => <p>{message}</p>,
+        });
       },
     }),
   );
@@ -79,8 +88,8 @@ const AssetTable = () => {
   const columns: ColumnDef<NonNullable<typeof assets.data>["data"][number]>[] =
     [
       {
-        accessorKey: "code",
-        header: "Kode",
+        accessorKey: "id",
+        header: "ID",
       },
       {
         accessorKey: "name",
@@ -123,6 +132,11 @@ const AssetTable = () => {
             });
           }
 
+          function handleEdit() {
+            setEditingAssetId(row.original.id);
+            setIsEditFormOpen(true);
+          }
+
           return (
             <AlertDialog>
               <Dialog>
@@ -137,15 +151,24 @@ const AssetTable = () => {
                     <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                     <DropdownMenuItem
                       onClick={() => {
-                        const code: string = row.getValue("code");
-                        copyToClipboard({ text: code });
+                        const id: string = row.getValue("id");
+                        copyToClipboard({ text: id });
                       }}
                     >
                       <Copy />
-                      Salin Kode Aset
+                      Salin ID Aset
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator />
+
+                    {session.data &&
+                      (session.data.user.id === row.original.createdBy ||
+                        session.data.user.role === "kades") && (
+                        <DropdownMenuItem onClick={handleEdit}>
+                          <Pencil />
+                          Edit Aset
+                        </DropdownMenuItem>
+                      )}
 
                     <DialogTrigger asChild>
                       <DropdownMenuItem variant="destructive">
@@ -154,12 +177,16 @@ const AssetTable = () => {
                       </DropdownMenuItem>
                     </DialogTrigger>
 
-                    <AlertDialogTrigger asChild>
-                      <DropdownMenuItem variant="destructive">
-                        <Trash />
-                        Hapus Aset
-                      </DropdownMenuItem>
-                    </AlertDialogTrigger>
+                    {session.data &&
+                      (session.data.user.id === row.original.createdBy ||
+                        session.data.user.role === "kades") && (
+                        <AlertDialogTrigger asChild>
+                          <DropdownMenuItem variant="destructive">
+                            <Trash />
+                            Hapus Aset
+                          </DropdownMenuItem>
+                        </AlertDialogTrigger>
+                      )}
                   </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -211,10 +238,10 @@ const AssetTable = () => {
       isFetching={assets.isPending}
       configButtons={
         <>
-          <InputGroup className="w-full sm:max-w-sm ">
+          <InputGroup className="w-full sm:max-w-sm">
             <InputGroupInput
               id="query"
-              className="min-w-60 w-fit"
+              className="w-fit min-w-60"
               value={queryInputValue}
               onChange={(e) => setQueryInputValue(e.target.value)}
               onKeyDown={(e) => {
@@ -255,7 +282,21 @@ const AssetTable = () => {
             </SheetContent>
           </Sheet>
 
-          <div className="flex ml-auto items-center gap-2">
+          <Sheet open={isEditFormOpen} onOpenChange={setIsEditFormOpen}>
+            <SheetContent className="overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Edit Aset</SheetTitle>
+              </SheetHeader>
+              {editingAssetId && (
+                <AssetEditForm
+                  assetId={editingAssetId}
+                  onSuccess={() => setIsEditFormOpen(false)}
+                />
+              )}
+            </SheetContent>
+          </Sheet>
+
+          <div className="ml-auto flex items-center gap-2">
             <Button
               size={`icon`}
               variant="outline"

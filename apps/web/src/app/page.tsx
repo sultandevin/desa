@@ -1,7 +1,6 @@
 import {
   ArrowRight,
   Building2,
-  ChevronRight,
   FileText,
   Gavel,
   Shield,
@@ -34,12 +33,14 @@ export default function Home() {
       <main className="flex min-h-[calc(100vh-5rem)] flex-col">
         {/* Hero Section */}
         <section className="relative overflow-hidden border-b bg-linear-to-b from-muted/50 to-background">
-          <div className="mx-auto max-w-4xl flex flex-col gap-6 py-20 text-center">
-            <pre className="mb-6 overflow-x-auto font-mono text-xs md:text-base leading-tight text-muted-foreground">
+          <div className="mx-auto flex max-w-4xl flex-col gap-6 py-20 text-center">
+            <pre className="mb-6 overflow-x-auto font-mono text-muted-foreground text-xs leading-tight md:text-base">
               {DESA_ASCII}
             </pre>
 
-            <p className="text-lg">Nilai jelek ditanggung Muhammad Natha Ulinnuha</p>
+            <p className="text-lg">
+              Nilai jelek ditanggung Muhammad Natha Ulinnuha
+            </p>
 
             <div className="flex items-center justify-center gap-2">
               <Button asChild>
@@ -52,7 +53,7 @@ export default function Home() {
         {/* Features Section */}
         <section className="container mx-auto px-4 py-16 md:py-24">
           <div className="mb-12 text-center">
-            <h2 className="mb-4  text-3xl font-medium md:text-4xl">
+            <h2 className="mb-4 font-medium text-3xl md:text-4xl">
               Fitur Utama
             </h2>
             <p className="mx-auto max-w-2xl text-muted-foreground">
@@ -72,7 +73,7 @@ export default function Home() {
                 <CardDescription>Kelompok 2</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Kelola dan pantau seluruh aset desa dengan sistem pencatatan
                   yang terstruktur dan mudah diakses
                 </p>
@@ -89,7 +90,7 @@ export default function Home() {
                 <CardDescription>Kelompok 7</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Dokumentasi lengkap peraturan desa yang terorganisir dengan
                   baik untuk kemudahan akses dan referensi
                 </p>
@@ -106,7 +107,7 @@ export default function Home() {
                 <CardDescription>Kelompok 8</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Arsip digital keputusan kepala desa yang tersimpan dengan aman
                   dan mudah untuk dilacak
                 </p>
@@ -119,7 +120,7 @@ export default function Home() {
         <section className="border-y bg-muted/30">
           <div className="container mx-auto px-4 py-16 md:py-24">
             <div className="mb-12 text-center">
-              <h2 className="mb-4  text-3xl font-medium md:text-4xl">
+              <h2 className="mb-4 font-medium text-3xl md:text-4xl">
                 Mengapa DESA?
               </h2>
               <p className="mx-auto max-w-2xl text-muted-foreground">
@@ -135,7 +136,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h3 className="mb-2 font-semibold">Mudah Digunakan</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Interface yang intuitif dan user-friendly untuk semua
                     kalangan
                   </p>
@@ -148,7 +149,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h3 className="mb-2 font-semibold">Aman & Terpercaya</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Dilindungi dengan sistem keamanan modern dan enkripsi data
                   </p>
                 </div>
@@ -160,7 +161,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h3 className="mb-2 font-semibold">Transparan</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-muted-foreground text-sm">
                     Akses informasi yang terbuka dan dapat dipertanggungjawabkan
                   </p>
                 </div>
@@ -172,7 +173,7 @@ export default function Home() {
         {/* CTA Section */}
         <section className="container mx-auto px-4 py-16 md:py-24">
           <div className="mx-auto max-w-3xl rounded-2xl border bg-gradient-to-br from-primary/5 to-primary/10 p-8 text-center md:p-12">
-            <h2 className="mb-4  text-3xl font-medium md:text-4xl">
+            <h2 className="mb-4 font-medium text-3xl md:text-4xl">
               Siap Memulai?
             </h2>
             <p className="mb-8 text-lg text-muted-foreground">
@@ -197,7 +198,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t">
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center text-sm text-muted-foreground">
+          <div className="text-center text-muted-foreground text-sm">
             <p>
               &copy; {new Date().getFullYear()} DESA - Sistem Informasi
               Administrasi Desa

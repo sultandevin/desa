@@ -5,6 +5,7 @@ import { asset } from "./schema/asset";
 if (process.env.NODE_ENV === "development")
   dotenv.config({
     path: "../../apps/web/.env",
+    quiet: true,
   });
 
 export const db = drizzle({

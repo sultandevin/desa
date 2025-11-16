@@ -1,7 +1,9 @@
-import { ORPCError, os } from "@orpc/server";
-import type { Context } from "./context";
-
-export const o = os.$context<Context>();
+import {
+  requireAuth,
+  requireKadesRole,
+  requireSekdesRole,
+} from "./middlewares/roles";
+import { o } from "./orpc";
 
 export const publicProcedure = o.errors({
   NOT_FOUND: {
@@ -10,15 +12,6 @@ export const publicProcedure = o.errors({
   },
 });
 
-const requireAuth = o.middleware(async ({ context, next }) => {
-  if (!context.session?.user) {
-    throw new ORPCError("UNAUTHORIZED");
-  }
-  return next({
-    context: {
-      session: context.session,
-    },
-  });
-});
-
 export const protectedProcedure = publicProcedure.use(requireAuth);
+export const kadesProcedure = protectedProcedure.use(requireKadesRole);
+export const sekdesProcedure = protectedProcedure.use(requireSekdesRole);

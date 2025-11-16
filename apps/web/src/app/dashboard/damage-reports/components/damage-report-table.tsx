@@ -7,12 +7,12 @@ import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
 import {
   AlertDialog,
-  AlertDialogTrigger,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogHeader,
   AlertDialogFooter,
+  AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { authClient } from "@/lib/auth-client";
 import { orpc } from "@/utils/orpc";
 import { DamageReportCreateForm } from "./damage-report-create-form";
 
@@ -43,6 +44,7 @@ const DamageReportTable = () => {
   const [addReportDialogOpen, setAddReportDialogOpen] = useState(false);
   const [, setQuery] = useState("");
   const [queryInputValue, setQueryInputValue] = useState("");
+  const session = authClient.useSession();
 
   const damageReports = useQuery(
     orpc.damageReport.list.queryOptions({ input: { offset: 0, limit: 10 } }),
@@ -125,6 +127,7 @@ const DamageReportTable = () => {
             id: row.original.id,
           });
         }
+        const isVerified = !!row.original.verifiedAt;
 
         return (
           <AlertDialog>
@@ -138,12 +141,16 @@ const DamageReportTable = () => {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <AlertDialogTrigger asChild>
-                  <DropdownMenuItem>
-                    <Check />
-                    Verifikasi Laporan
-                  </DropdownMenuItem>
-                </AlertDialogTrigger>
+                {!isVerified &&
+                  session.data &&
+                  session.data.user.role === "kades" && (
+                    <AlertDialogTrigger asChild>
+                      <DropdownMenuItem>
+                        <Check />
+                        Verifikasi Laporan
+                      </DropdownMenuItem>
+                    </AlertDialogTrigger>
+                  )}
                 <DropdownMenuItem variant="destructive">
                   <Trash />
                   Hapus Laporan
@@ -189,10 +196,10 @@ const DamageReportTable = () => {
       isFetching={damageReports.isPending}
       configButtons={
         <>
-          <InputGroup className="w-full sm:max-w-sm ">
+          <InputGroup className="w-full sm:max-w-sm">
             <InputGroupInput
               id="query"
-              className="min-w-60 w-fit"
+              className="w-fit min-w-60"
               value={queryInputValue}
               onChange={(e) => setQueryInputValue(e.target.value)}
               onKeyDown={(e) => {

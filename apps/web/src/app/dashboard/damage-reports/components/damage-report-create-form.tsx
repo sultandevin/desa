@@ -4,6 +4,7 @@ import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Loader, Plus } from "lucide-react";
 import { toast } from "sonner";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -131,6 +132,11 @@ const DamageReportCreateForm = ({
         <SheetInnerSection>
           <form.Field
             name="description"
+            validators={{
+              onBlur: z
+                .string()
+                .min(10, "Panjang deskripsi minimal 10 karakter"),
+            }}
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;

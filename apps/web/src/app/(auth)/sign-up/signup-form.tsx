@@ -1,6 +1,6 @@
 "use client";
 import { useForm } from "@tanstack/react-form";
-import { Github } from "lucide-react";
+import { Banana } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -187,9 +187,17 @@ export function SignupForm({
         <FieldSeparator>Atau lanjut dengan</FieldSeparator>
 
         <Field>
-          <Button variant="outline" type="button">
-            <Github />
-            Masuk dengan GitHub
+          <Button
+            onClick={async () => {
+              await authClient.signIn.social({
+                provider: "google",
+              });
+            }}
+            variant="outline"
+            type="button"
+          >
+            <Banana className="text-yellow-500" />
+            Masuk dengan Google
           </Button>
           <FieldDescription className="px-6 text-center">
             Sudah punya akun? <Link href="/login">Login</Link>

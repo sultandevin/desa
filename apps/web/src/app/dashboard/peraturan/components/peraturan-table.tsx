@@ -35,7 +35,7 @@ import { RegulationUpdateForm } from "./regulation-update-form";
 const PeraturanTable = () => {
   const [query, setQuery] = useState("");
   const [queryInputValue, setQueryInputValue] = useState("");
-  
+
   /*
   const peraturan = useQuery(
     orpc.regulation.list.queryOptions({
@@ -45,8 +45,8 @@ const PeraturanTable = () => {
   */
   const peraturan = useQuery(
     orpc.regulation.search.queryOptions({
-      input: { "query": query },
-    })
+      input: { query: query },
+    }),
   );
 
   // === Delete Mutation ===
@@ -125,7 +125,7 @@ const PeraturanTable = () => {
                     </>
                   ) : (
                     <>
-                      <Trash />
+                      <Trash className="mr-2 h-4 w-4" />
                       Hapus Peraturan
                     </>
                   )}
@@ -145,14 +145,14 @@ const PeraturanTable = () => {
       ) : (
         <DataTable
           columns={columns}
-          data={peraturan.data ?? []}
+          data={Array.isArray(peraturan.data) ? peraturan.data : []}
           isFetching={peraturan.isFetching}
           configButtons={
             <>
               <InputGroup className="w-fit min-w-60">
                 <InputGroupInput
                   id="query"
-                  className="min-w-60 w-fit"
+                  className="w-fit min-w-60"
                   value={queryInputValue}
                   onChange={(e) => setQueryInputValue(e.target.value)}
                   onKeyDown={(e) => {
@@ -167,7 +167,8 @@ const PeraturanTable = () => {
                   <SearchIcon />
                 </InputGroupAddon>
                 <InputGroupAddon align={`inline-end`}>
-                  {peraturan.data?.length} hasil
+                  {Array.isArray(peraturan.data) ? peraturan.data.length : 0}{" "}
+                  hasil
                 </InputGroupAddon>
               </InputGroup>
 

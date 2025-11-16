@@ -88,7 +88,7 @@ const AssetDamageReportFormDialog = ({
           form.handleSubmit();
         }}
       >
-        <div className="overflow-y-auto overflow-visible flex flex-col gap-4 py-4">
+        <div className="flex flex-col gap-4 overflow-visible overflow-y-auto py-4">
           <form.Field
             name="description"
             children={(field) => {

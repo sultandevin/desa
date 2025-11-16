@@ -1,10 +1,9 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useMutation } from "@tanstack/react-query";
-import { Loader, Save } from "lucide-react";
-import { toast, Toaster } from "sonner";
-import * as z from "zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Edit, Loader } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -14,13 +13,6 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   SheetClose,
   SheetFooter,
   SheetInnerContent,
@@ -29,44 +21,71 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { orpc, queryClient } from "@/utils/orpc";
 
-const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
-  const assetMutation = useMutation(
-    orpc.asset.create.mutationOptions({
-      onSuccess: () => {
+interface KeputusanEditFormProps {
+  keputusanId: string;
+  onSuccess?: () => void;
+}
+
+const KeputusanEditForm = ({
+  keputusanId,
+  onSuccess,
+}: KeputusanEditFormProps) => {
+  const keputusanQuery = useQuery(
+    orpc.decision.find.queryOptions({
+      input: { id: keputusanId },
+    }),
+  );
+
+  const keputusanMutation = useMutation(
+    orpc.decision.update.mutationOptions({
+      onSuccess: (_, variables) => {
         queryClient.invalidateQueries({
-          queryKey: orpc.asset.key(),
+          queryKey: orpc.decision.key(),
         });
-        toast.success("Berhasil mencatat aset baru!");
+        toast.success(`Keputusan ${variables.number} berhasil diperbarui!`);
+        onSuccess?.();
       },
-      onError: ({ message }) => {
-        toast.error("Gagal mencatat aset baru", {
-          description: () => <p>{message}</p>,
-        });
+      onError: (error) => {
+        console.error("Update keputusan error:", error);
+        toast.error(`Gagal memperbarui keputusan: ${error.message}`);
       },
     }),
   );
 
   const form = useForm({
     defaultValues: {
-      name: "",
-      nup: "",
-      brandType: "",
-      condition: "Baik",
-      note: "",
-      valueRp: 0,
-      acquiredAt: new Date().toISOString().split("T")[0],
+      number: keputusanQuery.data?.number || "",
+      date: keputusanQuery.data?.date || "",
+      regarding: keputusanQuery.data?.regarding || "",
+      shortDescription: keputusanQuery.data?.shortDescription || "",
+      reportNumber: keputusanQuery.data?.reportNumber || "",
+      reportDate: keputusanQuery.data?.reportDate || "",
+      notes: keputusanQuery.data?.notes || "",
+      file: null as File | null,
     },
     onSubmit: ({ value }) => {
-      assetMutation.mutate({
-        name: value.name,
-        nup: value.nup.length === 0 ? undefined : value.nup,
-        brandType: value.brandType || null,
-        condition: value.condition || null,
-        valueRp: value.valueRp || undefined,
-        note: value.note || null,
-        acquiredAt: value.acquiredAt ? new Date(value.acquiredAt) : null,
+      if (
+        !value.number.trim() ||
+        !value.date ||
+        !value.regarding.trim() ||
+        !value.reportNumber.trim() ||
+        !value.reportDate
+      ) {
+        toast.error("Mohon lengkapi field bertanda bintang (*)");
+        return;
+      }
+
+      keputusanMutation.mutate({
+        id: keputusanId,
+        number: value.number.trim(),
+        date: value.date,
+        regarding: value.regarding.trim(),
+        shortDescription: value.shortDescription?.trim() || null,
+        reportNumber: value.reportNumber.trim(),
+        reportDate: value.reportDate,
+        notes: value.notes?.trim() || null,
+        // file: value.file,
       });
-      assetMutation.isSuccess && onSuccess?.();
     },
   });
 
@@ -81,12 +100,7 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       <SheetInnerContent className="min-w-0 flex-1 overflow-y-auto">
         <SheetInnerSection>
           <form.Field
-            name="name"
-            validators={{
-              onBlur: z
-                .string()
-                .min(3, "Nama aset harus lebih dari 3 karakter"),
-            }}
+            name="number"
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
@@ -94,7 +108,7 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>
                     <span className="text-destructive">*</span>
-                    Nama Aset
+                    Nomor Keputusan
                   </FieldLabel>
                   <Input
                     id={field.name}
@@ -103,59 +117,7 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     aria-invalid={isInvalid}
-                    placeholder="Sikil Bau"
-                    autoComplete="off"
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
-          />
-          <form.Field
-            name="condition"
-            children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    <span className="text-destructive">*</span>
-                    Kondisi
-                  </FieldLabel>
-                  <Select
-                    value={field.state.value}
-                    onValueChange={(value) => field.handleChange(value)}
-                  >
-                    <SelectTrigger id={field.name} aria-invalid={isInvalid}>
-                      <SelectValue placeholder="Pilih kondisi aset" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Baik">Baik</SelectItem>
-                      <SelectItem value="Rusak Ringan">Rusak Ringan</SelectItem>
-                      <SelectItem value="Rusak Berat">Rusak Berat</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
-          />
-          <form.Field
-            name="nup"
-            children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>NUP</FieldLabel>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={isInvalid}
-                    placeholder="XXXXXX"
+                    placeholder="001/KEP/DS/2025"
                     autoComplete="off"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -165,32 +127,7 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           />
 
           <form.Field
-            name="brandType"
-            children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid;
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Merk/Tipe</FieldLabel>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={isInvalid}
-                    placeholder="Toyota"
-                    autoComplete="off"
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              );
-            }}
-          />
-        </SheetInnerSection>
-        <SheetInnerSection>
-          <form.Field
-            name="acquiredAt"
+            name="date"
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
@@ -198,17 +135,18 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>
                     <span className="text-destructive">*</span>
-                    Tanggal Perolehan
+                    Tanggal Keputusan
                   </FieldLabel>
                   <Input
                     id={field.name}
                     name={field.name}
                     type="date"
                     value={field.state.value}
-                    max={new Date().toISOString().split("T")[0]}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     aria-invalid={isInvalid}
+                    max="2100-12-31"
+                    min="1990-01-01"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
@@ -217,27 +155,104 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           />
 
           <form.Field
-            name="valueRp"
+            name="regarding"
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Nilai (Rp)</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>
+                    <span className="text-destructive">*</span>
+                    Tentang
+                  </FieldLabel>
                   <Input
                     id={field.name}
                     name={field.name}
-                    type="number"
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.valueAsNumber)}
+                    onChange={(e) => field.handleChange(e.target.value)}
                     aria-invalid={isInvalid}
-                    placeholder="1000000"
+                    placeholder="Perihal keputusan..."
                     autoComplete="off"
-                    min="0"
-                    step="0.01"
                   />
-                  <FieldDescription>Nilai aset dalam Rupiah</FieldDescription>
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          />
+
+          {/* Input File */}
+          <form.Field
+            name="file"
+            children={(field) => (
+              <Field>
+                <FieldLabel htmlFor={field.name}>Lampiran File</FieldLabel>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id={field.name}
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    onBlur={field.handleBlur}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null;
+                      field.handleChange(file);
+                    }}
+                    className="cursor-pointer file:mr-4 file:cursor-pointer file:text-primary"
+                  />
+                </div>
+                <FieldDescription>
+                  Format yang didukung: PDF. Maksimal ukuran file: 10MB.
+                </FieldDescription>
+              </Field>
+            )}
+          />
+
+          <form.Field
+            name="shortDescription"
+            children={(field) => (
+              <Field>
+                <FieldLabel htmlFor={field.name}>
+                  Uraian Singkat
+                  <span className="font-normal text-gray-500"> (opsional)</span>
+                </FieldLabel>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  placeholder="Ringkasan isi keputusan..."
+                  autoComplete="off"
+                />
+              </Field>
+            )}
+          />
+        </SheetInnerSection>
+
+        <SheetInnerSection>
+          <h3 className="mb-2 font-semibold text-muted-foreground text-sm">
+            Laporan
+          </h3>
+          <form.Field
+            name="reportNumber"
+            children={(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    <span className="text-destructive">*</span>
+                    Nomor Dilaporkan
+                  </FieldLabel>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    aria-invalid={isInvalid}
+                    placeholder="LAP-01/2025"
+                    autoComplete="off"
+                  />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
                 </Field>
               );
@@ -245,13 +260,47 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           />
 
           <form.Field
-            name="note"
+            name="reportDate"
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Catatan</FieldLabel>
+                  <FieldLabel htmlFor={field.name}>
+                    <span className="text-destructive">*</span>
+                    Tanggal Dilaporkan
+                  </FieldLabel>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    type="date"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    aria-invalid={isInvalid}
+                    max="2100-12-31"
+                    min="1990-01-01"
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              );
+            }}
+          />
+
+          <form.Field
+            name="notes"
+            children={(field) => {
+              const isInvalid =
+                field.state.meta.isTouched && !field.state.meta.isValid;
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    Keterangan
+                    <span className="font-normal text-gray-500">
+                      {" "}
+                      (opsional)
+                    </span>
+                  </FieldLabel>
                   <Textarea
                     id={field.name}
                     name={field.name}
@@ -259,7 +308,7 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     aria-invalid={isInvalid}
-                    placeholder="Catatan tamabahan mengenai aset jika ada"
+                    placeholder="Catatan tambahan mengenai keputusan jika ada"
                     autoComplete="off"
                   />
                   {isInvalid && <FieldError errors={field.state.meta.errors} />}
@@ -271,25 +320,25 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       </SheetInnerContent>
 
       <SheetFooter className="grid shrink-0 grid-cols-1 gap-2 border-t bg-background p-4 sm:grid-cols-2">
-        <Button type="submit" disabled={assetMutation.isPending}>
-          {assetMutation.isPending ? (
+        <Button type="submit" disabled={keputusanMutation.isPending}>
+          {keputusanMutation.isPending ? (
             <>
-              <Loader className="animate-spin" />
-              Memuat...
+              <Loader className="mr-2 size-4 animate-spin" />
+              Menyimpan...
             </>
           ) : (
             <>
-              <Save />
-              Simpan Aset
+              <Edit className="mr-2 size-4" />
+              Perbarui
             </>
           )}
         </Button>
         <SheetClose asChild>
-          <Button variant={`outline`}>Tutup</Button>
+          <Button variant="outline">Batal</Button>
         </SheetClose>
       </SheetFooter>
     </form>
   );
 };
 
-export { AssetCreateForm };
+export { KeputusanEditForm };
