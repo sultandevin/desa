@@ -2,7 +2,14 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Loader, MoreHorizontal, Plus, SearchIcon, Trash, Pencil } from "lucide-react";
+import {
+  Loader,
+  MoreHorizontal,
+  Plus,
+  SearchIcon,
+  Trash,
+  Pencil,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
@@ -46,7 +53,7 @@ const PeraturanTable = () => {
   const peraturan = useQuery(
     orpc.regulation.search.queryOptions({
       input: { query: query },
-    }),
+    })
   );
 
   // === Delete Mutation ===
@@ -61,7 +68,7 @@ const PeraturanTable = () => {
       onError: () => {
         toast.error("Gagal menghapus peraturan, coba lagi.");
       },
-    }),
+    })
   );
 
   const handleDelete = (id: string) => {
