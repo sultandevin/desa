@@ -1,6 +1,7 @@
 import { db } from "@desa/db";
 import { isForeignKeyError } from "@desa/db/lib/errors";
 import { asset } from "@desa/db/schema/asset";
+import { user } from "@desa/db/schema/auth";
 import {
   damageReport,
   damageReportInsertSchema,
@@ -8,6 +9,7 @@ import {
 } from "@desa/db/schema/damage-report";
 import { ORPCError } from "@orpc/client";
 import { eq, getTableColumns } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import * as z from "zod";
 import { kadesProcedure, protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
@@ -24,14 +26,38 @@ const list = publicProcedure
     z.array(
       damageReportSelectSchema.extend({
         assetName: z.string().nullable(),
+        reportedByUser: z.object({
+          id: z.string(),
+          name: z.string(),
+        }).nullable(),
+        verifiedByUser: z.object({
+          id: z.string(),
+          name: z.string(),
+        }).nullable(),
       }),
     ),
   )
   .handler(async ({ input, errors }) => {
+    const reportedByUser = alias(user, "reportedByUser");
+    const verifiedByUser = alias(user, "verifiedByUser");
+
     const reports = await db
-      .select({ ...getTableColumns(damageReport), assetName: asset.name })
+      .select({
+        ...getTableColumns(damageReport),
+        assetName: asset.name,
+        reportedByUser: {
+          id: reportedByUser.id,
+          name: reportedByUser.name,
+        },
+        verifiedByUser: {
+          id: verifiedByUser.id,
+          name: verifiedByUser.name,
+        },
+      })
       .from(damageReport)
       .leftJoin(asset, eq(damageReport.assetId, asset.id))
+      .leftJoin(reportedByUser, eq(damageReport.reportedBy, reportedByUser.id))
+      .leftJoin(verifiedByUser, eq(damageReport.verifiedBy, verifiedByUser.id))
       .limit(input.limit)
       .offset(input.offset);
 
