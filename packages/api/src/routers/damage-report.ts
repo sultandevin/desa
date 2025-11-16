@@ -9,7 +9,7 @@ import {
 import { ORPCError } from "@orpc/client";
 import { eq, getTableColumns } from "drizzle-orm";
 import * as z from "zod";
-import { protectedProcedure, publicProcedure } from "..";
+import { kadesProcedure, protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
 
 const list = publicProcedure
@@ -106,7 +106,7 @@ const create = protectedProcedure
     }
   });
 
-const verify = protectedProcedure
+const verify = kadesProcedure
   .route({
     method: "POST",
     path: "/damage-reports/{id}/verify",

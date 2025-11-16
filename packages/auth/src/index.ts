@@ -3,8 +3,9 @@ import * as schema from "@desa/db/schema/auth";
 import { type BetterAuthOptions, betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import * as z from "zod";
 
-export const auth = betterAuth<BetterAuthOptions>({
+export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
     schema,
@@ -26,10 +27,14 @@ export const auth = betterAuth<BetterAuthOptions>({
     additionalFields: {
       role: {
         type: "string",
-        required: true,
+        validator: {
+          input: z.enum(["user", "kades", "sekdes"]),
+        },
         defaultValue: "user",
         input: false,
       },
     },
   },
 });
+
+export type Session = typeof auth.$Infer.Session

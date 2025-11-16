@@ -38,11 +38,13 @@ import {
 } from "@/components/ui/sheet";
 import { orpc } from "@/utils/orpc";
 import { DamageReportCreateForm } from "./damage-report-create-form";
+import { authClient } from "@/lib/auth-client";
 
 const DamageReportTable = () => {
   const [addReportDialogOpen, setAddReportDialogOpen] = useState(false);
   const [, setQuery] = useState("");
   const [queryInputValue, setQueryInputValue] = useState("");
+  const session = authClient.useSession();
 
   const damageReports = useQuery(
     orpc.damageReport.list.queryOptions({ input: { offset: 0, limit: 10 } }),
@@ -139,14 +141,16 @@ const DamageReportTable = () => {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {!isVerified && (
-                  <AlertDialogTrigger asChild>
-                    <DropdownMenuItem>
-                      <Check />
-                      Verifikasi Laporan
-                    </DropdownMenuItem>
-                  </AlertDialogTrigger>
-                )}
+                {!isVerified &&
+                  session.data &&
+                  session.data.user.role === "kades" && (
+                    <AlertDialogTrigger asChild>
+                      <DropdownMenuItem>
+                        <Check />
+                        Verifikasi Laporan
+                      </DropdownMenuItem>
+                    </AlertDialogTrigger>
+                  )}
                 <DropdownMenuItem variant="destructive">
                   <Trash />
                   Hapus Laporan

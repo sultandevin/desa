@@ -55,6 +55,7 @@ import { orpc, queryClient } from "@/utils/orpc";
 import { AssetCreateForm } from "./asset-create-form";
 import { AssetDamageReportFormDialog } from "./asset-damage-report-form-dialog";
 import { AssetEditForm } from "./asset-edit-form";
+import { authClient } from "@/lib/auth-client";
 
 const AssetTable = () => {
   const [query, setQuery] = useState("");
@@ -63,6 +64,8 @@ const AssetTable = () => {
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   const [editingAssetId, setEditingAssetId] = useState<string | null>(null);
   const [cursor, setCursor] = useState<Date | undefined>(undefined);
+
+  const session = authClient.useSession();
 
   const assets = useQuery(
     orpc.asset.list.queryOptions({ input: { query, cursor } }),
@@ -74,8 +77,10 @@ const AssetTable = () => {
         queryClient.invalidateQueries({ queryKey: orpc.asset.key() });
         toast.success("Permintaan penghapusan aset berhasil dikirim");
       },
-      onError: () => {
-        toast.error("Gagal mengirim permintaan penghapusan aset");
+      onError: ({ message }) => {
+        toast.error("Gagal mengirim permintaan penghapusan aset", {
+          description: () => <p>{message}</p>,
+        });
       },
     }),
   );
@@ -156,10 +161,14 @@ const AssetTable = () => {
 
                     <DropdownMenuSeparator />
 
-                    <DropdownMenuItem onClick={handleEdit}>
-                      <Pencil />
-                      Edit Aset
-                    </DropdownMenuItem>
+                    {session.data &&
+                      (session.data.user.id === row.original.createdBy ||
+                        session.data.user.role === "kades") && (
+                        <DropdownMenuItem onClick={handleEdit}>
+                          <Pencil />
+                          Edit Aset
+                        </DropdownMenuItem>
+                      )}
 
                     <DialogTrigger asChild>
                       <DropdownMenuItem variant="destructive">
@@ -168,12 +177,16 @@ const AssetTable = () => {
                       </DropdownMenuItem>
                     </DialogTrigger>
 
-                    <AlertDialogTrigger asChild>
-                      <DropdownMenuItem variant="destructive">
-                        <Trash />
-                        Hapus Aset
-                      </DropdownMenuItem>
-                    </AlertDialogTrigger>
+                    {session.data &&
+                      (session.data.user.id === row.original.createdBy ||
+                        session.data.user.role === "kades") && (
+                        <AlertDialogTrigger asChild>
+                          <DropdownMenuItem variant="destructive">
+                            <Trash />
+                            Hapus Aset
+                          </DropdownMenuItem>
+                        </AlertDialogTrigger>
+                      )}
                   </DropdownMenuContent>
                 </DropdownMenu>
 

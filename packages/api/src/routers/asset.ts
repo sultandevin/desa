@@ -178,8 +178,9 @@ const update = protectedProcedure
     }),
   )
   .output(assetSelectSchema)
-  .handler(async ({ input, errors }) => {
+  .handler(async ({ input, errors, context }) => {
     const { id, ...updateData } = input;
+    const isKades = context.session.user.role === "kades";
 
     const [updatedAsset] = await db
       .update(asset)
@@ -187,7 +188,13 @@ const update = protectedProcedure
         ...updateData,
         valueRp: updateData.valueRp ? String(updateData.valueRp) : undefined,
       })
-      .where(and(eq(asset.id, id), isNull(asset.deletedAt)))
+      .where(
+        and(
+          eq(asset.id, id),
+          isNull(asset.deletedAt),
+          !isKades ? undefined : eq(asset.createdBy, context.session.user.id),
+        ),
+      )
       .returning();
 
     if (!updatedAsset) {
@@ -214,11 +221,18 @@ const remove = protectedProcedure
       message: z.string(),
     }),
   )
-  .handler(async ({ input, errors }) => {
+  .handler(async ({ input, errors, context }) => {
+    const isKades = context.session.user.id === "kades";
     const [deletedAsset] = await db
       .update(asset)
       .set({ deletedAt: new Date() })
-      .where(and(eq(asset.id, input.id), isNull(asset.deletedAt)))
+      .where(
+        and(
+          isKades ? undefined : eq(asset.id, context.session.user.id),
+          eq(asset.id, input.id),
+          isNull(asset.deletedAt),
+        ),
+      )
       .returning();
 
     if (!deletedAsset) {
