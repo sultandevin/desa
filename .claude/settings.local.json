@@ -14,7 +14,9 @@
       "WebFetch(domain:github.com)",
       "Bash(find:*)",
       "Bash(docker build:*)",
-      "WebFetch(domain:orm.drizzle.team)"
+      "WebFetch(domain:orm.drizzle.team)",
+      "WebFetch(domain:orpc.unnoq.com)",
+      "Bash(npx tsc:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
