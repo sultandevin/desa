@@ -7,6 +7,7 @@ node_modules
 dist
 build
 *.tsbuildinfo
+out
 
 # Environment variables
 .env
@@ -42,6 +43,9 @@ lerna-debug.log*
 # Testing
 coverage
 .nyc_output
+k6/results/*.json
+k6/results/*.html
+k6/results/*.txt
 
 # Misc
 *.tgz

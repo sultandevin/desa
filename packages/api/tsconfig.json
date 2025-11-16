@@ -22,6 +22,5 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "dist",
-    "composite": true
   }
 }

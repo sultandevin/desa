@@ -30,9 +30,9 @@ const list = publicProcedure
           message: "Year must be between 1999 and 2100",
         }),
       category: z.enum(["anggaran", "personal", "infrastruktur"]).optional(),
-    }),
+    })
   )
-  .output(z.array(decisionSelectSchema))
+  // .output(z.array(decisionSelectSchema))
   .handler(async ({ input }) => {
     try {
       const searchTerm = input.query?.trim() ? `%${input.query}%` : null;
@@ -79,8 +79,8 @@ const list = publicProcedure
                 ilike(decision.regarding, `%${keyword}%`),
                 ilike(decision.shortDescription, `%${keyword}%`),
                 ilike(decision.reportNumber, `%${keyword}%`),
-                ilike(decision.notes, `%${keyword}%`),
-              ),
+                ilike(decision.notes, `%${keyword}%`)
+              )
             );
 
             return conditions.length > 0 ? or(...conditions) : undefined;
@@ -97,14 +97,14 @@ const list = publicProcedure
                   ilike(decision.number, searchTerm),
                   ilike(decision.regarding, searchTerm),
                   ilike(decision.shortDescription, searchTerm),
-                  ilike(decision.reportNumber, searchTerm),
+                  ilike(decision.reportNumber, searchTerm)
                 )
               : undefined,
             input.year
               ? sql`EXTRACT(YEAR FROM ${decision.date}) = ${input.year}`
               : undefined,
-            categoryCondition,
-          ),
+            categoryCondition
+          )
         )
         .orderBy(sql`${decision.createdAt} DESC`)
         .limit(input.limit)
@@ -127,9 +127,9 @@ const find = publicProcedure
   .input(
     z.object({
       id: z.string(),
-    }),
+    })
   )
-  .output(decisionSelectSchema)
+  // .output(decisionSelectSchema)
   .handler(async ({ input, errors }) => {
     const id = input.id;
     const [decisionItem] = await db
@@ -152,7 +152,7 @@ const create = protectedProcedure
     tags: ["Decisions"],
   })
   .input(
-    decisionInsertSchema.omit({ id: true, createdBy: true, createdAt: true }),
+    decisionInsertSchema.omit({ id: true, createdBy: true, createdAt: true })
   )
   .output(decisionSelectSchema)
   .handler(async ({ input, context }) => {
@@ -210,8 +210,8 @@ const update = protectedProcedure
       .merge(
         decisionInsertSchema
           .omit({ createdBy: true, createdAt: true })
-          .partial(),
-      ),
+          .partial()
+      )
   )
   .output(decisionSelectSchema)
   .handler(async ({ input }) => {

@@ -18,7 +18,7 @@ const list = publicProcedure
     tags: ["Regulations"],
   })
   .input(paginationSchema)
-  .output(z.array(regulationSelectSchema))
+  // .output(z.array(regulationSelectSchema))
   .handler(async ({ input, errors }) => {
     const regulations = await db
       .select()

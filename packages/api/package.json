@@ -30,6 +30,7 @@
     "dotenv": "catalog:",
     "zod": "catalog:",
     "drizzle-orm": "catalog:",
+    "drizzle-zod": "catalog:",
     "@desa/auth": "workspace:*",
     "@desa/db": "workspace:*"
   }
