@@ -1,11 +1,16 @@
 "use client";
 
 import { useForm } from "@tanstack/react-form";
-import { useMutation } from "@tanstack/react-query";
-import { Loader, Plus } from "lucide-react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Loader, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError, FieldDescription, FieldLabel } from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   SheetClose,
@@ -16,46 +21,54 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { orpc, queryClient } from "@/utils/orpc";
 
-interface KeputusanCreateFormProps {
+interface KeputusanEditFormProps {
+  keputusanId: string;
   onSuccess?: () => void;
 }
 
-const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
+const KeputusanEditForm = ({ keputusanId, onSuccess }: KeputusanEditFormProps) => {
+  const keputusanQuery = useQuery(
+    orpc.decision.find.queryOptions({
+      input: { id: keputusanId }
+    })
+  );
+
   const keputusanMutation = useMutation(
-    orpc.decision.create.mutationOptions({
-      onSuccess: () => {
+    orpc.decision.update.mutationOptions({
+      onSuccess: (_, variables) => {
         queryClient.invalidateQueries({
           queryKey: orpc.decision.key(),
         });
-        toast.success("Keputusan berhasil ditambahkan!");
+        toast.success(`Keputusan ${variables.number} berhasil diperbarui!`);
         onSuccess?.();
       },
       onError: (error) => {
-        toast.error(`Gagal menambahkan keputusan: ${error.message}`);
+        console.error("Update keputusan error:", error);
+        toast.error(`Gagal memperbarui keputusan: ${error.message}`);
       },
     }),
   );
 
   const form = useForm({
     defaultValues: {
-      number: "",
-      date: "",
-      regarding: "",
-      shortDescription: "",
-      reportNumber: "",
-      reportDate: "",
-      notes: "",
-      file: null as File | null, // Tambahkan state untuk file
+      number: keputusanQuery.data?.number || "",
+      date: keputusanQuery.data?.date || "",
+      regarding: keputusanQuery.data?.regarding || "",
+      shortDescription: keputusanQuery.data?.shortDescription || "",
+      reportNumber: keputusanQuery.data?.reportNumber || "",
+      reportDate: keputusanQuery.data?.reportDate || "",
+      notes: keputusanQuery.data?.notes || "",
+      file: null as File | null,
     },
     onSubmit: ({ value }) => {
-      if (!value.number?.trim() || !value.date || !value.regarding?.trim() ||
-          !value.reportNumber?.trim() || !value.reportDate) {
+      if (!value.number.trim() || !value.date || !value.regarding.trim() ||
+          !value.reportNumber.trim() || !value.reportDate) {
         toast.error("Mohon lengkapi field bertanda bintang (*)");
         return;
       }
 
-      // Pastikan backend (orpc.decision.create) mendukung properti 'file'
       keputusanMutation.mutate({
+        id: keputusanId,
         number: value.number.trim(),
         date: value.date,
         regarding: value.regarding.trim(),
@@ -63,16 +76,15 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
         reportNumber: value.reportNumber.trim(),
         reportDate: value.reportDate,
         notes: value.notes?.trim() || null,
-        // file: value.file, // Kirim file ke backend
+        // file: value.file,
       });
     },
   });
 
   return (
-    <form
+      <form
       onSubmit={(e) => {
         e.preventDefault();
-        e.stopPropagation();
         form.handleSubmit();
       }}
       className="flex min-h-0 min-w-0 flex-1 flex-col"
@@ -87,7 +99,8 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>
-                    <span className="text-destructive">*</span> Nomor Keputusan
+                    <span className="text-destructive">*</span>
+                    Nomor Keputusan
                   </FieldLabel>
                   <Input
                     id={field.name}
@@ -113,7 +126,8 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>
-                    <span className="text-destructive">*</span> Tanggal Keputusan
+                    <span className="text-destructive">*</span>
+                    Tanggal Keputusan
                   </FieldLabel>
                   <Input
                     id={field.name}
@@ -130,9 +144,8 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
                 </Field>
               );
             }}
-
           />
-          
+
           <form.Field
             name="regarding"
             children={(field) => {
@@ -141,7 +154,8 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
               return (
                 <Field data-invalid={isInvalid}>
                   <FieldLabel htmlFor={field.name}>
-                    <span className="text-destructive">*</span> Tentang
+                    <span className="text-destructive">*</span>
+                    Tentang
                   </FieldLabel>
                   <Input
                     id={field.name}
@@ -159,7 +173,7 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
             }}
           />
 
-          {/* Input File Baru */}
+          {/* Input File */}
           <form.Field
             name="file"
             children={(field) => (
@@ -169,7 +183,6 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
                   <Input
                     id={field.name}
                     type="file"
-                    // Hanya menerima PDF
                     accept=".pdf,application/pdf"
                     onBlur={field.handleBlur}
                     onChange={(e) => {
@@ -180,7 +193,7 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
                   />
                 </div>
                 <FieldDescription>
-                  Format yang didukung: PDF
+                  Format yang didukung: PDF. Maksimal ukuran file: 10MB.
                 </FieldDescription>
               </Field>
             )}
@@ -198,7 +211,6 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
                   id={field.name}
                   name={field.name}
                   value={field.state.value}
-                  onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                   placeholder="Ringkasan isi keputusan..."
                   autoComplete="off"
@@ -209,8 +221,8 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
         </SheetInnerSection>
 
         <SheetInnerSection>
-          <h3 className="mb-2 font-semibold text-muted-foreground text-sm">
-            Laporan
+          <h3 className="mb-2 font-semibold text-sm text-muted-foreground">
+            Laporan 
           </h3>
           <form.Field
             name="reportNumber"
@@ -266,9 +278,7 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
               );
             }}
           />
-        </SheetInnerSection>
 
-        <SheetInnerSection>
           <form.Field
             name="notes"
             children={(field) => {
@@ -298,17 +308,17 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
         </SheetInnerSection>
       </SheetInnerContent>
 
-      <SheetFooter className="grid shrink-0 grid-cols-1 gap-2 border-t bg-background p-4 sm:grid-cols-2">
+    <SheetFooter className="grid shrink-0 grid-cols-1 gap-2 border-t bg-background p-4 sm:grid-cols-2">
         <Button type="submit" disabled={keputusanMutation.isPending}>
           {keputusanMutation.isPending ? (
             <>
-              <Loader className="mr-2 size-4 animate-spin" />
+              <Loader className="animate-spin mr-2 size-4" />
               Menyimpan...
             </>
           ) : (
             <>
-              <Plus className="mr-2 size-4" />
-              Tambah
+              <Edit className="mr-2 size-4" />
+              Perbarui
             </>
           )}
         </Button>
@@ -320,4 +330,4 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
   );
 };
 
-export { KeputusanCreateForm };
+export { KeputusanEditForm };

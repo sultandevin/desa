@@ -1,12 +1,13 @@
 import { db } from "@desa/db";
 import {
-  type DecisionInsert,
   decision,
   decisionInsertSchema,
   decisionSelectSchema,
 } from "@desa/db/schema/decision";
-import { file } from "@desa/db/schema/file";
-import { eq, like, or } from "drizzle-orm";
+import { ORPCError } from "@orpc/client";
+import { isForeignKeyError } from "@desa/db/lib/errors";
+// import { file } from "@desa/db/schema/file";
+import { eq, ilike, or, and, sql } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
@@ -18,20 +19,69 @@ const list = publicProcedure
     summary: "List ALL Decisions",
     tags: ["Decisions"],
   })
-  .input(paginationSchema)
+  .input(
+    paginationSchema.extend({
+      query: z.string().optional().default(""),
+      year: z.string().optional()
+        .transform(val => val ? parseInt(val) : undefined)
+        .refine((val) => !val || (val >= 1999 && val <= 2100), {
+          message: "Year must be between 1999 and 2100"
+        }),
+      category: z.enum(["anggaran", "personal", "infrastruktur"]).optional(),
+    }),
+  )
   .output(z.array(decisionSelectSchema))
-  .handler(async ({ input, errors }) => {
-    const decisions = await db
-      .select()
-      .from(decision)
-      .limit(input.limit)
-      .offset(input.offset);
+  .handler(async ({ input }) => {
+    try {
+      const searchTerm = input.query?.trim() ? `%${input.query}%` : null;
+      
+      const categoryCondition = input.category ? (() => {
+        const categoryKeywords = {
+          // Contoh kategori dan kata kunci terkait
+          anggaran: ["anggaran", "dana", "budget", "keuangan", "biaya", "apbd", "rka"],
+          personal: ["pegawai", "staff", "personnel", "karyawan", "sdm", "cpns"],
+          infrastruktur: ["jalan", "bangunan", "infrastructure", "fasilitas", "gedung", "jembatan"],
+        };
 
-    if (!decisions) {
-      throw errors.NOT_FOUND();
+        const keywords = categoryKeywords[input.category as keyof typeof categoryKeywords] || [];
+
+        const conditions = keywords.map(keyword =>
+          or(
+            ilike(decision.number, `%${keyword}%`),
+            ilike(decision.regarding, `%${keyword}%`),
+            ilike(decision.shortDescription, `%${keyword}%`),
+            ilike(decision.reportNumber, `%${keyword}%`),
+            ilike(decision.notes, `%${keyword}%`)
+          )
+        );
+
+        return conditions.length > 0 ? or(...conditions) : undefined;
+      })() : undefined;
+
+      const decisions = await db
+        .select()
+        .from(decision)
+        .where(
+          and(
+            searchTerm ? or(
+              ilike(decision.number, searchTerm),
+              ilike(decision.regarding, searchTerm),
+              ilike(decision.shortDescription, searchTerm),
+              ilike(decision.reportNumber, searchTerm)
+            ) : undefined,
+            input.year ? sql`EXTRACT(YEAR FROM ${decision.date}) = ${input.year}` : undefined,
+            categoryCondition
+          )
+        )
+        .orderBy(sql`${decision.createdAt} DESC`)
+        .limit(input.limit)
+        .offset(input.offset);
+
+      return decisions;
+    } catch (err) {
+      console.error("List decisions error:", err);
+      throw new ORPCError("INTERNAL_SERVER_ERROR");
     }
-
-    return decisions;
   });
 
 const find = publicProcedure
@@ -61,39 +111,6 @@ const find = publicProcedure
     return decisionItem;
   });
 
-const search = publicProcedure
-  .route({
-    method: "POST",
-    path: "/decisionsearch",
-    summary: "Search decisions",
-    tags: ["Decisions"],
-  })
-  .input(
-    z.object({
-      query: z.string(),
-    }),
-  )
-  .output(z.array(decisionSelectSchema))
-  .handler(async ({ input, errors }) => {
-    const query = input.query;
-    const decisions = await db
-      .select()
-      .from(decision)
-      .where(
-        or(
-          like(decision.number, `%${query}%`),
-          like(decision.regarding, `%${query}%`),
-          like(decision.shortDescription, `%${query}%`),
-          like(decision.reportNumber, `%${query}%`),
-          like(decision.notes, `%${query}%`),
-        ),
-      );
-
-    if (!decisions) {
-      throw errors.NOT_FOUND();
-    }
-    return decisions;
-  });
 
 const create = protectedProcedure
   .route({
@@ -106,29 +123,45 @@ const create = protectedProcedure
     decisionInsertSchema.omit({ id: true, createdBy: true, createdAt: true }),
   )
   .output(decisionSelectSchema)
-  .handler(async ({ input, errors, context }) => {
-    if (input.file) {
-      const [fileExists] = await db
-        .select()
-        .from(file)
-        .where(eq(file.id, input.file))
-        .limit(1);
+  .handler(async ({ input, context }) => {
+    try {
+      // if (input.file) {
+      //   const [fileExists] = await db
+      //     .select()
+      //     .from(file)
+      //     .where(eq(file.id, input.file))
+      //     .limit(1);
 
-      if (!fileExists) throw errors.NOT_FOUND({ message: "File not found" });
-    }
+      //   if (!fileExists) {
+      //     throw new ORPCError("BAD_REQUEST", {
+      //       message: "File not found",
+      //     });
+      //   }
+      // }
 
-    const [newDecision] = await db
-      .insert(decision)
-      .values({
+      // Temp set file 
+      const inputData = {
         ...input,
+        file: undefined, // Enable when file upload is ready
         createdBy: context.session.user.id,
-      })
-      .returning();
+      };
 
-    if (!newDecision) {
-      throw errors.NOT_FOUND();
+      const [newDecision] = await db
+        .insert(decision)
+        .values(inputData)
+        .returning();
+
+      if (!newDecision) {
+        throw new ORPCError("BAD_REQUEST");
+      }
+
+      return newDecision;
+    } catch (err) {
+      if (isForeignKeyError(err)) throw new ORPCError("BAD_REQUEST", {
+        message: "Invalid foreign key reference"
+      });
+      throw new ORPCError("INTERNAL_SERVER_ERROR");
     }
-    return newDecision;
   });
 
 const update = protectedProcedure
@@ -148,32 +181,52 @@ const update = protectedProcedure
       ),
   )
   .output(decisionSelectSchema)
-  .handler(async ({ input, errors }) => {
-    if (input.file) {
-      const [fileExists] = await db
-        .select()
-        .from(file)
-        .where(eq(file.id, input.file))
-        .limit(1);
+  .handler(async ({ input }) => {
+    try {
+      const { id, ...updateData } = input;
 
-      if (!fileExists) throw errors.NOT_FOUND({ message: "File not found" });
+      // if (updateData.file) {
+      //   const [fileExists] = await db
+      //     .select()
+      //     .from(file)
+      //     .where(eq(file.id, updateData.file))
+      //     .limit(1);
+
+      //   if (!fileExists) {
+      //     throw new ORPCError("BAD_REQUEST", {
+      //       message: "File not found",
+      //     });
+      //   }
+      // }
+
+      // File upload not ready yet
+      const { file: _file, ...cleanUpdateData } = updateData;
+
+      const finalUpdateData = {
+        ...cleanUpdateData,
+        shortDescription: cleanUpdateData.shortDescription?.trim() || null,
+        notes: cleanUpdateData.notes?.trim() || null,
+      };
+
+      const [updatedDecision] = await db
+        .update(decision)
+        .set(finalUpdateData)
+        .where(eq(decision.id, id))
+        .returning();
+
+      if (!updatedDecision) {
+        throw new ORPCError("NOT_FOUND");
+      }
+
+      return updatedDecision;
+    } catch (err) {
+      if (isForeignKeyError(err)) {
+        throw new ORPCError("BAD_REQUEST", {
+          message: "Invalid foreign key reference",
+        });
+      }
+      throw new ORPCError("INTERNAL_SERVER_ERROR");
     }
-
-    type DecisionUpdate = { id: string } & Partial<DecisionInsert>;
-    const { id, ...rest }: DecisionUpdate = input;
-
-    const [updatedDecision] = await db
-      .update(decision)
-      .set({
-        ...rest,
-      })
-      .where(eq(decision.id, id))
-      .returning();
-
-    if (!updatedDecision) {
-      throw errors.NOT_FOUND();
-    }
-    return updatedDecision;
   });
 
 const remove = protectedProcedure
@@ -185,24 +238,34 @@ const remove = protectedProcedure
   })
   .input(z.object({ id: z.string() }))
   .output(z.object({ message: z.string() }))
-  .handler(async ({ input, errors }) => {
-    const [deletedDecision] = await db
-      .delete(decision)
-      .where(eq(decision.id, input.id))
-      .returning();
+  .handler(async ({ input }) => {
+    try {
+      const [deletedDecision] = await db
+        .delete(decision)
+        .where(eq(decision.id, input.id))
+        .returning();
 
-    if (!deletedDecision) {
-      throw errors.NOT_FOUND();
+      if (!deletedDecision) {
+        throw new ORPCError("NOT_FOUND");
+      }
+
+      return {
+        message: `Successfully deleted decision with ID ${deletedDecision.id}`,
+      };
+    } catch (err) {
+      if (isForeignKeyError(err)) {
+        throw new ORPCError("BAD_REQUEST", {
+          message: "Cannot delete decision due to foreign key constraints",
+        });
+      }
+      console.error("Delete decision error:", err);
+      throw new ORPCError("INTERNAL_SERVER_ERROR");
     }
-    return {
-      message: `Successfully deleted decision with ID ${deletedDecision.id}`,
-    };
   });
 
 export const decisionRouter = {
   list,
   find,
-  search,
   create,
   update,
   remove,

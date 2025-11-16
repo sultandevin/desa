@@ -1,6 +1,5 @@
 "use client";
 
-import type { Decision } from "@desa/db/schema/decision";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
@@ -41,6 +40,7 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { Input } from "@/components/ui/input";
 import {
   Sheet,
   SheetContent,
@@ -50,22 +50,28 @@ import {
 } from "@/components/ui/sheet";
 import { orpc, queryClient } from "@/utils/orpc";
 import { KeputusanCreateForm } from "./keputusan-create-form";
-
-// import { KeputusanEditForm } from "./keputusan-edit-form";
+import { KeputusanEditForm } from "./keputusan-edit-form";
 
 const KeputusanTable = () => {
   const [query, setQuery] = useState("");
   const [queryInputValue, setQueryInputValue] = useState("");
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
-  const [editingKeputusan, setEditingKeputusan] = useState<Decision | null>(
-    null,
-  );
+  const [editingKeputusanId, setEditingKeputusanId] = useState<string | null>(null);
   const [offset, setOffset] = useState(0);
+  const [year, setYear] = useState("");
+  const [category, setCategory] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
   const keputusan = useQuery(
     orpc.decision.list.queryOptions({
-      input: { offset, limit: 10, query },
+      input: {
+        offset,
+        limit: 10,
+        query,
+        year: year || undefined,
+        category: (category as "anggaran" | "personal" | "infrastruktur" | undefined) || undefined,
+      },
     }),
   );
 
@@ -79,22 +85,6 @@ const KeputusanTable = () => {
       },
       onError: () => {
         toast.error("Gagal menghapus keputusan, coba lagi.");
-      },
-    }),
-  );
-
-  const _updateMutation = useMutation(
-    orpc.decision.update.mutationOptions({
-      onSuccess: (_, _variables) => {
-        queryClient.invalidateQueries({
-          queryKey: orpc.decision.key(),
-        });
-        toast.success(`Keputusan berhasil diperbarui!`);
-        setIsEditFormOpen(false);
-        setEditingKeputusan(null);
-      },
-      onError: () => {
-        toast.error("Gagal memperbarui keputusan, coba lagi.");
       },
     }),
   );
@@ -167,7 +157,7 @@ const KeputusanTable = () => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => {
-                    setEditingKeputusan(row.original);
+                    setEditingKeputusanId(row.original.id);
                     setIsEditFormOpen(true);
                   }}
                 >
@@ -252,6 +242,16 @@ const KeputusanTable = () => {
             )}
           </InputGroup>
 
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowFilters(!showFilters)}
+            className={showFilters ? "bg-primary text-primary-foreground" : ""}
+          >
+            <SearchIcon className="w-4 h-4 mr-2" />
+            Filter
+          </Button>
+
           <Sheet open={isCreateFormOpen} onOpenChange={setIsCreateFormOpen}>
             <SheetTrigger asChild className="">
               <Button size={`sm`}>
@@ -259,25 +259,77 @@ const KeputusanTable = () => {
                 Tambah
               </Button>
             </SheetTrigger>
-            <SheetContent className="min-w-[400px] overflow-y-auto sm:min-w-[540px]">
+            <SheetContent className="overflow-y-auto">
               <SheetHeader>
                 <SheetTitle>Tambah Keputusan Baru</SheetTitle>
               </SheetHeader>
-              {/* UNCOMMENT dan gunakan komponen form di sini */}
-              <KeputusanCreateForm
-                onSuccess={() => setIsCreateFormOpen(false)}
-              />
+              <KeputusanCreateForm onSuccess={() => setIsCreateFormOpen(false)} />
             </SheetContent>
           </Sheet>
+
+          {showFilters && (
+            <div className="flex flex-wrap gap-4 p-4 border rounded-lg bg-background w-full">
+              <div className="flex flex-col space-y-2">
+                <label className="text-sm font-medium text-foreground">Tahun Keputusan</label>
+                <Input
+                  type="number"
+                  placeholder="2025"
+                  min="2000"
+                  max="2045"
+                  value={year}
+                  onChange={(e) => {
+                    setYear(e.target.value);
+                    setOffset(0);
+                    setQuery("");
+                  }}
+                  className="w-28"
+                />
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <label className="text-sm font-medium text-foreground">Kategori</label>
+                <select
+                  value={category}
+                  onChange={(e) => {
+                    setCategory(e.target.value);
+                    setOffset(0);
+                    setQuery(""); 
+                  }}
+                  className="w-48 px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="">Semua Kategori</option>
+                  <option value="anggaran">Anggaran & Keuangan</option>
+                  <option value="personal">Personal & SDM</option>
+                  <option value="infrastruktur">Infrastruktur & Bangunan</option>
+                </select>
+              </div>
+
+              <div className="flex flex-col space-y-2">
+                <label className="text-sm font-medium text-transparent">.</label>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setYear("");
+                    setCategory("");
+                    setOffset(0);
+                  }}
+                  className="h-9"
+                >
+                  Reset Filter
+                </Button>
+              </div>
+            </div>
+          )}
 
           <Sheet open={isEditFormOpen} onOpenChange={setIsEditFormOpen}>
             <SheetContent className="overflow-y-auto">
               <SheetHeader>
                 <SheetTitle>Edit Keputusan</SheetTitle>
               </SheetHeader>
-              {editingKeputusan && (
+              {editingKeputusanId && (
                 <KeputusanEditForm
-                  keputusan={editingKeputusan}
+                  keputusanId={editingKeputusanId}
                   onSuccess={() => setIsEditFormOpen(false)}
                 />
               )}
