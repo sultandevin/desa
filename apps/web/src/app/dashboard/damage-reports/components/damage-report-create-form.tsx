@@ -114,7 +114,7 @@ const DamageReportCreateForm = ({
                     <SelectContent>
                       {assets.data?.data.map((asset) => (
                         <SelectItem key={asset.id} value={asset.id}>
-                          {asset.name} {asset.code ? `(${asset.code})` : ""}
+                          {asset.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
