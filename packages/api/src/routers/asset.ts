@@ -42,7 +42,6 @@ const list = publicProcedure
           input.query.length > 0
             ? or(
                 ilike(asset.name, `%${input.query}%`),
-                ilike(asset.code, `%${input.query}%`),
                 ilike(asset.nup, `%${input.query}%`),
                 ilike(asset.brandType, `%${input.query}%`),
               )

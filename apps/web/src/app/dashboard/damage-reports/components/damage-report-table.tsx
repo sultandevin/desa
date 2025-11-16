@@ -89,18 +89,27 @@ const DamageReportTable = () => {
       },
     },
     {
-      accessorKey: "verifiedBy",
+      id: "verifiedBy",
       header: "Diverifikasi Oleh",
       cell: ({ row }) => {
-        const verifiedBy = row.getValue("verifiedBy") as string | null;
-        if (!verifiedBy) {
+        const verifiedByUser = row.original.verifiedByUser;
+        if (!verifiedByUser) {
           return (
             <span className="text-muted-foreground">Belum diverifikasi</span>
           );
         }
-        return (
-          <span className="font-mono text-xs">{verifiedBy.slice(0, 8)}...</span>
-        );
+        return <span>{verifiedByUser.name}</span>;
+      },
+    },
+    {
+      id: "reportedBy",
+      header: "Dilaporkan Oleh",
+      cell: ({ row }) => {
+        const reportedByUser = row.original.reportedByUser;
+        if (!reportedByUser) {
+          return <span className="text-muted-foreground">-</span>;
+        }
+        return <span>{reportedByUser.name}</span>;
       },
     },
     {

@@ -218,6 +218,12 @@ const update = protectedProcedure
     try {
       const { id, ...updateData } = input;
 
+      if (!id) {
+        throw new ORPCError("BAD_REQUEST", {
+          message: "Decision ID is required",
+        });
+      }
+
       // if (updateData.file) {
       //   const [fileExists] = await db
       //     .select()

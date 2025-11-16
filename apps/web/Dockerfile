@@ -12,8 +12,6 @@ COPY . .
 # Generate a partial monorepo with a pruned lockfile for a target workspace.
 # Assuming "web" is the name entered in the project's package.json: { name: "web" }
 RUN turbo prune web --docker
-# Ensure root tsconfig is in pruned output
-RUN cp tsconfig.base.json /app/out/full/tsconfig.base.json 2>/dev/null || true
  
 # ---
 FROM base AS builder

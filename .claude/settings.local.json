@@ -8,9 +8,17 @@
       "Bash(bunx shadcn@latest add:*)",
       "Bash(bun:*)",
       "Bash(cat:*)",
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:community.fly.io)",
+      "WebFetch(domain:stackoverflow.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(find:*)",
+      "Bash(docker build:*)",
+      "WebFetch(domain:orm.drizzle.team)"
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["shadcn"]
+  "enabledMcpjsonServers": [
+    "shadcn"
+  ]
 }
