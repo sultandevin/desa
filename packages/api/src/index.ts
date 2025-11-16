@@ -1,12 +1,9 @@
-import { os } from "@orpc/server";
-import type { Context } from "./context";
 import {
   requireAuth,
   requireKadesRole,
   requireSekdesRole,
 } from "./middlewares/roles";
-
-export const o = os.$context<Context>();
+import { o } from "./orpc";
 
 export const publicProcedure = o.errors({
   NOT_FOUND: {

@@ -88,8 +88,8 @@ const AssetTable = () => {
   const columns: ColumnDef<NonNullable<typeof assets.data>["data"][number]>[] =
     [
       {
-        accessorKey: "code",
-        header: "Kode",
+        accessorKey: "id",
+        header: "ID",
       },
       {
         accessorKey: "name",
@@ -151,12 +151,12 @@ const AssetTable = () => {
                     <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                     <DropdownMenuItem
                       onClick={() => {
-                        const code: string = row.getValue("code");
-                        copyToClipboard({ text: code });
+                        const id: string = row.getValue("id");
+                        copyToClipboard({ text: id });
                       }}
                     >
                       <Copy />
-                      Salin Kode Aset
+                      Salin ID Aset
                     </DropdownMenuItem>
 
                     <DropdownMenuSeparator />
