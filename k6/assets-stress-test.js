@@ -90,7 +90,7 @@ export default function () {
 
 export function handleSummary(data) {
   return {
-    "k6/results/assets-stress-test-summary.json": JSON.stringify(data),
+    "results/assets-stress-test-summary.json": JSON.stringify(data),
     stdout: textSummary(data, { indent: " ", enableColors: true }),
   };
 }
