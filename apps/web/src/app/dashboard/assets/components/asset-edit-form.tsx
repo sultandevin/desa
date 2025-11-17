@@ -61,7 +61,7 @@ const AssetEditForm = ({
   const form = useForm({
     defaultValues: {
       name: "",
-      nup: "",
+      nup: 0,
       brandType: "",
       condition: assetQuery.data?.condition || "Baik",
       note: "",
@@ -72,7 +72,7 @@ const AssetEditForm = ({
       assetMutation.mutate({
         id: assetId,
         name: value.name,
-        nup: value.nup.length === 0 ? undefined : value.nup,
+        nup: String(value.nup),
         brandType: value.brandType || undefined,
         condition: value.condition || undefined,
         valueRp: value.valueRp || undefined,
@@ -87,7 +87,7 @@ const AssetEditForm = ({
     if (assetQuery.data) {
       const asset = assetQuery.data;
       form.setFieldValue("name", asset.name);
-      form.setFieldValue("nup", asset.nup ?? "");
+      form.setFieldValue("nup", asset.nup ? Number(asset.nup) : 0);
       form.setFieldValue("brandType", asset.brandType ?? "");
       form.setFieldValue("condition", asset.condition ?? "");
       form.setFieldValue("note", asset.note ?? "");
@@ -161,7 +161,8 @@ const AssetEditForm = ({
             validators={{
               onBlur: z
                 .string()
-                .min(3, "Nama aset harus lebih dari 3 karakter"),
+                .min(3, "Nama aset harus lebih dari 3 karakter")
+                .max(100, "Nama aset harus kurang dari 100 karakter"),
             }}
             children={(field) => {
               const isInvalid =
@@ -218,6 +219,9 @@ const AssetEditForm = ({
           />
           <form.Field
             name="nup"
+            validators={{
+              onBlur: z.number(),
+            }}
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
@@ -227,9 +231,10 @@ const AssetEditForm = ({
                   <Input
                     id={field.name}
                     name={field.name}
+                    type="number"
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(e.target.valueAsNumber)}
                     aria-invalid={isInvalid}
                     placeholder="XXXXXX"
                     autoComplete="off"
@@ -294,6 +299,15 @@ const AssetEditForm = ({
 
           <form.Field
             name="valueRp"
+            validators={{
+              onBlur: z
+                .number()
+                .min(0, "Harga aset harus lebih dari Rp0,00")
+                .max(
+                  999999999,
+                  "Harga aset harus kurang dari Rp999.999.999,00",
+                ),
+            }}
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
