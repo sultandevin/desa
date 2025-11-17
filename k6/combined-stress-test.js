@@ -34,7 +34,7 @@ export default function () {
   if (scenario < 0.5) {
     // 50% chance - Test Assets endpoints
     group("Assets API", () => {
-      const res = http.get(`${BASE_URL}/api/rpc/assets?pageSize=20&query=`, {
+      const res = http.get(`${BASE_URL}/api/rpc/api-reference/assets?pageSize=20&query=`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -61,7 +61,7 @@ export default function () {
     // 50% chance - Test Damage Reports endpoints
     group("Damage Reports API", () => {
       const res = http.get(
-        `${BASE_URL}/api/rpc/damage-reports?limit=20&offset=0`,
+        `${BASE_URL}/api/rpc/api-reference/damage-reports?limit=20&offset=0`,
         {
           headers: {
             "Content-Type": "application/json",

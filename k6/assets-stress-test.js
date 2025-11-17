@@ -25,7 +25,7 @@ const BASE_URL = __ENV.BASE_URL || "http://localhost:3001";
 
 export default function () {
   // Test 1: List assets without query
-  const res1 = http.get(`${BASE_URL}/api/rpc/assets?pageSize=20`, {
+  const res1 = http.get(`${BASE_URL}/api/rpc/api-reference/assets?pageSize=20`, {
     headers: {
       "Content-Type": "application/json",
     },
@@ -46,7 +46,7 @@ export default function () {
   sleep(1);
 
   // Test 2: List assets with search query
-  const res2 = http.get(`${BASE_URL}/api/rpc/assets?pageSize=10&query=test`, {
+  const res2 = http.get(`${BASE_URL}/api/rpc/api-reference/assets?pageSize=10&query=test`, {
     headers: {
       "Content-Type": "application/json",
     },
@@ -67,7 +67,7 @@ export default function () {
   sleep(1);
 
   // Test 3: List assets with cursor pagination
-  const res3 = http.get(`${BASE_URL}/api/rpc/assets?pageSize=15`, {
+  const res3 = http.get(`${BASE_URL}/api/rpc/api-reference/assets?pageSize=15`, {
     headers: {
       "Content-Type": "application/json",
     },

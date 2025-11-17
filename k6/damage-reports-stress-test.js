@@ -26,7 +26,7 @@ const BASE_URL = __ENV.BASE_URL || "http://localhost:3001";
 export default function () {
   // Test 1: List damage reports with default pagination
   const res1 = http.get(
-    `${BASE_URL}/api/rpc/damage-reports?limit=20&offset=0`,
+    `${BASE_URL}/api/rpc/api-reference/damage-reports?limit=20&offset=0`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export default function () {
     pageSizes[Math.floor(Math.random() * pageSizes.length)];
 
   const res2 = http.get(
-    `${BASE_URL}/api/rpc/damage-reports?limit=${randomPageSize}&offset=0`,
+    `${BASE_URL}/api/rpc/api-reference/damage-reports?limit=${randomPageSize}&offset=0`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -96,7 +96,7 @@ export default function () {
   const randomOffset = Math.floor(Math.random() * 50);
 
   const res3 = http.get(
-    `${BASE_URL}/api/rpc/damage-reports?limit=15&offset=${randomOffset}`,
+    `${BASE_URL}/api/rpc/api-reference/damage-reports?limit=15&offset=${randomOffset}`,
     {
       headers: {
         "Content-Type": "application/json",
