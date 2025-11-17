@@ -26,14 +26,18 @@ const list = publicProcedure
     z.array(
       damageReportSelectSchema.extend({
         assetName: z.string().nullable(),
-        reportedByUser: z.object({
-          id: z.string(),
-          name: z.string(),
-        }).nullable(),
-        verifiedByUser: z.object({
-          id: z.string(),
-          name: z.string(),
-        }).nullable(),
+        reportedByUser: z
+          .object({
+            id: z.string(),
+            name: z.string(),
+          })
+          .nullable(),
+        verifiedByUser: z
+          .object({
+            id: z.string(),
+            name: z.string(),
+          })
+          .nullable(),
       }),
     ),
   )

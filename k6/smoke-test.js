@@ -1,5 +1,5 @@
-import http from "k6/http";
 import { check, group, sleep } from "k6";
+import http from "k6/http";
 
 // Smoke test - minimal load to verify endpoints work
 export const options = {
@@ -53,7 +53,7 @@ export default function () {
         try {
           const body = JSON.parse(r.body);
           return Array.isArray(body);
-        } catch  {
+        } catch {
           return false;
         }
       },
