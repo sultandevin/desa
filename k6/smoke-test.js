@@ -18,21 +18,19 @@ export default function () {
     const res = http.get(`${BASE_URL}/api/rpc/api-reference/healthcheck`);
     check(res, {
       "healthcheck status 200": (r) => r.status === 200,
-      "healthcheck returns OK": (r) => r.body === "OK",
+      "healthcheck returns OK": (r) => r.json() === "OK",
     });
   });
 
   sleep(1);
 
   group("Assets Endpoint", () => {
-    const res = http.get(
-      `${BASE_URL}/api/rpc/api-reference/assets?pageSize=10`,
-    );
+    const res = http.get(`${BASE_URL}/api/rpc/api-reference/assets`);
     check(res, {
       "assets status 200": (r) => r.status === 200,
       "assets returns data": (r) => {
         try {
-          const body = JSON.parse(r.body);
+          const body = r.json();
           return body.data !== undefined;
         } catch {
           return false;
@@ -44,14 +42,12 @@ export default function () {
   sleep(1);
 
   group("Damage Reports Endpoint", () => {
-    const res = http.get(
-      `${BASE_URL}/api/rpc/api-reference/damage-reports?limit=10&offset=0`,
-    );
+    const res = http.get(`${BASE_URL}/api/rpc/api-reference/damage-reports`);
     check(res, {
       "damage reports status 200": (r) => r.status === 200,
       "damage reports returns array": (r) => {
         try {
-          const body = JSON.parse(r.body);
+          const body = r.json();
           return Array.isArray(body);
         } catch {
           return false;

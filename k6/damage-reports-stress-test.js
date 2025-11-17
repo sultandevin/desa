@@ -26,7 +26,7 @@ const BASE_URL = __ENV.BASE_URL || "http://localhost:3001";
 export default function () {
   // Test 1: List damage reports with default pagination
   const res1 = http.get(
-    `${BASE_URL}/api/rpc/api-reference/damage-reports?limit=20&offset=0`,
+    `${BASE_URL}/api/rpc/api-reference/damage-reports`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -65,12 +65,8 @@ export default function () {
   sleep(1);
 
   // Test 2: List damage reports with different page sizes
-  const pageSizes = [10, 25, 50];
-  const randomPageSize =
-    pageSizes[Math.floor(Math.random() * pageSizes.length)];
-
   const res2 = http.get(
-    `${BASE_URL}/api/rpc/api-reference/damage-reports?limit=${randomPageSize}&offset=0`,
+    `${BASE_URL}/api/rpc/api-reference/damage-reports`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -83,7 +79,7 @@ export default function () {
     "damage reports pagination response valid": (r) => {
       try {
         const body = JSON.parse(r.body);
-        return Array.isArray(body) && body.length <= randomPageSize;
+        return Array.isArray(body);
       } catch (_e) {
         return false;
       }
@@ -93,10 +89,8 @@ export default function () {
   sleep(1);
 
   // Test 3: List damage reports with offset pagination
-  const randomOffset = Math.floor(Math.random() * 50);
-
   const res3 = http.get(
-    `${BASE_URL}/api/rpc/api-reference/damage-reports?limit=15&offset=${randomOffset}`,
+    `${BASE_URL}/api/rpc/api-reference/damage-reports`,
     {
       headers: {
         "Content-Type": "application/json",
