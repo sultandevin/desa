@@ -23,7 +23,5 @@
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "shadcn"
-  ]
+  "enabledMcpjsonServers": ["shadcn"]
 }

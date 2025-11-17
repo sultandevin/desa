@@ -85,7 +85,8 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             validators={{
               onBlur: z
                 .string()
-                .min(3, "Nama aset harus lebih dari 3 karakter"),
+                .min(3, "Nama aset harus lebih dari 3 karakter")
+                .max(100, "Nama aset harus kurang dari 100 karakter"),
             }}
             children={(field) => {
               const isInvalid =
@@ -222,6 +223,15 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
           <form.Field
             name="valueRp"
+            validators={{
+              onBlur: z
+                .number()
+                .min(0, "Harga aset harus lebih dari Rp0,00")
+                .max(
+                  999999999,
+                  "Harga aset harus kurang dari Rp999.999.999,00",
+                ),
+            }}
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;

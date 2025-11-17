@@ -25,7 +25,7 @@ const list = publicProcedure
   .input(
     cursorPaginationSchema.extend({
       query: z.string().optional().default(""),
-    })
+    }),
   )
   // .output(
   //   cursorOutputSchema.extend({
@@ -43,11 +43,11 @@ const list = publicProcedure
             ? or(
                 ilike(asset.name, `%${input.query}%`),
                 ilike(asset.nup, `%${input.query}%`),
-                ilike(asset.brandType, `%${input.query}%`)
+                ilike(asset.brandType, `%${input.query}%`),
               )
             : undefined,
-          input.cursor ? lt(asset.updatedAt, input.cursor) : undefined
-        )
+          input.cursor ? lt(asset.updatedAt, input.cursor) : undefined,
+        ),
       )
       .limit(input.pageSize)
       .orderBy(desc(asset.updatedAt));
@@ -60,7 +60,7 @@ const list = publicProcedure
       data: assets,
       nextCursor:
         assets.length === input.pageSize
-          ? assets.at(-1)?.updatedAt ?? null
+          ? (assets.at(-1)?.updatedAt ?? null)
           : null,
     };
   });
@@ -76,12 +76,12 @@ const find = publicProcedure
     z.object({
       id: z.string(),
       includeDamageReports: z.boolean().optional().default(false),
-    })
+    }),
   )
   .output(
     assetSelectSchema.extend({
       damageReports: z.array(damageReportSelectSchema).optional(),
-    })
+    }),
   )
   .handler(async ({ input, errors }) => {
     const id = input.id;
@@ -127,7 +127,7 @@ const create = protectedProcedure
         .number()
         .min(0, "Nilai aset harus lebih dari atau sama dengan 0")
         .optional(),
-    })
+    }),
   )
   .output(assetSelectSchema)
   .handler(async ({ input, context }) => {
@@ -174,7 +174,7 @@ const update = protectedProcedure
         .optional(),
       note: z.string().optional(),
       acquiredAt: z.date().optional(),
-    })
+    }),
   )
   .output(assetSelectSchema)
   .handler(async ({ input, errors, context }) => {
@@ -191,8 +191,8 @@ const update = protectedProcedure
         and(
           eq(asset.id, id),
           isNull(asset.deletedAt),
-          !isKades ? undefined : eq(asset.createdBy, context.session.user.id)
-        )
+          !isKades ? undefined : eq(asset.createdBy, context.session.user.id),
+        ),
       )
       .returning();
 
@@ -213,12 +213,12 @@ const remove = protectedProcedure
   .input(
     z.object({
       id: z.string(),
-    })
+    }),
   )
   .output(
     z.object({
       message: z.string(),
-    })
+    }),
   )
   .handler(async ({ input, errors, context }) => {
     const isKades = context.session.user.id === "kades";
@@ -229,8 +229,8 @@ const remove = protectedProcedure
         and(
           isKades ? undefined : eq(asset.id, context.session.user.id),
           eq(asset.id, input.id),
-          isNull(asset.deletedAt)
-        )
+          isNull(asset.deletedAt),
+        ),
       )
       .returning();
 

@@ -50,7 +50,7 @@ export const link = new RPCLink({
 /**
  * Fallback to client-side client if server-side client is not available.
  */
-export const client: AppRouterClient =
-  (globalThis.$client ?? createORPCClient(link)) as AppRouterClient;
+export const client: AppRouterClient = (globalThis.$client ??
+  createORPCClient(link)) as AppRouterClient;
 
 export const orpc = createTanstackQueryUtils(client);
