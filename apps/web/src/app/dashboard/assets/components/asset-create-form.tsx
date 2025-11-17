@@ -37,6 +37,7 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           queryKey: orpc.asset.key(),
         });
         toast.success("Berhasil mencatat aset baru!");
+        onSuccess?.();
       },
       onError: ({ message }) => {
         toast.error("Gagal mencatat aset baru", {
@@ -85,7 +86,7 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             validators={{
               onBlur: z
                 .string()
-                .min(3, "Nama aset harus lebih dari 3 karakter")
+                .min(1, "Nama aset harus lebih dari 1 karakter")
                 .max(100, "Nama aset harus kurang dari 100 karakter"),
             }}
             children={(field) => {

@@ -161,7 +161,7 @@ const AssetEditForm = ({
             validators={{
               onBlur: z
                 .string()
-                .min(3, "Nama aset harus lebih dari 3 karakter")
+                .min(1, "Nama aset harus lebih dari 1 karakter")
                 .max(100, "Nama aset harus kurang dari 100 karakter"),
             }}
             children={(field) => {

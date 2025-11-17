@@ -37,7 +37,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { authClient } from "@/lib/auth-client";
-import { orpc } from "@/utils/orpc";
+import { orpc, queryClient } from "@/utils/orpc";
 import { DamageReportCreateForm } from "./damage-report-create-form";
 
 const DamageReportTable = () => {
@@ -53,6 +53,10 @@ const DamageReportTable = () => {
   const damageReportVerifyMutation = useMutation(
     orpc.damageReport.verify.mutationOptions({
       onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: orpc.damageReport.list.queryKey(),
+        });
+
         toast.success("Laporan berhasil diverifikasi");
       },
     }),
