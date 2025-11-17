@@ -40,6 +40,7 @@ export const asset = pgTable(
   (t) => [
     check("price_check", sql`${t.valueRp} >= 0`),
     index("updated_at_index").on(t.updatedAt),
+    index("asset_id_idx").on(t.id),
   ],
 );
 

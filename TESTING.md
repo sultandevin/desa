@@ -7,8 +7,8 @@ Comprehensive stress testing documentation for DESA API endpoints using Grafana 
 This directory contains stress tests for DESA API endpoints using Grafana k6. Tests run via Docker, no local k6 installation required.
 
 **Tested Endpoints:**
-- `/api/rpc/assets` - Asset inventory listing with cursor pagination
-- `/api/rpc/damage-reports` - Damage reports with offset pagination
+- `/api/rpc/api-reference/assets` - Asset inventory listing with cursor pagination
+- `/api/rpc/api-reference/damage-reports` - Damage reports with offset pagination
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ This directory contains stress tests for DESA API endpoints using Grafana k6. Te
 
 ```bash
 # From project root
-bun dev
+docker compose up -d
 ```
 
 API should be available at `http://localhost:3001`
