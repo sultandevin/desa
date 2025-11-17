@@ -5,7 +5,7 @@ import {
   regulationInsertSchema,
   regulationSelectSchema,
 } from "@desa/db/schema/regulation";
-import { eq, like, or } from "drizzle-orm";
+import { eq, like, or, sql } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
@@ -18,7 +18,7 @@ const list = publicProcedure
     tags: ["Regulations"],
   })
   .input(paginationSchema)
-  .output(z.array(regulationSelectSchema))
+  // .output(z.array(regulationSelectSchema))
   .handler(async ({ input, errors }) => {
     const regulations = await db
       .select()

@@ -1,0 +1,7 @@
+# k6 test results
+results/*.json
+results/*.html
+results/*.txt
+
+# Keep the results directory
+!results/.gitkeep

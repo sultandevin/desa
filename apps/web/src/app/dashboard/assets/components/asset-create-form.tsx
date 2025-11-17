@@ -3,7 +3,7 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { Loader, Save } from "lucide-react";
-import { toast, Toaster } from "sonner";
+import { toast } from "sonner";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,6 +37,7 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           queryKey: orpc.asset.key(),
         });
         toast.success("Berhasil mencatat aset baru!");
+        onSuccess?.();
       },
       onError: ({ message }) => {
         toast.error("Gagal mencatat aset baru", {
@@ -49,7 +50,7 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const form = useForm({
     defaultValues: {
       name: "",
-      nup: "",
+      nup: 0,
       brandType: "",
       condition: "Baik",
       note: "",
@@ -59,7 +60,7 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     onSubmit: ({ value }) => {
       assetMutation.mutate({
         name: value.name,
-        nup: value.nup.length === 0 ? undefined : value.nup,
+        nup: String(value.nup),
         brandType: value.brandType || null,
         condition: value.condition || null,
         valueRp: value.valueRp || undefined,
@@ -85,7 +86,8 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             validators={{
               onBlur: z
                 .string()
-                .min(3, "Nama aset harus lebih dari 3 karakter"),
+                .min(1, "Nama aset harus lebih dari 1 karakter")
+                .max(100, "Nama aset harus kurang dari 100 karakter"),
             }}
             children={(field) => {
               const isInvalid =
@@ -142,6 +144,9 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           />
           <form.Field
             name="nup"
+            validators={{
+              onBlur: z.number(),
+            }}
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;
@@ -151,9 +156,10 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                   <Input
                     id={field.name}
                     name={field.name}
+                    type="number"
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => field.handleChange(e.target.valueAsNumber)}
                     aria-invalid={isInvalid}
                     placeholder="XXXXXX"
                     autoComplete="off"
@@ -218,6 +224,15 @@ const AssetCreateForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
           <form.Field
             name="valueRp"
+            validators={{
+              onBlur: z
+                .number()
+                .min(0, "Harga aset harus lebih dari Rp0,00")
+                .max(
+                  999999999,
+                  "Harga aset harus kurang dari Rp999.999.999,00",
+                ),
+            }}
             children={(field) => {
               const isInvalid =
                 field.state.meta.isTouched && !field.state.meta.isValid;

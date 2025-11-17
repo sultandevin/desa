@@ -32,7 +32,7 @@ const list = publicProcedure
       category: z.enum(["anggaran", "personal", "infrastruktur"]).optional(),
     }),
   )
-  .output(z.array(decisionSelectSchema))
+  // .output(z.array(decisionSelectSchema))
   .handler(async ({ input }) => {
     try {
       const searchTerm = input.query?.trim() ? `%${input.query}%` : null;
@@ -129,7 +129,7 @@ const find = publicProcedure
       id: z.string(),
     }),
   )
-  .output(decisionSelectSchema)
+  // .output(decisionSelectSchema)
   .handler(async ({ input, errors }) => {
     const id = input.id;
     const [decisionItem] = await db
@@ -217,6 +217,12 @@ const update = protectedProcedure
   .handler(async ({ input }) => {
     try {
       const { id, ...updateData } = input;
+
+      if (!id) {
+        throw new ORPCError("BAD_REQUEST", {
+          message: "Decision ID is required",
+        });
+      }
 
       // if (updateData.file) {
       //   const [fileExists] = await db

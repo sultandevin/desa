@@ -70,10 +70,8 @@ const DamageReportCreateForm = ({
         });
         toast.success("Laporan kerusakan berhasil ditambahkan!");
 
-        // Reset form
         form.reset();
 
-        // Call onSuccess callback to close dialog
         onSuccess?.();
       },
       onError: (error) => {
@@ -114,7 +112,7 @@ const DamageReportCreateForm = ({
                     <SelectContent>
                       {assets.data?.data.map((asset) => (
                         <SelectItem key={asset.id} value={asset.id}>
-                          {asset.name} {asset.code ? `(${asset.code})` : ""}
+                          {asset.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

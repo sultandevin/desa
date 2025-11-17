@@ -8,7 +8,18 @@
       "Bash(bunx shadcn@latest add:*)",
       "Bash(bun:*)",
       "Bash(cat:*)",
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:community.fly.io)",
+      "WebFetch(domain:stackoverflow.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(find:*)",
+      "Bash(docker build:*)",
+      "WebFetch(domain:orm.drizzle.team)",
+      "WebFetch(domain:orpc.unnoq.com)",
+      "Bash(npx tsc:*)",
+      "Bash(chmod:*)",
+      "Bash(tree:*)",
+      "Bash(./run-tests.sh:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
