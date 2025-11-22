@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { Loader, Plus } from "lucide-react";
@@ -17,6 +18,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { orpc, queryClient } from "@/utils/orpc";
 
 const RegulationCreateForm = () => {
+  const [file, setFile] = useState<File | null>(null);
+
   const regulationMutation = useMutation(
     orpc.regulation.create.mutationOptions({
       onSuccess: () => {
@@ -25,7 +28,10 @@ const RegulationCreateForm = () => {
         });
         toast.success("Peraturan berhasil ditambahkan!");
       },
-    }),
+      onError: (err: any) => {
+        toast.error(err?.message || "Gagal membuat peraturan");
+      },
+    })
   );
 
   const form = useForm({
@@ -36,17 +42,42 @@ const RegulationCreateForm = () => {
       description: "",
       effectiveBy: new Date().toISOString().split("T")[0],
     },
-    onSubmit: ({ value }) => {
-      console.log("Data yang dikirim:", value);
-      regulationMutation.mutate({
-        title: value.title,
-        number: value.number,
-        level: value.level,
-        description: value.description || null,
-        effectiveBy: value.effectiveBy
-          ? new Date(value.effectiveBy)
-          : undefined,
-      });
+    onSubmit: async ({ value }) => {
+      let fileId: string | null = null;
+
+      try {
+        if (file) {
+          const formData = new FormData();
+          formData.append("file", file);
+
+          const res = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!res.ok) {
+            toast.error("Upload file gagal");
+            return;
+          }
+
+          const data = await res.json();
+
+          fileId = data.id;
+        }
+
+        regulationMutation.mutate({
+          title: value.title,
+          number: value.number,
+          level: value.level,
+          description: value.description || null,
+          effectiveBy: value.effectiveBy
+            ? new Date(value.effectiveBy)
+            : undefined,
+          file: fileId,
+        });
+      } catch (e) {
+        toast.error("Terjadi kesalahan.");
+      }
     },
   });
 
@@ -122,6 +153,17 @@ const RegulationCreateForm = () => {
         </SheetInnerSection>
 
         <SheetInnerSection>
+          <Field>
+            <FieldLabel>Upload Dokumen</FieldLabel>
+            <Input
+              type="file"
+              accept=".pdf,.doc,.docx,.jpg,.png"
+              onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            />
+          </Field>
+        </SheetInnerSection>
+
+        <SheetInnerSection>
           <form.Field
             name="description"
             children={(field) => (
@@ -131,17 +173,20 @@ const RegulationCreateForm = () => {
                   id={field.name}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Tambahkan deskripsi singkat mengenai peraturan ini"
+                  placeholder="Deskripsi singkat mengenai peraturan ini"
+                  rows={4}
                 />
               </Field>
             )}
           />
+        </SheetInnerSection>
 
+        <SheetInnerSection>
           <form.Field
             name="effectiveBy"
             children={(field) => (
               <Field>
-                <FieldLabel htmlFor={field.name}>Tanggal Ditetapkan</FieldLabel>
+                <FieldLabel htmlFor={field.name}>Tanggal Berlaku</FieldLabel>
                 <Input
                   id={field.name}
                   type="date"
@@ -155,19 +200,19 @@ const RegulationCreateForm = () => {
       </SheetInnerContent>
 
       <SheetFooter className="grid shrink-0 grid-cols-1 gap-2 border-t bg-background p-4 sm:grid-cols-2">
-        <Button type="submit" disabled={regulationMutation.isPending}>
-          {regulationMutation.isPending ? (
-            <>
-              <Loader className="animate-spin" />
-              Menyimpan...
-            </>
-          ) : (
-            <>
+        {regulationMutation.isPending ? (
+          <Button type="submit" disabled>
+            <Loader className="animate-spin" />
+            Menyimpan...
+          </Button>
+        ) : (
+          <SheetClose asChild>
+            <Button type="submit">
               <Plus />
               Tambah Peraturan
-            </>
-          )}
-        </Button>
+            </Button>
+          </SheetClose>
+        )}
         <SheetClose asChild>
           <Button variant="outline">Tutup</Button>
         </SheetClose>

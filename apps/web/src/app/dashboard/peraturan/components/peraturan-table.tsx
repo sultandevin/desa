@@ -82,6 +82,7 @@ const PeraturanTable = () => {
     { accessorKey: "title", header: "Peraturan" },
     { accessorKey: "number", header: "No. Peraturan" },
     { accessorKey: "level", header: "Tingkat" },
+    { accessorKey: "file", header: "File" },
     { accessorKey: "description", header: "Deskripsi" },
     { accessorKey: "effectiveBy", header: "Tanggal Ditetapkan" },
     {
@@ -106,6 +107,7 @@ const PeraturanTable = () => {
                   title={row.getValue("title")}
                   number={row.getValue("number")}
                   level={row.getValue("level")}
+                  file={row.getValue("file")}
                   description={row.getValue("description")}
                   effectiveBy={row.getValue("effectiveBy")}
                 />

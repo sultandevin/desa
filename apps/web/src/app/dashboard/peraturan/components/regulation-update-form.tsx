@@ -17,15 +17,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { orpc, queryClient } from "@/utils/orpc";
 
 interface RegulationUpdateProps {
-    id: string;
-    title: string;
-    number: string;
-    level: string;
-    description: string | null;
-    effectiveBy: Date | undefined;
+  id: string;
+  title: string;
+  number: string;
+  level: string;
+  file: string | null;
+  description: string | null;
+  effectiveBy: Date | undefined;
 }
 
-const RegulationUpdateForm = ({id, title, number, level, description, effectiveBy}: RegulationUpdateProps) => {
+export function RegulationUpdateForm({
+  id,
+  title,
+  number,
+  level,
+  file,
+  description,
+  effectiveBy,
+}: RegulationUpdateProps) {
   const regulationMutation = useMutation(
     orpc.regulation.update.mutationOptions({
       onSuccess: () => {
@@ -33,26 +42,31 @@ const RegulationUpdateForm = ({id, title, number, level, description, effectiveB
           queryKey: orpc.regulation.key(),
         });
         toast.success("Peraturan berhasil diperbarui!");
+
+        const closeButton = document.getElementById("close-sheet-btn");
+        closeButton?.click();
       },
-    }),
+    })
   );
-  const regulationId = id
 
   const form = useForm({
     defaultValues: {
-      title: title,
-      number: number,
-      level: level,
-      description: description ? description : "",
-      effectiveBy: effectiveBy ? effectiveBy.toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
+      title,
+      number,
+      level,
+      file,
+      description: description ?? "",
+      effectiveBy: effectiveBy
+        ? effectiveBy.toISOString().split("T")[0]
+        : new Date().toISOString().split("T")[0],
     },
-    onSubmit: ({ value }) => {
-      console.log("Data yang dikirim:", value);
+    onSubmit: async ({ value }) => {
       regulationMutation.mutate({
-        id: regulationId,
+        id,
         title: value.title,
         number: value.number,
         level: value.level,
+        file: value.file, // <-- string id
         description: value.description || null,
         effectiveBy: value.effectiveBy
           ? new Date(value.effectiveBy)
@@ -82,7 +96,6 @@ const RegulationUpdateForm = ({id, title, number, level, description, effectiveB
                   id={field.name}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Contoh: Peraturan Akademik Mahasiswa"
                 />
                 {field.state.meta.isTouched && !field.state.meta.isValid && (
                   <FieldError errors={field.state.meta.errors} />
@@ -102,7 +115,6 @@ const RegulationUpdateForm = ({id, title, number, level, description, effectiveB
                   id={field.name}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Nomor 02 Tahun 2025"
                 />
                 {field.state.meta.isTouched && !field.state.meta.isValid && (
                   <FieldError errors={field.state.meta.errors} />
@@ -122,7 +134,6 @@ const RegulationUpdateForm = ({id, title, number, level, description, effectiveB
                   id={field.name}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Universitas / Fakultas / Program Studi"
                 />
                 {field.state.meta.isTouched && !field.state.meta.isValid && (
                   <FieldError errors={field.state.meta.errors} />
@@ -134,6 +145,41 @@ const RegulationUpdateForm = ({id, title, number, level, description, effectiveB
 
         <SheetInnerSection>
           <form.Field
+            name="file"
+            children={(field) => (
+              <Field>
+                <FieldLabel htmlFor={field.name}>Upload Dokumen</FieldLabel>
+
+                <Input
+                  id={field.name}
+                  type="file"
+                  onChange={async (e) => {
+                    const uploadFile = e.target.files?.[0];
+                    if (!uploadFile) return;
+
+                    const formData = new FormData();
+                    formData.append("file", uploadFile);
+
+                    const res = await fetch("/api/upload", {
+                      method: "POST",
+                      body: formData,
+                    });
+
+                    if (!res.ok) {
+                      toast.error("Upload gagal");
+                      return;
+                    }
+
+                    const data = await res.json();
+                    field.handleChange(data.id);
+                    toast.success("File berhasil diupload!");
+                  }}
+                />
+              </Field>
+            )}
+          />
+
+          <form.Field
             name="description"
             children={(field) => (
               <Field>
@@ -142,7 +188,6 @@ const RegulationUpdateForm = ({id, title, number, level, description, effectiveB
                   id={field.name}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Tambahkan deskripsi singkat mengenai peraturan ini"
                 />
               </Field>
             )}
@@ -179,12 +224,13 @@ const RegulationUpdateForm = ({id, title, number, level, description, effectiveB
             </>
           )}
         </Button>
+
         <SheetClose asChild>
-          <Button variant="outline">Tutup</Button>
+          <Button id="close-sheet-btn" variant="outline">
+            Tutup
+          </Button>
         </SheetClose>
       </SheetFooter>
     </form>
   );
-};
-
-export { RegulationUpdateForm };
+}

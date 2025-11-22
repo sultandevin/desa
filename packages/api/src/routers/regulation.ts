@@ -43,7 +43,7 @@ const find = publicProcedure
   .input(
     z.object({
       id: z.string(),
-    }),
+    })
   )
   .output(regulationSelectSchema)
   .handler(async ({ input, errors }) => {
@@ -70,7 +70,7 @@ const search = publicProcedure
   .input(
     z.object({
       query: z.string(),
-    }),
+    })
   )
   .output(z.array(regulationSelectSchema))
   .handler(async ({ input, errors }) => {
@@ -84,8 +84,8 @@ const search = publicProcedure
           like(regulation.number, `%${query}%`),
           like(regulation.level, `%${query}%`),
           like(regulation.description, `%${query}%`),
-          like(sql`${regulation.effectiveBy}::text`, `%${query}%`),
-        ),
+          like(sql`${regulation.effectiveBy}::text`, `%${query}%`)
+        )
       );
 
     if (!regulations) {
@@ -102,7 +102,7 @@ const create = protectedProcedure
     tags: ["Regulations"],
   })
   .input(
-    regulationInsertSchema.omit({ id: true, createdBy: true, createdAt: true }),
+    regulationInsertSchema.omit({ id: true, createdBy: true, createdAt: true })
   )
   .output(regulationSelectSchema)
   .handler(async ({ input, errors, context }) => {
@@ -140,7 +140,7 @@ const update = publicProcedure // hapus line ini kalo auth udah siap
     regulationInsertSchema
       .omit({ createdBy: true, createdAt: true })
       .partial()
-      .required({ id: true }),
+      .required({ id: true })
   )
   .output(regulationSelectSchema)
   .handler(async ({ input, errors }) => {
@@ -153,12 +153,16 @@ const update = publicProcedure // hapus line ini kalo auth udah siap
 
       if (!fileExists) throw errors.NOT_FOUND({ message: "File not found" });
     }
+
+    const { id, file: fileId, ...updateData } = input;
+
     const [updatedRegulation] = await db
       .update(regulation)
       .set({
-        ...input,
+        ...updateData,
+        file: fileId,
       })
-      .where(eq(regulation.id, input.id))
+      .where(eq(regulation.id, id))
       .returning();
 
     if (!updatedRegulation) {
