@@ -41,10 +41,10 @@ const list = publicProcedure
           isNull(asset.deletedAt),
           input.query.length > 0
             ? or(
-                ilike(asset.name, `%${input.query}%`),
-                ilike(asset.nup, `%${input.query}%`),
-                ilike(asset.brandType, `%${input.query}%`),
-              )
+              ilike(asset.name, `%${input.query}%`),
+              ilike(asset.nup, `%${input.query}%`),
+              ilike(asset.brandType, `%${input.query}%`),
+            )
             : undefined,
           input.cursor ? lt(asset.updatedAt, input.cursor) : undefined,
         ),
@@ -120,8 +120,7 @@ const create = protectedProcedure
   })
   .input(
     assetInsertSchema.extend({
-      name: z.string().min(3, "Nama aset minimal 3 karakter"),
-      code: z.string().min(3, "Kode aset minimal 3 karakter").optional(),
+      name: z.string().min(1, "Nama aset minimal 1 karakter"),
       nup: z.string().min(3, "Kode aset minimal 3 karakter").optional(),
       valueRp: z
         .number()

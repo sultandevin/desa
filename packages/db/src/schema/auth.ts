@@ -1,4 +1,4 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, index, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -12,7 +12,10 @@ export const user = pgTable("user", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   role: text("role").default("user").notNull(),
-});
+}, (table) => ({
+  idIdx: index("user_id_idx").on(table.id),
+  emailIdx: index("user_email_idx").on(table.email),
+}));
 
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
@@ -27,7 +30,10 @@ export const session = pgTable("session", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-});
+}, (table) => ({
+  userIdIdx: index("session_user_id_idx").on(table.userId),
+  tokenIdx: index("session_token_idx").on(table.token),
+}));
 
 export const account = pgTable("account", {
   id: text("id").primaryKey(),
@@ -47,7 +53,9 @@ export const account = pgTable("account", {
   updatedAt: timestamp("updated_at")
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
-});
+}, (table) => ({
+  userIdIdx: index("account_user_id_idx").on(table.userId),
+}));
 
 export const verification = pgTable("verification", {
   id: text("id").primaryKey(),

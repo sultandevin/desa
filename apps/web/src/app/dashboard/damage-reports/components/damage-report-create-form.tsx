@@ -70,10 +70,8 @@ const DamageReportCreateForm = ({
         });
         toast.success("Laporan kerusakan berhasil ditambahkan!");
 
-        // Reset form
         form.reset();
 
-        // Call onSuccess callback to close dialog
         onSuccess?.();
       },
       onError: (error) => {

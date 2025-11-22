@@ -10,10 +10,10 @@ const damageReportsErrorRate = new Rate("damage_reports_errors");
 // Test configuration
 export const options = {
   stages: [
-    { duration: "30s", target: 20 }, // Ramp up to 20 users
-    { duration: "1m", target: 75 }, // Ramp up to 75 users
-    { duration: "2m", target: 150 }, // Ramp up to 150 users
-    { duration: "1m", target: 150 }, // Stay at 150 users
+    { duration: "30s", target: 2000 }, // Ramp up to 20 users
+    { duration: "1m", target: 7500 }, // Ramp up to 75 users
+    { duration: "2m", target: 10000 }, // Ramp up to 150 users
+    { duration: "1m", target: 10000 }, // Stay at 150 users
     { duration: "30s", target: 0 }, // Ramp down to 0 users
   ],
   thresholds: {
@@ -34,7 +34,7 @@ export default function () {
   if (scenario < 0.5) {
     // 50% chance - Test Assets endpoints
     group("Assets API", () => {
-      const res = http.get(`${BASE_URL}/api/rpc/assets?pageSize=20&query=`, {
+      const res = http.get(`${BASE_URL}/api/rpc/api-reference/assets`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -60,14 +60,11 @@ export default function () {
   } else {
     // 50% chance - Test Damage Reports endpoints
     group("Damage Reports API", () => {
-      const res = http.get(
-        `${BASE_URL}/api/rpc/damage-reports?limit=20&offset=0`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
+      const res = http.get(`${BASE_URL}/api/rpc/api-reference/damage-reports`, {
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+      });
 
       const success = check(res, {
         "damage reports status 200": (r) => r.status === 200,
@@ -93,7 +90,7 @@ export default function () {
 
 export function handleSummary(data) {
   return {
-    "k6/results/combined-stress-test-summary.json": JSON.stringify(data),
+    "results/combined-stress-test-summary.json": JSON.stringify(data),
     stdout: textSummary(data, { indent: " ", enableColors: true }),
   };
 }

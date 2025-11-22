@@ -37,22 +37,28 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { authClient } from "@/lib/auth-client";
-import { orpc } from "@/utils/orpc";
+import { orpc, queryClient } from "@/utils/orpc";
 import { DamageReportCreateForm } from "./damage-report-create-form";
 
 const DamageReportTable = () => {
   const [addReportDialogOpen, setAddReportDialogOpen] = useState(false);
-  const [, setQuery] = useState("");
+  const [query, setQuery] = useState("");
   const [queryInputValue, setQueryInputValue] = useState("");
   const session = authClient.useSession();
 
   const damageReports = useQuery(
-    orpc.damageReport.list.queryOptions({ input: { offset: 0, limit: 10 } }),
+    orpc.damageReport.list.queryOptions({
+      input: { query, offset: 0, limit: 10 },
+    }),
   );
 
   const damageReportVerifyMutation = useMutation(
     orpc.damageReport.verify.mutationOptions({
       onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: orpc.damageReport.list.queryKey(),
+        });
+
         toast.success("Laporan berhasil diverifikasi");
       },
     }),
