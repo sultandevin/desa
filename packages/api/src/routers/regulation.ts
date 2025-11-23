@@ -5,7 +5,7 @@ import {
   regulationInsertSchema,
   regulationSelectSchema,
 } from "@desa/db/schema/regulation";
-import { eq, like, or, sql } from "drizzle-orm";
+import { eq, getTableColumns, like, or, sql } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
@@ -45,19 +45,28 @@ const find = publicProcedure
       id: z.string(),
     })
   )
-  .output(regulationSelectSchema)
+  .output(
+    regulationSelectSchema.extend({
+      fileUrl: z.string().nullable().optional(),
+    })
+  )
   .handler(async ({ input, errors }) => {
     const id = input.id;
-    const [regulationItem] = await db
-      .select()
+    const [item] = await db
+      .select({
+        ...getTableColumns(regulation),
+        fileUrl: file.path,
+      })
       .from(regulation)
+      .leftJoin(file, eq(regulation.file, file.id))
       .where(eq(regulation.id, id))
       .limit(1);
 
-    if (!regulationItem) {
+    if (!item) {
       throw errors.NOT_FOUND();
     }
-    return regulationItem;
+
+    return item;
   });
 
 const search = publicProcedure

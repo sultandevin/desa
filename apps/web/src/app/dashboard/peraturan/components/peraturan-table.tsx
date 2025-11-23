@@ -9,6 +9,7 @@ import {
   SearchIcon,
   Trash,
   Pencil,
+  Eye,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -38,10 +39,12 @@ import { orpc, queryClient } from "@/utils/orpc";
 import { DashboardSection } from "../../components/dashboard";
 import { RegulationCreateForm } from "./regulation-create-form";
 import { RegulationUpdateForm } from "./regulation-update-form";
+import { useRouter } from "next/navigation";
 
 const PeraturanTable = () => {
   const [query, setQuery] = useState("");
   const [queryInputValue, setQueryInputValue] = useState("");
+  const router = useRouter();
 
   /*
   const peraturan = useQuery(
@@ -122,6 +125,17 @@ const PeraturanTable = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+
+                <DropdownMenuItem
+                  onClick={() =>
+                    router.push(`/dashboard/peraturan/${id}` as any)
+                  }
+                  className="cursor-pointer"
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  Lihat Detail
+                </DropdownMenuItem>
+
                 <DropdownMenuItem
                   onClick={() => handleDelete(id)}
                   disabled={deleteMutation.isPending}
