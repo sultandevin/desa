@@ -46,6 +46,7 @@
     "format:check": "biome check --write"
   },
   "dependencies": {
+    "@vercel/blob": "^2.0.0",
     "dotenv": "^17.2.2",
     "pg": "^8.16.3",
     "zod": "^4.1.12"

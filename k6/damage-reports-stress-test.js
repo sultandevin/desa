@@ -115,7 +115,7 @@ export default function () {
 
 export function handleSummary(data) {
   return {
-    "k6/results/damage-reports-stress-test-summary.json": JSON.stringify(data),
+    "results/damage-reports-stress-test-summary.json": JSON.stringify(data),
     stdout: textSummary(data, { indent: " ", enableColors: true }),
   };
 }

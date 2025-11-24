@@ -8,7 +8,7 @@ import {
   damageReportSelectSchema,
 } from "@desa/db/schema/damage-report";
 import { ORPCError } from "@orpc/client";
-import { eq, getTableColumns } from "drizzle-orm";
+import { and, eq, getTableColumns, ilike, or } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import * as z from "zod";
 import { kadesProcedure, protectedProcedure, publicProcedure } from "..";
@@ -21,7 +21,11 @@ const list = publicProcedure
     summary: "List All Damage Reports",
     tags: ["Damage Reports"],
   })
-  .input(paginationSchema)
+  .input(
+    paginationSchema.extend({
+      query: z.string().optional().default(""),
+    }),
+  )
   .output(
     z.array(
       damageReportSelectSchema.extend({
@@ -62,6 +66,14 @@ const list = publicProcedure
       .leftJoin(asset, eq(damageReport.assetId, asset.id))
       .leftJoin(reportedByUser, eq(damageReport.reportedBy, reportedByUser.id))
       .leftJoin(verifiedByUser, eq(damageReport.verifiedBy, verifiedByUser.id))
+      .where(
+        input.query.length > 0
+          ? or(
+              ilike(damageReport.description, `%${input.query}%`),
+              ilike(asset.name, `%${input.query}%`),
+            )
+          : undefined,
+      )
       .limit(input.limit)
       .offset(input.offset);
 

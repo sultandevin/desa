@@ -2,7 +2,15 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Loader, MoreHorizontal, Plus, SearchIcon, Trash, Pencil } from "lucide-react";
+import {
+  Loader,
+  MoreHorizontal,
+  Plus,
+  SearchIcon,
+  Trash,
+  Pencil,
+  Eye,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
@@ -31,10 +39,12 @@ import { orpc, queryClient } from "@/utils/orpc";
 import { DashboardSection } from "../../components/dashboard";
 import { RegulationCreateForm } from "./regulation-create-form";
 import { RegulationUpdateForm } from "./regulation-update-form";
+import { useRouter } from "next/navigation";
 
 const PeraturanTable = () => {
   const [query, setQuery] = useState("");
   const [queryInputValue, setQueryInputValue] = useState("");
+  const router = useRouter();
 
   /*
   const peraturan = useQuery(
@@ -46,7 +56,7 @@ const PeraturanTable = () => {
   const peraturan = useQuery(
     orpc.regulation.search.queryOptions({
       input: { query: query },
-    }),
+    })
   );
 
   // === Delete Mutation ===
@@ -61,7 +71,7 @@ const PeraturanTable = () => {
       onError: () => {
         toast.error("Gagal menghapus peraturan, coba lagi.");
       },
-    }),
+    })
   );
 
   const handleDelete = (id: string) => {
@@ -75,6 +85,7 @@ const PeraturanTable = () => {
     { accessorKey: "title", header: "Peraturan" },
     { accessorKey: "number", header: "No. Peraturan" },
     { accessorKey: "level", header: "Tingkat" },
+    { accessorKey: "file", header: "File" },
     { accessorKey: "description", header: "Deskripsi" },
     { accessorKey: "effectiveBy", header: "Tanggal Ditetapkan" },
     {
@@ -99,6 +110,7 @@ const PeraturanTable = () => {
                   title={row.getValue("title")}
                   number={row.getValue("number")}
                   level={row.getValue("level")}
+                  file={row.getValue("file")}
                   description={row.getValue("description")}
                   effectiveBy={row.getValue("effectiveBy")}
                 />
@@ -113,6 +125,17 @@ const PeraturanTable = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+
+                <DropdownMenuItem
+                  onClick={() =>
+                    router.push(`/dashboard/peraturan/${id}` as any)
+                  }
+                  className="cursor-pointer"
+                >
+                  <Eye className="mr-2 h-4 w-4" />
+                  Lihat Detail
+                </DropdownMenuItem>
+
                 <DropdownMenuItem
                   onClick={() => handleDelete(id)}
                   disabled={deleteMutation.isPending}
