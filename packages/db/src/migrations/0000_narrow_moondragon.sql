@@ -16,7 +16,7 @@ CREATE TABLE "asset_removal_request" (
 	"assetId" uuid NOT NULL,
 	"reason" text NOT NULL,
 	"status" "asset_removal_status",
-	"decision_letter" text,
+	"decision_letter" uuid,
 	"reported_by" text NOT NULL,
 	"decided_by" text
 );
@@ -24,19 +24,18 @@ CREATE TABLE "asset_removal_request" (
 CREATE TABLE "asset" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
-	"code" text,
 	"nup" text,
 	"brand_type" text,
 	"value_rp" numeric,
 	"condition" text,
-	"proof_of_ownership" text,
-	"status" text,
+	"proof_of_ownership" uuid,
 	"note" text,
+	"status" "damage_status",
 	"acquisition_year" timestamp,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"deleted_at" timestamp,
-	"created_by" text,
+	"created_by" text NOT NULL,
 	CONSTRAINT "price_check" CHECK ("asset"."value_rp" >= 0)
 );
 --> statement-breakpoint
@@ -76,6 +75,7 @@ CREATE TABLE "user" (
 	"image" text,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
+	"role" text DEFAULT 'user' NOT NULL,
 	CONSTRAINT "user_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
@@ -92,14 +92,15 @@ CREATE TABLE "damage_report" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"asset_id" uuid NOT NULL,
 	"description" text NOT NULL,
-	"status" "damage_status",
+	"status" "damage_status" NOT NULL,
 	"reported_by" text NOT NULL,
 	"verified_by" text,
+	"verified_at" timestamp,
 	"reported_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "keputusan" (
-	"id" text PRIMARY KEY NOT NULL,
+CREATE TABLE "decision" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"number" text NOT NULL,
 	"date" date NOT NULL,
 	"regarding" text NOT NULL,
@@ -107,13 +108,13 @@ CREATE TABLE "keputusan" (
 	"report_number" text NOT NULL,
 	"report_date" date NOT NULL,
 	"notes" text,
-	"file" text,
+	"file" uuid,
 	"created_by" text NOT NULL,
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "file" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"nama_file" text NOT NULL,
 	"file_path" text NOT NULL,
 	"uploaded_by" text NOT NULL,
@@ -121,13 +122,13 @@ CREATE TABLE "file" (
 );
 --> statement-breakpoint
 CREATE TABLE "regulation" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" varchar NOT NULL,
 	"number" varchar NOT NULL,
 	"level" varchar NOT NULL,
 	"description" text,
-	"file" text,
-	"effective_by" timestamp,
+	"file" uuid,
+	"effective_by" timestamp DEFAULT now(),
 	"created_by" text NOT NULL,
 	"created_at" timestamp DEFAULT now()
 );
@@ -142,11 +143,19 @@ ALTER TABLE "asset" ADD CONSTRAINT "asset_proof_of_ownership_file_id_fk" FOREIGN
 ALTER TABLE "asset" ADD CONSTRAINT "asset_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "account" ADD CONSTRAINT "account_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session" ADD CONSTRAINT "session_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "damage_report" ADD CONSTRAINT "damage_report_asset_id_asset_id_fk" FOREIGN KEY ("asset_id") REFERENCES "public"."asset"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "damage_report" ADD CONSTRAINT "damage_report_asset_id_asset_id_fk" FOREIGN KEY ("asset_id") REFERENCES "public"."asset"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "damage_report" ADD CONSTRAINT "damage_report_reported_by_user_id_fk" FOREIGN KEY ("reported_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "damage_report" ADD CONSTRAINT "damage_report_verified_by_user_id_fk" FOREIGN KEY ("verified_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "keputusan" ADD CONSTRAINT "keputusan_file_file_id_fk" FOREIGN KEY ("file") REFERENCES "public"."file"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "keputusan" ADD CONSTRAINT "keputusan_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "decision" ADD CONSTRAINT "decision_file_file_id_fk" FOREIGN KEY ("file") REFERENCES "public"."file"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "decision" ADD CONSTRAINT "decision_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "file" ADD CONSTRAINT "file_uploaded_by_user_id_fk" FOREIGN KEY ("uploaded_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "regulation" ADD CONSTRAINT "regulation_file_file_id_fk" FOREIGN KEY ("file") REFERENCES "public"."file"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "regulation" ADD CONSTRAINT "regulation_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
+ALTER TABLE "regulation" ADD CONSTRAINT "regulation_created_by_user_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+CREATE INDEX "updated_at_index" ON "asset" USING btree ("updated_at");--> statement-breakpoint
+CREATE INDEX "asset_id_idx" ON "asset" USING btree ("id");--> statement-breakpoint
+CREATE INDEX "account_user_id_idx" ON "account" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "session_user_id_idx" ON "session" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "session_token_idx" ON "session" USING btree ("token");--> statement-breakpoint
+CREATE INDEX "user_id_idx" ON "user" USING btree ("id");--> statement-breakpoint
+CREATE INDEX "user_email_idx" ON "user" USING btree ("email");--> statement-breakpoint
+CREATE INDEX "damage_report_assetId_idx" ON "damage_report" USING btree ("asset_id");
