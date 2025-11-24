@@ -6,8 +6,8 @@ import {
   decisionSelectSchema,
 } from "@desa/db/schema/decision";
 import { ORPCError } from "@orpc/client";
-// import { file } from "@desa/db/schema/file";
-import { and, eq, ilike, or, sql } from "drizzle-orm";
+import { file } from "@desa/db/schema/file";
+import { and, eq, getTableColumns, ilike, or, sql } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
 import { paginationSchema } from "../schemas";
@@ -129,12 +129,20 @@ const find = publicProcedure
       id: z.string(),
     }),
   )
-  // .output(decisionSelectSchema)
+  .output(
+    decisionSelectSchema.extend({
+      fileUrl: z.string().nullable().optional(),
+    }),
+  )
   .handler(async ({ input, errors }) => {
     const id = input.id;
     const [decisionItem] = await db
-      .select()
+      .select({
+        ...getTableColumns(decision),
+        fileUrl: file.path,
+      })
       .from(decision)
+      .leftJoin(file, eq(decision.file, file.id))
       .where(eq(decision.id, id))
       .limit(1);
 
@@ -157,24 +165,22 @@ const create = protectedProcedure
   .output(decisionSelectSchema)
   .handler(async ({ input, context }) => {
     try {
-      // if (input.file) {
-      //   const [fileExists] = await db
-      //     .select()
-      //     .from(file)
-      //     .where(eq(file.id, input.file))
-      //     .limit(1);
+      if (input.file) {
+        const [fileExists] = await db
+          .select()
+          .from(file)
+          .where(eq(file.id, input.file))
+          .limit(1);
 
-      //   if (!fileExists) {
-      //     throw new ORPCError("BAD_REQUEST", {
-      //       message: "File not found",
-      //     });
-      //   }
-      // }
+        if (!fileExists) {
+          throw new ORPCError("BAD_REQUEST", {
+            message: "File not found",
+          });
+        }
+      }
 
-      // Temp set file
       const inputData = {
         ...input,
-        file: undefined, // Enable when file upload is ready
         createdBy: context.session.user.id,
       };
 
@@ -224,27 +230,24 @@ const update = protectedProcedure
         });
       }
 
-      // if (updateData.file) {
-      //   const [fileExists] = await db
-      //     .select()
-      //     .from(file)
-      //     .where(eq(file.id, updateData.file))
-      //     .limit(1);
+      if (updateData.file) {
+        const [fileExists] = await db
+          .select()
+          .from(file)
+          .where(eq(file.id, updateData.file))
+          .limit(1);
 
-      //   if (!fileExists) {
-      //     throw new ORPCError("BAD_REQUEST", {
-      //       message: "File not found",
-      //     });
-      //   }
-      // }
-
-      // File upload not ready yet
-      const { file: _file, ...cleanUpdateData } = updateData;
+        if (!fileExists) {
+          throw new ORPCError("BAD_REQUEST", {
+            message: "File not found",
+          });
+        }
+      }
 
       const finalUpdateData = {
-        ...cleanUpdateData,
-        shortDescription: cleanUpdateData.shortDescription?.trim() || null,
-        notes: cleanUpdateData.notes?.trim() || null,
+        ...updateData,
+        shortDescription: updateData.shortDescription?.trim() || null,
+        notes: updateData.notes?.trim() || null,
       };
 
       const [updatedDecision] = await db

@@ -7,15 +7,20 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
+
   Edit,
+  Eye,
   MoreHorizontal,
   Plus,
   SearchIcon,
   Trash,
 } from "lucide-react";
+import type { Route } from "next";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
+import LoaderSkeleton from "@/components/loader-skeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -64,7 +69,9 @@ const KeputusanTable = () => {
   const [offset, setOffset] = useState(0);
   const [year, setYear] = useState("");
   const [category, setCategory] = useState("");
+
   const [showFilters, setShowFilters] = useState(false);
+  const router = useRouter();
 
   const keputusan = useQuery(
     orpc.decision.list.queryOptions({
@@ -161,6 +168,15 @@ const KeputusanTable = () => {
                 <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
+                  onClick={() =>
+                    router.push(`/dashboard/keputusan/${row.original.id}` as Route)
+                  }
+                  className="cursor-pointer"
+                >
+                  <Eye />
+                  Lihat Detail
+                </DropdownMenuItem>
+                <DropdownMenuItem
                   onClick={() => {
                     setEditingKeputusanId(row.original.id);
                     setIsEditFormOpen(true);
@@ -212,7 +228,9 @@ const KeputusanTable = () => {
     },
   ];
 
-  return (
+  return keputusan.isPending ? (
+    <LoaderSkeleton />
+  ) : (
     <DataTable
       columns={columns}
       data={keputusan.data ?? []}
