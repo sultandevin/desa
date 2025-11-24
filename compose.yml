@@ -5,7 +5,7 @@ services:
     platform: linux/amd64
     build:
       context: .
-      dockerfile: ./apps/web/Dockerfile.old
+      dockerfile: ./apps/web/Dockerfile
     ports:
       - 3001:3001
     env_file: ./apps/web/.env.prod
@@ -26,7 +26,7 @@ services:
     volumes:
       - desa_postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
