@@ -39,7 +39,7 @@ export default function Home() {
             </pre>
 
             <p className="text-lg">
-              Nilai jelek ditanggung Muhammad Natha Ulinnuha
+              Nilai jelek ditanggung Muhammad Natha Ulinnuha iya
             </p>
 
             <div className="flex items-center justify-center gap-2">
