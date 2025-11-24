@@ -37,6 +37,7 @@ on:
 env:
   PROJECT_ID: "development-460517" # TODO: update to your Google Cloud project ID
   REGION: "asia-southeast2" # TODO: update to your region
+  REPOSITORY: "desa" # Artifact Registry repository name
   SERVICE: "desa" # TODO: update to your service name
   # WORKLOAD_IDENTITY_PROVIDER: "projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider" # TODO: update to your workload identity provider
   BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
@@ -78,10 +79,12 @@ jobs:
           registry: "${{ env.REGION }}-docker.pkg.dev"
 
       - name: "Build and Push Container"
+        env:
+          IMAGE_TAG: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}"
         run: |-
-          DOCKER_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
-          docker build --tag "${DOCKER_TAG}" -f apps/web/Dockerfile .
-          docker push "${DOCKER_TAG}"
+          echo "Building and pushing: ${IMAGE_TAG}"
+          docker build --tag "${IMAGE_TAG}" -f apps/web/Dockerfile .
+          docker push "${IMAGE_TAG}"
 
       # END - Docker auth and build
 
@@ -92,7 +95,7 @@ jobs:
           service: "${{ env.SERVICE }}"
           region: "${{ env.REGION }}"
           # NOTE: If using a pre-built image, update the image name below:
-          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
+          image: "${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/${{ env.SERVICE }}:${{ github.sha }}"
 
       # If required, use the Cloud Run URL output in later steps
       - name: "Show output"
