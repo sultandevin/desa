@@ -5,16 +5,26 @@ import {
   assetInsertSchema,
   assetSelectSchema,
 } from "@desa/db/schema/asset";
+import { assetRemovalRequest } from "@desa/db/schema/asset-removal-request";
 import {
   damageReport,
   damageReportSelectSchema,
 } from "@desa/db/schema/damage-report";
+import { decision } from "@desa/db/schema/decision";
 import { ORPCError } from "@orpc/client";
-import { and, desc, eq, ilike, isNull, lt, or } from "drizzle-orm";
+import {
+  and,
+  desc,
+  eq,
+  getTableColumns,
+  ilike,
+  isNull,
+  lt,
+  or,
+} from "drizzle-orm";
 import * as z from "zod";
 import { kadesProcedure, protectedProcedure, publicProcedure } from "..";
 import { cursorPaginationSchema } from "../schemas";
-import { decision } from "@desa/db/schema/decision";
 
 const list = publicProcedure
   .route({
@@ -35,17 +45,21 @@ const list = publicProcedure
   // )
   .handler(async ({ input, errors }) => {
     const assets = await db
-      .select()
+      .select({
+        ...getTableColumns(asset),
+        removalStatus: assetRemovalRequest.status,
+      })
       .from(asset)
+      .leftJoin(assetRemovalRequest, eq(asset.id, assetRemovalRequest.assetId))
       .where(
         and(
           isNull(asset.deletedAt),
           input.query.length > 0
             ? or(
-              ilike(asset.name, `%${input.query}%`),
-              ilike(asset.nup, `%${input.query}%`),
-              ilike(asset.brandType, `%${input.query}%`),
-            )
+                ilike(asset.name, `%${input.query}%`),
+                ilike(asset.nup, `%${input.query}%`),
+                ilike(asset.brandType, `%${input.query}%`),
+              )
             : undefined,
           input.cursor ? lt(asset.updatedAt, input.cursor) : undefined,
         ),
@@ -57,26 +71,8 @@ const list = publicProcedure
       throw errors.NOT_FOUND();
     }
 
-    const assetsWithDeleteStatus = assets.map((asset) => {
-      let deleteStatus: null | "requested" | "deleted";
-      const isPendingDeletion = asset.requestDeletedAt && !asset.deletedAt;
-
-      if (isPendingDeletion) {
-        deleteStatus = "requested";
-      } else if (asset.deletedAt) {
-        deleteStatus = "deleted";
-      } else {
-        deleteStatus = null;
-      }
-
-      return {
-        ...asset,
-        deleteStatus,
-      };
-    });
-
     return {
-      data: assetsWithDeleteStatus,
+      data: assets,
       nextCursor:
         assets.length === input.pageSize
           ? (assets.at(-1)?.updatedAt ?? null)
@@ -230,14 +226,15 @@ const requestRemove = protectedProcedure
   .input(
     z.object({
       id: z.string(),
+      reason: z.string().min(1, "Alasan penghapusan wajib diisi"),
     }),
   )
   .handler(async ({ input, context, errors }) => {
     const isKades = context.session.user.role === "kades";
 
-    const [requestedAsset] = await db
-      .update(asset)
-      .set({ requestDeletedAt: new Date() })
+    const [existingAsset] = await db
+      .select()
+      .from(asset)
       .where(
         and(
           isKades ? undefined : eq(asset.createdBy, context.session.user.id),
@@ -245,14 +242,31 @@ const requestRemove = protectedProcedure
           isNull(asset.deletedAt),
         ),
       )
-      .returning();
+      .limit(1);
 
-    if (!requestedAsset) {
+    if (!existingAsset) {
       throw errors.NOT_FOUND();
     }
 
+    await db
+      .insert(assetRemovalRequest)
+      .values({
+        assetId: input.id,
+        reason: input.reason,
+        status: "PENDING",
+        reportedBy: context.session.user.id,
+      })
+      .onConflictDoUpdate({
+        target: assetRemovalRequest.assetId,
+        set: {
+          reason: input.reason,
+          status: "PENDING",
+          reportedBy: context.session.user.id,
+        },
+      });
+
     return {
-      message: `Sukses mengirim permintaan penghapusan ${requestedAsset.name}`,
+      message: `Sukses mengirim permintaan penghapusan ${existingAsset.name}`,
     };
   });
 

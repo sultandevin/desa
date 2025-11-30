@@ -14,6 +14,7 @@ import {
   Pencil,
   Plus,
   SearchIcon,
+  Send,
   Trash,
 } from "lucide-react";
 import { useState } from "react";
@@ -89,9 +90,9 @@ const AssetTable = () => {
 
   const kadesRemoveAssetOptions = useMutation(
     orpc.asset.remove.mutationOptions({
-      onSuccess: () => {
+      onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: orpc.asset.key() });
-        toast.success("Permintaan penghapusan aset berhasil dikirim");
+        toast.success(data.message);
       },
       onError: ({ message }) => {
         toast.error("Gagal mengirim permintaan penghapusan aset", {
@@ -104,12 +105,18 @@ const AssetTable = () => {
   const columns: ColumnDef<NonNullable<typeof assets.data>["data"][number]>[] =
     [
       {
-        accessorKey: "id",
-        header: "ID",
-      },
-      {
         accessorKey: "name",
         header: "Nama",
+        cell: ({ row }) => {
+          return (
+            <div className="flex gap-2">
+              {row.getValue("name")}
+              <span className="rounded-full bg-destructive px-1.5 py-0.5 text-xs">
+                permintaan penghapusan
+              </span>
+            </div>
+          );
+        },
       },
       {
         accessorKey: "brandType",
@@ -145,6 +152,8 @@ const AssetTable = () => {
           function handleRemove() {
             removeRequestAssetOptions.mutate({
               id: row.original.id,
+              // TO DO: popup buat input reason
+              reason: "Data aset salah ketik",
             });
           }
 
@@ -193,7 +202,8 @@ const AssetTable = () => {
                       </DropdownMenuItem>
                     </DialogTrigger>
 
-                    {session.data &&
+                    {row.original.removalStatus === null &&
+                      session.data &&
                       (session.data.user.id === row.original.createdBy ||
                         session.data.user.role === "kades") && (
                         <AlertDialogTrigger asChild>
@@ -204,7 +214,7 @@ const AssetTable = () => {
                         </AlertDialogTrigger>
                       )}
 
-                    {row.original.deleteStatus === "requested" &&
+                    {row.original.removalStatus === "PENDING" &&
                       session.data &&
                       session.data.user.role === "kades" && (
                         <DropdownMenuItem
@@ -232,14 +242,17 @@ const AssetTable = () => {
 
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Konfirmasi Hapus Aset</AlertDialogTitle>
+                    <AlertDialogTitle>
+                      Konfirmasi Permintaan Hapus Aset
+                    </AlertDialogTitle>
 
                     <AlertDialogDescription>
-                      Dengan mengeklik "Hapus", permintaan penghapusan aset anda
+                      Dengan mengeklik "Kirim", permintaan penghapusan aset anda
                       akan dikirimkan kepada Kepala Desa
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
                     <AlertDialogAction asChild>
                       <Button
                         onClick={handleRemove}
@@ -250,13 +263,12 @@ const AssetTable = () => {
                           "Menghapus..."
                         ) : (
                           <>
-                            <Trash />
-                            Hapus
+                            <Send />
+                            Kirim
                           </>
                         )}
                       </Button>
                     </AlertDialogAction>
-                    <AlertDialogCancel>Batal</AlertDialogCancel>
                   </AlertDialogFooter>
                 </AlertDialogContent>
 
