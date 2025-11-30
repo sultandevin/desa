@@ -14,6 +14,7 @@ import { and, desc, eq, ilike, isNull, lt, or } from "drizzle-orm";
 import * as z from "zod";
 import { kadesProcedure, protectedProcedure, publicProcedure } from "..";
 import { cursorPaginationSchema } from "../schemas";
+import { decision } from "@desa/db/schema/decision";
 
 const list = publicProcedure
   .route({
@@ -268,12 +269,26 @@ const remove = kadesProcedure
       )
       .returning();
 
+    if (!deletedAsset) throw errors.NOT_FOUND();
+
+    const [kadesDecision] = await db
+      .insert(decision)
+      .values({
+        number: `SK-HAPUS-ASET-${deletedAsset.id}`,
+        date: new Date().toDateString(),
+        regarding: `Penghapusan Aset ${deletedAsset.name}`,
+        reportNumber: `RPT-HAPUS-ASET-${deletedAsset.id}`,
+        reportDate: new Date().toDateString(),
+        createdBy: context.session.user.id,
+      })
+      .returning();
+
     if (!deletedAsset) {
       throw errors.NOT_FOUND();
     }
 
     return {
-      message: `Sukses menghapus aset "${deletedAsset.name}"`,
+      message: `Sukses menghapus aset ${deletedAsset.name} dan generasi Surat Keputusan ${kadesDecision?.number}`,
     };
   });
 
