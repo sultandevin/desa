@@ -8,7 +8,7 @@ import {
   damageReportSelectSchema,
 } from "@desa/db/schema/damage-report";
 import { ORPCError } from "@orpc/client";
-import { eq, getTableColumns, ilike, or } from "drizzle-orm";
+import { and, eq, getTableColumns, ilike, or } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import * as z from "zod";
 import { kadesProcedure, protectedProcedure, publicProcedure } from "..";
@@ -183,9 +183,44 @@ const verify = kadesProcedure
     return report;
   });
 
+const remove = protectedProcedure
+  .route({
+    method: "DELETE",
+    path: "/damage-reports/{id}",
+    summary: "Delete a Damage Report",
+    tags: ["Damage Reports"],
+  })
+  .input(
+    z.object({
+      id: z.string(),
+    }),
+  )
+  .handler(async ({ input, context, errors }) => {
+    const isKades = context.session.user.role === "kades";
+
+    const [deletedReport] = await db
+      .delete(damageReport)
+      .where(
+        and(
+          eq(damageReport.id, input.id),
+          isKades
+            ? undefined
+            : eq(damageReport.reportedBy, context.session.user.id),
+        ),
+      )
+      .returning();
+
+    if (!deletedReport) throw errors.NOT_FOUND();
+
+    return {
+      message: "Laporan kerusakan berhasil dihapus",
+    };
+  });
+
 export const damageReportRouter = {
   list,
   find,
   create,
   verify,
+  remove,
 };
