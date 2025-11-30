@@ -1,5 +1,5 @@
-import http from "k6/http";
 import { check, sleep } from "k6";
+import http from "k6/http";
 import { Rate } from "k6/metrics";
 
 // Custom metrics
@@ -52,7 +52,7 @@ export default function () {
       headers: {
         "Content-Type": "application/json",
       },
-    }
+    },
   );
 
   check(res2, {
@@ -106,20 +106,18 @@ function textSummary(data, options) {
   summary +=
     `${indent}✓ checks.........................: ${(
       (data.metrics.checks.values.passes / data.metrics.checks.values.count) *
-      100
+        100
     ).toFixed(2)}% ` +
     `✓ ${data.metrics.checks.values.passes} ✗ ${data.metrics.checks.values.fails}\n`;
   summary += `${indent}  data_received..................: ${(
-    data.metrics.data_received.values.count /
-    1024 /
-    1024
+    data.metrics.data_received.values.count / 1024 / 1024
   ).toFixed(2)} MB\n`;
   summary += `${indent}  data_sent......................: ${(
     data.metrics.data_sent.values.count / 1024
   ).toFixed(2)} KB\n`;
   summary +=
     `${indent}  http_req_duration..............: avg=${data.metrics.http_req_duration.values.avg.toFixed(
-      2
+      2,
     )}ms ` +
     `min=${data.metrics.http_req_duration.values.min.toFixed(2)}ms ` +
     `med=${data.metrics.http_req_duration.values.med.toFixed(2)}ms ` +

@@ -12,7 +12,7 @@ import {
 import { ORPCError } from "@orpc/client";
 import { and, desc, eq, ilike, isNull, lt, or } from "drizzle-orm";
 import * as z from "zod";
-import { protectedProcedure, publicProcedure } from "..";
+import { kadesProcedure, protectedProcedure, publicProcedure } from "..";
 import { cursorPaginationSchema } from "../schemas";
 
 const list = publicProcedure
@@ -202,7 +202,37 @@ const update = protectedProcedure
     return updatedAsset;
   });
 
-const remove = protectedProcedure
+const requestRemove = protectedProcedure
+  .input(
+    z.object({
+      id: z.string(),
+    }),
+  )
+  .handler(async ({ input, context, errors }) => {
+    const isKades = context.session.user.role === "kades";
+
+    const [requestedAsset] = await db
+      .update(asset)
+      .set({ requestDeletedAt: new Date() })
+      .where(
+        and(
+          isKades ? undefined : eq(asset.createdBy, context.session.user.id),
+          eq(asset.id, input.id),
+          isNull(asset.deletedAt),
+        ),
+      )
+      .returning();
+
+    if (!requestedAsset) {
+      throw errors.NOT_FOUND();
+    }
+
+    return {
+      message: `Sukses mengirim permintaan penghapusan ${requestedAsset.name}`,
+    };
+  });
+
+const remove = kadesProcedure
   .route({
     method: "DELETE",
     path: "/assets/{id}",
@@ -238,7 +268,7 @@ const remove = protectedProcedure
     }
 
     return {
-      message: `Successfully deleted asset with ID ${deletedAsset.id}`,
+      message: `Sukses menghapus aset "${deletedAsset.name}"`,
     };
   });
 
@@ -247,5 +277,6 @@ export const assetRouter = {
   find,
   create,
   update,
+  requestRemove,
   remove,
 };

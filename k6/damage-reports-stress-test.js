@@ -25,14 +25,11 @@ const BASE_URL = __ENV.BASE_URL || "http://localhost:3001";
 
 export default function () {
   // Test 1: List damage reports with default pagination
-  const res1 = http.get(
-    `${BASE_URL}/api/rpc/api-reference/damage-reports`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
+  const res1 = http.get(`${BASE_URL}/api/rpc/api-reference/damage-reports`, {
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+  });
 
   check(res1, {
     "damage reports list status 200": (r) => r.status === 200,
@@ -65,14 +62,11 @@ export default function () {
   sleep(1);
 
   // Test 2: List damage reports with different page sizes
-  const res2 = http.get(
-    `${BASE_URL}/api/rpc/api-reference/damage-reports`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
+  const res2 = http.get(`${BASE_URL}/api/rpc/api-reference/damage-reports`, {
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+  });
 
   check(res2, {
     "damage reports pagination status 200": (r) => r.status === 200,
@@ -89,14 +83,11 @@ export default function () {
   sleep(1);
 
   // Test 3: List damage reports with offset pagination
-  const res3 = http.get(
-    `${BASE_URL}/api/rpc/api-reference/damage-reports`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
+  const res3 = http.get(`${BASE_URL}/api/rpc/api-reference/damage-reports`, {
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+  });
 
   check(res3, {
     "damage reports offset pagination status 200": (r) => r.status === 200,
