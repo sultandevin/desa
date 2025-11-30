@@ -13,12 +13,13 @@ CREATE TABLE "asset_audit" (
 --> statement-breakpoint
 CREATE TABLE "asset_removal_request" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"assetId" uuid NOT NULL,
+	"asset_id" uuid NOT NULL,
 	"reason" text NOT NULL,
 	"status" "asset_removal_status",
 	"decision_letter" uuid,
 	"reported_by" text NOT NULL,
-	"decided_by" text
+	"decided_by" text,
+	CONSTRAINT "asset_removal_request_asset_id_unique" UNIQUE("asset_id")
 );
 --> statement-breakpoint
 CREATE TABLE "asset" (
@@ -135,8 +136,8 @@ CREATE TABLE "regulation" (
 --> statement-breakpoint
 ALTER TABLE "asset_audit" ADD CONSTRAINT "asset_audit_assest_id_asset_id_fk" FOREIGN KEY ("assest_id") REFERENCES "public"."asset"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "asset_audit" ADD CONSTRAINT "asset_audit_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "asset_removal_request" ADD CONSTRAINT "asset_removal_request_assetId_asset_id_fk" FOREIGN KEY ("assetId") REFERENCES "public"."asset"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "asset_removal_request" ADD CONSTRAINT "asset_removal_request_decision_letter_file_id_fk" FOREIGN KEY ("decision_letter") REFERENCES "public"."file"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "asset_removal_request" ADD CONSTRAINT "asset_removal_request_asset_id_asset_id_fk" FOREIGN KEY ("asset_id") REFERENCES "public"."asset"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "asset_removal_request" ADD CONSTRAINT "asset_removal_request_decision_letter_decision_id_fk" FOREIGN KEY ("decision_letter") REFERENCES "public"."decision"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "asset_removal_request" ADD CONSTRAINT "asset_removal_request_reported_by_user_id_fk" FOREIGN KEY ("reported_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "asset_removal_request" ADD CONSTRAINT "asset_removal_request_decided_by_user_id_fk" FOREIGN KEY ("decided_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "asset" ADD CONSTRAINT "asset_proof_of_ownership_file_id_fk" FOREIGN KEY ("proof_of_ownership") REFERENCES "public"."file"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint

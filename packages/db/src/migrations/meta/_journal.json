@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1764503299505,
-      "tag": "0000_wooden_wong",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1764516021959,
-      "tag": "0001_blue_starfox",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1764522576295,
-      "tag": "0002_stiff_wind_dancer",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1764523138588,
-      "tag": "0003_petite_chameleon",
+      "when": 1764524276213,
+      "tag": "0000_medical_zzzax",
       "breakpoints": true
     }
   ]
