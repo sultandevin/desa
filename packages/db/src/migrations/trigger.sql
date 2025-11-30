@@ -1,4 +1,5 @@
 --> statement-breakpoint
+-- comment
 -- Trigger to log asset changes to assset_audit
 CREATE OR REPLACE FUNCTION log_asset_changes()
 RETURNS TRIGGER AS $$
