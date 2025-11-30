@@ -247,8 +247,8 @@ const AssetTable = () => {
                     </AlertDialogTitle>
 
                     <AlertDialogDescription>
-                      Dengan mengeklik "Kirim", permintaan penghapusan aset anda
-                      akan dikirimkan kepada Kepala Desa
+                      Dengan mengeklik <strong>Kirim</strong>, permintaan
+                      penghapusan aset anda akan dikirimkan kepada Kepala Desa
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
