@@ -203,6 +203,11 @@ const update = protectedProcedure
   });
 
 const requestRemove = protectedProcedure
+  .route({
+    path: "/assets/{id}/request-remove",
+    method: "POST",
+    tags: ["Assets"],
+  })
   .input(
     z.object({
       id: z.string(),

@@ -22,6 +22,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { authClient } from "@/lib/auth-client";
 
 const data = {
   navMain: [
@@ -81,6 +82,8 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const session = authClient.useSession();
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -96,7 +99,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
               <div className="grid flex-1 text-left text-sm leading-tight *:select-none">
                 <span className="truncate font-medium">{"Desa"}</span>
-                <span className="truncate text-xs">{"Administrator"}</span>
+                <span className="truncate text-xs">
+                  {session.data?.user.role.toLocaleUpperCase()}
+                </span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
