@@ -1,5 +1,5 @@
 {
-  "id": "0167b8a3-4893-4529-8c8f-e01e5861dba9",
+  "id": "7df99e61-0aae-4fbe-99d2-d43991026061",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -70,8 +70,12 @@
           "name": "asset_audit_assest_id_asset_id_fk",
           "tableFrom": "asset_audit",
           "tableTo": "asset",
-          "columnsFrom": ["assest_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "assest_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -79,8 +83,12 @@
           "name": "asset_audit_user_id_user_id_fk",
           "tableFrom": "asset_audit",
           "tableTo": "user",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -123,7 +131,7 @@
         },
         "decision_letter": {
           "name": "decision_letter",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
@@ -146,8 +154,12 @@
           "name": "asset_removal_request_assetId_asset_id_fk",
           "tableFrom": "asset_removal_request",
           "tableTo": "asset",
-          "columnsFrom": ["assetId"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "assetId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -155,8 +167,12 @@
           "name": "asset_removal_request_decision_letter_file_id_fk",
           "tableFrom": "asset_removal_request",
           "tableTo": "file",
-          "columnsFrom": ["decision_letter"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "decision_letter"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -164,8 +180,12 @@
           "name": "asset_removal_request_reported_by_user_id_fk",
           "tableFrom": "asset_removal_request",
           "tableTo": "user",
-          "columnsFrom": ["reported_by"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "reported_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -173,8 +193,12 @@
           "name": "asset_removal_request_decided_by_user_id_fk",
           "tableFrom": "asset_removal_request",
           "tableTo": "user",
-          "columnsFrom": ["decided_by"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "decided_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -202,12 +226,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "code": {
-          "name": "code",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
         "nup": {
           "name": "nup",
           "type": "text",
@@ -234,19 +252,20 @@
         },
         "proof_of_ownership": {
           "name": "proof_of_ownership",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "status": {
-          "name": "status",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
         "note": {
           "name": "note",
           "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "damage_status",
+          "typeSchema": "public",
           "primaryKey": false,
           "notNull": false
         },
@@ -280,17 +299,52 @@
           "name": "created_by",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "updated_at_index": {
+          "name": "updated_at_index",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "asset_id_idx": {
+          "name": "asset_id_idx",
+          "columns": [
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "asset_proof_of_ownership_file_id_fk": {
           "name": "asset_proof_of_ownership_file_id_fk",
           "tableFrom": "asset",
           "tableTo": "file",
-          "columnsFrom": ["proof_of_ownership"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "proof_of_ownership"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -298,8 +352,12 @@
           "name": "asset_created_by_user_id_fk",
           "tableFrom": "asset",
           "tableTo": "user",
-          "columnsFrom": ["created_by"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -399,14 +457,34 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "account_user_id_idx": {
+          "name": "account_user_id_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "account_user_id_user_id_fk": {
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -471,14 +549,49 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "session_user_id_idx": {
+          "name": "session_user_id_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "session_token_idx": {
+          "name": "session_token_idx",
+          "columns": [
+            {
+              "expression": "token",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "session_user_id_user_id_fk": {
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -488,7 +601,9 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": ["token"]
+          "columns": [
+            "token"
+          ]
         }
       },
       "policies": {},
@@ -543,16 +658,56 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'user'"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "user_id_idx": {
+          "name": "user_id_idx",
+          "columns": [
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "user_email_idx": {
+          "name": "user_email_idx",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": ["email"]
+          "columns": [
+            "email"
+          ]
         }
       },
       "policies": {},
@@ -638,7 +793,7 @@
           "type": "damage_status",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "reported_by": {
           "name": "reported_by",
@@ -652,6 +807,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "verified_at": {
+          "name": "verified_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
         "reported_at": {
           "name": "reported_at",
           "type": "timestamp",
@@ -660,23 +821,47 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "damage_report_assetId_idx": {
+          "name": "damage_report_assetId_idx",
+          "columns": [
+            {
+              "expression": "asset_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "damage_report_asset_id_asset_id_fk": {
           "name": "damage_report_asset_id_asset_id_fk",
           "tableFrom": "damage_report",
           "tableTo": "asset",
-          "columnsFrom": ["asset_id"],
-          "columnsTo": ["id"],
-          "onDelete": "no action",
+          "columnsFrom": [
+            "asset_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
           "onUpdate": "no action"
         },
         "damage_report_reported_by_user_id_fk": {
           "name": "damage_report_reported_by_user_id_fk",
           "tableFrom": "damage_report",
           "tableTo": "user",
-          "columnsFrom": ["reported_by"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "reported_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -684,8 +869,12 @@
           "name": "damage_report_verified_by_user_id_fk",
           "tableFrom": "damage_report",
           "tableTo": "user",
-          "columnsFrom": ["verified_by"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "verified_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -696,15 +885,16 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.keputusan": {
-      "name": "keputusan",
+    "public.decision": {
+      "name": "decision",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "number": {
           "name": "number",
@@ -750,7 +940,7 @@
         },
         "file": {
           "name": "file",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
@@ -770,21 +960,29 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "keputusan_file_file_id_fk": {
-          "name": "keputusan_file_file_id_fk",
-          "tableFrom": "keputusan",
+        "decision_file_file_id_fk": {
+          "name": "decision_file_file_id_fk",
+          "tableFrom": "decision",
           "tableTo": "file",
-          "columnsFrom": ["file"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "file"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "keputusan_created_by_user_id_fk": {
-          "name": "keputusan_created_by_user_id_fk",
-          "tableFrom": "keputusan",
+        "decision_created_by_user_id_fk": {
+          "name": "decision_created_by_user_id_fk",
+          "tableFrom": "decision",
           "tableTo": "user",
-          "columnsFrom": ["created_by"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -801,9 +999,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "nama_file": {
           "name": "nama_file",
@@ -837,8 +1036,12 @@
           "name": "file_uploaded_by_user_id_fk",
           "tableFrom": "file",
           "tableTo": "user",
-          "columnsFrom": ["uploaded_by"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "uploaded_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -855,9 +1058,10 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "title": {
           "name": "title",
@@ -885,7 +1089,7 @@
         },
         "file": {
           "name": "file",
-          "type": "text",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
@@ -893,7 +1097,8 @@
           "name": "effective_by",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": false
+          "notNull": false,
+          "default": "now()"
         },
         "created_by": {
           "name": "created_by",
@@ -915,8 +1120,12 @@
           "name": "regulation_file_file_id_fk",
           "tableFrom": "regulation",
           "tableTo": "file",
-          "columnsFrom": ["file"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "file"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -924,8 +1133,12 @@
           "name": "regulation_created_by_user_id_fk",
           "tableFrom": "regulation",
           "tableTo": "user",
-          "columnsFrom": ["created_by"],
-          "columnsTo": ["id"],
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -941,17 +1154,29 @@
     "public.transaction": {
       "name": "transaction",
       "schema": "public",
-      "values": ["INSERT", "UPDATE", "DELETE"]
+      "values": [
+        "INSERT",
+        "UPDATE",
+        "DELETE"
+      ]
     },
     "public.asset_removal_status": {
       "name": "asset_removal_status",
       "schema": "public",
-      "values": ["PENDING", "APPROVED", "REJECTED"]
+      "values": [
+        "PENDING",
+        "APPROVED",
+        "REJECTED"
+      ]
     },
     "public.damage_status": {
       "name": "damage_status",
       "schema": "public",
-      "values": ["SEVERE", "MILD", "MINIMAL"]
+      "values": [
+        "SEVERE",
+        "MILD",
+        "MINIMAL"
+      ]
     }
   },
   "schemas": {},

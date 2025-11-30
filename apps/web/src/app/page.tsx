@@ -39,7 +39,8 @@ export default function Home() {
             </pre>
 
             <p className="text-lg">
-              Nilai jelek ditanggung Muhammad Natha Ulinnuha
+              Solusi digital yang menghadirkan transparansi dan efisiensi dalam
+              pengelolaan desa
             </p>
 
             <div className="flex items-center justify-center gap-2">

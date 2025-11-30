@@ -1,21 +1,25 @@
 /** biome-ignore-all lint/a11y/noLabelWithoutControl: sudais */
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   Edit,
+  Eye,
   MoreHorizontal,
   Plus,
   SearchIcon,
   Trash,
 } from "lucide-react";
-import { useState } from "react";
+import type { Route } from "next";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
+import LoaderSkeleton from "@/components/loader-skeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,18 +57,46 @@ import { orpc, queryClient } from "@/utils/orpc";
 import { KeputusanCreateForm } from "./keputusan-create-form";
 import { KeputusanEditForm } from "./keputusan-edit-form";
 
+// Helper untuk format tanggal Indonesia (Hari Bulan Tahun)
+const formatDate = (dateString: string | null | undefined) => {
+  if (!dateString) return "-";
+  return new Date(dateString).toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+};
+
 const KeputusanTable = () => {
   const [query, setQuery] = useState("");
   const [queryInputValue, setQueryInputValue] = useState("");
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   const [editingKeputusanId, setEditingKeputusanId] = useState<string | null>(
-    null,
+    null
   );
   const [offset, setOffset] = useState(0);
+
+  // State untuk query ke API (Debounced)
   const [year, setYear] = useState("");
+  // State untuk input UI agar responsif saat mengetik
+  const [yearInput, setYearInput] = useState("");
+
   const [category, setCategory] = useState("");
   const [showFilters, setShowFilters] = useState(false);
+  const router = useRouter();
+
+  // Efek Debounce untuk Tahun: Update 'year' hanya setelah user berhenti mengetik 500ms
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setYear(yearInput);
+      // Reset offset jika tahun berubah agar kembali ke halaman 1
+      if (yearInput !== year) {
+        setOffset(0);
+      }
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [yearInput, year]);
 
   const keputusan = useQuery(
     orpc.decision.list.queryOptions({
@@ -77,7 +109,10 @@ const KeputusanTable = () => {
           (category as "anggaran" | "personal" | "infrastruktur" | undefined) ||
           undefined,
       },
-    }),
+      // PENTING: keepPreviousData mencegah tabel berubah jadi loading skeleton saat filter/paging berubah
+      // Ini menjaga input filter tetap ada di layar saat data sedang diambil ulang
+      placeholderData: keepPreviousData,
+    })
   );
 
   const deleteMutation = useMutation(
@@ -91,7 +126,7 @@ const KeputusanTable = () => {
       onError: () => {
         toast.error("Gagal menghapus keputusan, coba lagi.");
       },
-    }),
+    })
   );
 
   const columns: ColumnDef<NonNullable<typeof keputusan.data>[number]>[] = [
@@ -104,7 +139,8 @@ const KeputusanTable = () => {
       header: "No dan Tanggal Keputusan",
       cell: ({ row }) => {
         const decisionNumber = row.original.number;
-        const decisionDate = row.original.date;
+        // Format tanggal di sini
+        const decisionDate = formatDate(row.original.date);
         return (
           <div>
             <div className="font-medium">{decisionNumber}</div>
@@ -126,11 +162,12 @@ const KeputusanTable = () => {
       header: "No dan Tanggal Dilaporkan",
       cell: ({ row }) => {
         const reportNumber = row.original.reportNumber;
-        const reportDate = row.original.reportDate;
+        // Format tanggal di sini
+        const reportDate = formatDate(row.original.reportDate);
         return (
           <div>
             <div className="font-medium">{reportNumber || "-"}</div>
-            <div className="text-gray-500 text-sm">{reportDate || "-"}</div>
+            <div className="text-gray-500 text-sm">{reportDate}</div>
           </div>
         );
       },
@@ -160,6 +197,17 @@ const KeputusanTable = () => {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() =>
+                    router.push(
+                      `/dashboard/keputusan/${row.original.id}` as Route
+                    )
+                  }
+                  className="cursor-pointer"
+                >
+                  <Eye />
+                  Lihat Detail
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
                     setEditingKeputusanId(row.original.id);
@@ -212,11 +260,13 @@ const KeputusanTable = () => {
     },
   ];
 
-  return (
+  return keputusan.isPending ? (
+    <LoaderSkeleton />
+  ) : (
     <DataTable
       columns={columns}
       data={keputusan.data ?? []}
-      isFetching={keputusan.isPending}
+      isFetching={keputusan.isFetching} // Gunakan isFetching agar spinner kecil bisa muncul jika perlu
       configButtons={
         <>
           <InputGroup className="w-fit w-full max-w-sm">
@@ -231,7 +281,7 @@ const KeputusanTable = () => {
                   setQuery(queryInputValue);
                 }
               }}
-              disabled={keputusan.isPending}
+              // Hapus disabled saat pending agar UX lebih lancar
               placeholder="Cari..."
             />
             <InputGroupAddon>
@@ -240,7 +290,7 @@ const KeputusanTable = () => {
             {keputusan.data && (
               <InputGroupAddon
                 align={`inline-end`}
-                className={`${keputusan.isPending && "animate-pulse"}`}
+                className={`${keputusan.isFetching && "animate-pulse"}`}
               >
                 {keputusan.data.length} hasil
               </InputGroupAddon>
@@ -285,11 +335,11 @@ const KeputusanTable = () => {
                   placeholder="2025"
                   min="2000"
                   max="2045"
-                  value={year}
+                  // Gunakan yearInput untuk binding ke UI
+                  value={yearInput}
                   onChange={(e) => {
-                    setYear(e.target.value);
-                    setOffset(0);
-                    setQuery("");
+                    setYearInput(e.target.value);
+                    // Kita tidak setOffset di sini, tapi di useEffect debounce
                   }}
                   className="w-28"
                 />
@@ -304,7 +354,7 @@ const KeputusanTable = () => {
                   onChange={(e) => {
                     setCategory(e.target.value);
                     setOffset(0);
-                    setQuery("");
+                    // setQuery(""); // Opsional: apakah ganti kategori mereset search text? biasanya tidak
                   }}
                   className="w-48 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                 >
@@ -326,6 +376,7 @@ const KeputusanTable = () => {
                   size="sm"
                   onClick={() => {
                     setYear("");
+                    setYearInput(""); // Reset input UI juga
                     setCategory("");
                     setOffset(0);
                   }}

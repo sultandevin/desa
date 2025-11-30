@@ -197,3 +197,33 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.typing-line1 {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  animation: typing1 2.5s steps(25) forwards, blink 0.7s step-end infinite;
+}
+
+.typing-line2 {
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  opacity: 0; 
+  animation: typing2 2.5s steps(30) forwards 2.6s; 
+}
+
+@keyframes typing1 {
+  from { width: 0; }
+  to { width: 320px; }
+}
+
+@keyframes typing2 {
+  from { width: 0; opacity: 1; }
+  to { width: 420px; opacity: 1; }
+}
+
+@keyframes blink {
+  50% { border-color: transparent; }
+}
+

@@ -23,11 +23,20 @@ export default function LoginPage() {
       </div>
       <div className="relative hidden bg-muted lg:block">
         <Image
-          src="/placeholder.svg"
+          src="/image/login.webp"
           alt="Sistem Informasi Desa | Gambar Halaman Login"
           fill
-          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+          sizes="100%"
+          className="object-cover dark:brightness-[0.6] dark:grayscale"
         />
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30">
+          <h1 className="typing-line1 text-white text-4xl font-bold drop-shadow-lg">
+            Selamat Datang
+          </h1>
+          <h1 className="typing-line2 text-white text-3xl font-semibold drop-shadow-lg mt-2">
+            di Sistem Pengelolaan Desa
+          </h1>
+        </div>
       </div>
     </div>
   );

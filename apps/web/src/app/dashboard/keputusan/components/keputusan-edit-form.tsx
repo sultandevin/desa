@@ -75,17 +75,47 @@ const KeputusanEditForm = ({
         return;
       }
 
-      keputusanMutation.mutate({
-        id: keputusanId,
-        number: value.number.trim(),
-        date: value.date,
-        regarding: value.regarding.trim(),
-        shortDescription: value.shortDescription?.trim() || null,
-        reportNumber: value.reportNumber.trim(),
-        reportDate: value.reportDate,
-        notes: value.notes?.trim() || null,
-        // file: value.file,
-      });
+      const submitData = async () => {
+        let fileId: string | undefined;
+
+        if (value.file) {
+          try {
+            const formData = new FormData();
+            formData.append("file", value.file);
+
+            const res = await fetch("/api/upload", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!res.ok) {
+              toast.error("Gagal mengupload file");
+              return;
+            }
+
+            const data = await res.json();
+            fileId = data.id;
+          } catch (error) {
+            console.error("Upload error:", error);
+            toast.error("Terjadi kesalahan saat upload file");
+            return;
+          }
+        }
+
+        keputusanMutation.mutate({
+          id: keputusanId,
+          number: value.number.trim(),
+          date: value.date,
+          regarding: value.regarding.trim(),
+          shortDescription: value.shortDescription?.trim() || null,
+          reportNumber: value.reportNumber.trim(),
+          reportDate: value.reportDate,
+          notes: value.notes?.trim() || null,
+          file: fileId,
+        });
+      };
+
+      submitData();
     },
   });
 

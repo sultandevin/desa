@@ -1,12 +1,11 @@
-import dotenv from "dotenv";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { asset } from "./schema/asset";
 
-if (process.env.NODE_ENV === "development")
-  dotenv.config({
-    path: "../../apps/web/.env",
-    quiet: true,
-  });
+// if (process.env.NODE_ENV === "development")
+//   dotenv.config({
+//     path: "../../apps/web/.env",
+//     quiet: true,
+//   });
 
 export const db = drizzle({
   connection: process.env.DATABASE_URL || "",

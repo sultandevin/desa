@@ -8,7 +8,7 @@ import {
   damageReportSelectSchema,
 } from "@desa/db/schema/damage-report";
 import { ORPCError } from "@orpc/client";
-import { and, eq, getTableColumns, ilike, or } from "drizzle-orm";
+import { eq, getTableColumns, ilike, or } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import * as z from "zod";
 import { kadesProcedure, protectedProcedure, publicProcedure } from "..";
