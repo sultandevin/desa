@@ -220,13 +220,13 @@ const remove = protectedProcedure
     }),
   )
   .handler(async ({ input, errors, context }) => {
-    const isKades = context.session.user.id === "kades";
+    const isKades = context.session.user.role === "kades";
     const [deletedAsset] = await db
       .update(asset)
       .set({ deletedAt: new Date() })
       .where(
         and(
-          isKades ? undefined : eq(asset.id, context.session.user.id),
+          isKades ? undefined : eq(asset.createdBy, context.session.user.id),
           eq(asset.id, input.id),
           isNull(asset.deletedAt),
         ),
