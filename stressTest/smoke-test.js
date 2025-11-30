@@ -1,5 +1,5 @@
-import http from "k6/http";
 import { check, group, sleep } from "k6";
+import http from "k6/http";
 
 // Smoke test - minimal load to verify endpoints work
 export const options = {
@@ -26,7 +26,7 @@ export default function () {
 
   group("Peraturan Endpoint", () => {
     const res = http.get(
-      `${BASE_URL}/api/rpc/api-reference/peraturan?pageSize=10`
+      `${BASE_URL}/api/rpc/api-reference/peraturan?pageSize=10`,
     );
     check(res, {
       "peraturan status 200": (r) => r.status === 200,

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { Loader, Plus } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
@@ -31,7 +31,7 @@ const RegulationCreateForm = () => {
       onError: (err: any) => {
         toast.error(err?.message || "Gagal membuat peraturan");
       },
-    })
+    }),
   );
 
   const form = useForm({

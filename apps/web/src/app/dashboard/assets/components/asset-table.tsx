@@ -72,7 +72,7 @@ const AssetTable = () => {
   );
 
   const removeAssetOptions = useMutation(
-    orpc.asset.remove.mutationOptions({
+    orpc.asset.requestRemove.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: orpc.asset.key() });
         toast.success("Permintaan penghapusan aset berhasil dikirim");

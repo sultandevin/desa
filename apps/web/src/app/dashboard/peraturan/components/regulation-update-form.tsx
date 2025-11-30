@@ -46,7 +46,7 @@ export function RegulationUpdateForm({
         const closeButton = document.getElementById("close-sheet-btn");
         closeButton?.click();
       },
-    })
+    }),
   );
 
   const form = useForm({

@@ -1,11 +1,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { orpc } from "@/utils/orpc";
-import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, Eye, FileText, Tag } from "lucide-react";
 import Link from "next/link";
 import LoaderSkeleton from "@/components/loader-skeleton";
+import { Button } from "@/components/ui/button";
+import { orpc } from "@/utils/orpc";
 
 export default function PeraturanDetailPage({
   params,
@@ -20,7 +20,7 @@ export default function PeraturanDetailPage({
   } = useQuery(
     orpc.regulation.find.queryOptions({
       input: { id },
-    })
+    }),
   );
 
   if (isPending) return <LoaderSkeleton />;

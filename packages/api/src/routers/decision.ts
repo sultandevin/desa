@@ -5,8 +5,8 @@ import {
   decisionInsertSchema,
   decisionSelectSchema,
 } from "@desa/db/schema/decision";
-import { ORPCError } from "@orpc/client";
 import { file } from "@desa/db/schema/file";
+import { ORPCError } from "@orpc/client";
 import { and, eq, getTableColumns, ilike, or, sql } from "drizzle-orm";
 import * as z from "zod";
 import { protectedProcedure, publicProcedure } from "..";
@@ -39,52 +39,52 @@ const list = publicProcedure
 
       const categoryCondition = input.category
         ? (() => {
-            const categoryKeywords = {
-              // Contoh kategori dan kata kunci terkait
-              anggaran: [
-                "anggaran",
-                "dana",
-                "budget",
-                "keuangan",
-                "biaya",
-                "apbd",
-                "rka",
-              ],
-              personal: [
-                "pegawai",
-                "staff",
-                "personnel",
-                "karyawan",
-                "sdm",
-                "cpns",
-              ],
-              infrastruktur: [
-                "jalan",
-                "bangunan",
-                "infrastructure",
-                "fasilitas",
-                "gedung",
-                "jembatan",
-              ],
-            };
+          const categoryKeywords = {
+            // Contoh kategori dan kata kunci terkait
+            anggaran: [
+              "anggaran",
+              "dana",
+              "budget",
+              "keuangan",
+              "biaya",
+              "apbd",
+              "rka",
+            ],
+            personal: [
+              "pegawai",
+              "staff",
+              "personnel",
+              "karyawan",
+              "sdm",
+              "cpns",
+            ],
+            infrastruktur: [
+              "jalan",
+              "bangunan",
+              "infrastructure",
+              "fasilitas",
+              "gedung",
+              "jembatan",
+            ],
+          };
 
-            const keywords =
-              categoryKeywords[
-                input.category as keyof typeof categoryKeywords
-              ] || [];
+          const keywords =
+            categoryKeywords[
+            input.category as keyof typeof categoryKeywords
+            ] || [];
 
-            const conditions = keywords.map((keyword) =>
-              or(
-                ilike(decision.number, `%${keyword}%`),
-                ilike(decision.regarding, `%${keyword}%`),
-                ilike(decision.shortDescription, `%${keyword}%`),
-                ilike(decision.reportNumber, `%${keyword}%`),
-                ilike(decision.notes, `%${keyword}%`),
-              ),
-            );
+          const conditions = keywords.map((keyword) =>
+            or(
+              ilike(decision.number, `%${keyword}%`),
+              ilike(decision.regarding, `%${keyword}%`),
+              ilike(decision.shortDescription, `%${keyword}%`),
+              ilike(decision.reportNumber, `%${keyword}%`),
+              ilike(decision.notes, `%${keyword}%`),
+            ),
+          );
 
-            return conditions.length > 0 ? or(...conditions) : undefined;
-          })()
+          return conditions.length > 0 ? or(...conditions) : undefined;
+        })()
         : undefined;
 
       const decisions = await db
@@ -94,11 +94,11 @@ const list = publicProcedure
           and(
             searchTerm
               ? or(
-                  ilike(decision.number, searchTerm),
-                  ilike(decision.regarding, searchTerm),
-                  ilike(decision.shortDescription, searchTerm),
-                  ilike(decision.reportNumber, searchTerm),
-                )
+                ilike(decision.number, searchTerm),
+                ilike(decision.regarding, searchTerm),
+                ilike(decision.shortDescription, searchTerm),
+                ilike(decision.reportNumber, searchTerm),
+              )
               : undefined,
             input.year
               ? sql`EXTRACT(YEAR FROM ${decision.date}) = ${input.year}`

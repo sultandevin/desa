@@ -73,7 +73,7 @@ const KeputusanTable = () => {
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   const [editingKeputusanId, setEditingKeputusanId] = useState<string | null>(
-    null
+    null,
   );
   const [offset, setOffset] = useState(0);
 
@@ -112,7 +112,7 @@ const KeputusanTable = () => {
       // PENTING: keepPreviousData mencegah tabel berubah jadi loading skeleton saat filter/paging berubah
       // Ini menjaga input filter tetap ada di layar saat data sedang diambil ulang
       placeholderData: keepPreviousData,
-    })
+    }),
   );
 
   const deleteMutation = useMutation(
@@ -126,7 +126,7 @@ const KeputusanTable = () => {
       onError: () => {
         toast.error("Gagal menghapus keputusan, coba lagi.");
       },
-    })
+    }),
   );
 
   const columns: ColumnDef<NonNullable<typeof keputusan.data>[number]>[] = [
@@ -200,7 +200,7 @@ const KeputusanTable = () => {
                 <DropdownMenuItem
                   onClick={() =>
                     router.push(
-                      `/dashboard/keputusan/${row.original.id}` as Route
+                      `/dashboard/keputusan/${row.original.id}` as Route,
                     )
                   }
                   className="cursor-pointer"

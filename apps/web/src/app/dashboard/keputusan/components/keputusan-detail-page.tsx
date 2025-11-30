@@ -1,20 +1,20 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { orpc } from "@/utils/orpc";
-import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
+  Calendar,
+  Clock,
   Download,
   Eye,
   FileText,
-  Tag,
-  Calendar,
-  Clock,
   Info,
+  Tag,
 } from "lucide-react";
 import Link from "next/link";
 import LoaderSkeleton from "@/components/loader-skeleton";
+import { Button } from "@/components/ui/button";
+import { orpc } from "@/utils/orpc";
 
 export default function KeputusanDetailPage({
   params,
@@ -29,7 +29,7 @@ export default function KeputusanDetailPage({
   } = useQuery(
     orpc.decision.find.queryOptions({
       input: { id },
-    })
+    }),
   );
 
   if (isPending) return <LoaderSkeleton />;
@@ -129,7 +129,7 @@ export default function KeputusanDetailPage({
               {formatDateTime(
                 (decision as any).createdAt ||
                   (decision as any).created_at ||
-                  decision.date
+                  decision.date,
               )}
             </p>
           </div>
@@ -223,7 +223,7 @@ export default function KeputusanDetailPage({
           {formatDateTime(
             (decision as any).updatedAt ||
               (decision as any).updated_at ||
-              new Date()
+              new Date(),
           )}
         </div>
       </div>

@@ -3,14 +3,15 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
+  Eye,
   Loader,
   MoreHorizontal,
+  Pencil,
   Plus,
   SearchIcon,
   Trash,
-  Pencil,
-  Eye,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
@@ -39,7 +40,6 @@ import { orpc, queryClient } from "@/utils/orpc";
 import { DashboardSection } from "../../components/dashboard";
 import { RegulationCreateForm } from "./regulation-create-form";
 import { RegulationUpdateForm } from "./regulation-update-form";
-import { useRouter } from "next/navigation";
 
 const PeraturanTable = () => {
   const [query, setQuery] = useState("");
@@ -56,7 +56,7 @@ const PeraturanTable = () => {
   const peraturan = useQuery(
     orpc.regulation.search.queryOptions({
       input: { query: query },
-    })
+    }),
   );
 
   // === Delete Mutation ===
@@ -71,7 +71,7 @@ const PeraturanTable = () => {
       onError: () => {
         toast.error("Gagal menghapus peraturan, coba lagi.");
       },
-    })
+    }),
   );
 
   const handleDelete = (id: string) => {

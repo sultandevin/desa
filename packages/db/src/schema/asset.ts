@@ -32,6 +32,7 @@ export const asset = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date())
       .notNull(),
+    requestDeletedAt: timestamp("request_deleted_at"),
     deletedAt: timestamp("deleted_at"),
     createdBy: text("created_by")
       .references(() => user.id)
