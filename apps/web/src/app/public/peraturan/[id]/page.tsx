@@ -7,7 +7,7 @@ import {
   DashboardSection,
   DashboardTitle,
 } from "../../../dashboard/components/dashboard";
-import PeraturanDetailPage from "../../../dashboard/peraturan/components/peraturan-detail-page";
+import PeraturanDetailPagePublic from "../components/peraturan-detail-page-public";
 
 interface PageProps {
   params: Promise<{
@@ -29,7 +29,7 @@ export default async function Page({ params }: PageProps) {
 
       <DashboardSection>
         <Suspense fallback={<Loader />}>
-          <PeraturanDetailPage params={{ id }} />
+          <PeraturanDetailPagePublic params={{ id }} />
         </Suspense>
       </DashboardSection>
     </Dashboard>

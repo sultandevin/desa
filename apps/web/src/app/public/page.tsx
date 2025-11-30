@@ -17,7 +17,7 @@ import {
   DashboardTitle,
 } from "../dashboard/components/dashboard";
 
-export default async function DashboardPage() {
+export default async function PublicPage() {
 
   return (
     <Dashboard>
@@ -43,7 +43,7 @@ export default async function DashboardPage() {
               </div>
               <CardAction>
                 <Button asChild size="sm">
-                  <Link href="/dashboard/assets">Buka</Link>
+                  <Link href="/public/assets">Buka</Link>
                 </Button>
               </CardAction>
               <CardDescription>
@@ -67,7 +67,7 @@ export default async function DashboardPage() {
               </div>
               <CardAction>
                 <Button asChild size="sm">
-                  <Link href="/dashboard/damage-reports">Buka</Link>
+                  <Link href="/public/damage-reports">Buka</Link>
                 </Button>
               </CardAction>
               <CardDescription>
@@ -92,7 +92,7 @@ export default async function DashboardPage() {
               </div>
               <CardAction>
                 <Button asChild size="sm">
-                  <Link href="/dashboard/keputusan">Buka</Link>
+                  <Link href="/public/keputusan">Buka</Link>
                 </Button>
               </CardAction>
               <CardDescription>
@@ -116,7 +116,7 @@ export default async function DashboardPage() {
               </div>
               <CardAction>
                 <Button asChild size="sm">
-                  <Link href="/dashboard/peraturan">Buka</Link>
+                  <Link href="/public/peraturan">Buka</Link>
                 </Button>
               </CardAction>
               <CardDescription>
