@@ -18,8 +18,10 @@ import { orpc } from "@/utils/orpc";
 
 export default function KeputusanDetailPage({
   params,
+  backUrl = "/dashboard/keputusan",
 }: {
   params: { id: string };
+  backUrl?: string;
 }) {
   const { id } = params;
   const {
@@ -39,7 +41,7 @@ export default function KeputusanDetailPage({
       <div className="p-8 text-center">
         <h2 className="text-xl font-bold text-red-500">Data tidak ditemukan</h2>
         <Button asChild className="mt-4">
-          <Link href="/dashboard/keputusan">Kembali</Link>
+          <Link href={backUrl as any}>Kembali</Link>
         </Button>
       </div>
     );
@@ -76,7 +78,7 @@ export default function KeputusanDetailPage({
         className="mb-6 pl-0 hover:bg-transparent"
       >
         <Link
-          href="/dashboard/keputusan"
+          href={backUrl as any}
           className="flex items-center gap-2 text-muted-foreground hover:text-primary"
         >
           <ArrowLeft className="h-4 w-4" /> Kembali ke Daftar

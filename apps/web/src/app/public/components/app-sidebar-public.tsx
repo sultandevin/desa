@@ -51,6 +51,7 @@ const data = {
         },
       ],
     },
+    */
     {
       title: "Keputusan Kepala Desa",
       items: [
@@ -61,7 +62,6 @@ const data = {
         },
       ],
     },
-    */
     {
       title: "Peraturan",
       items: [
@@ -92,14 +92,14 @@ export function AppSidebarPublic({ ...props }: React.ComponentProps<typeof Sideb
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+              <span className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <Skull className="size-4" />
-              </div>
+              </span>
 
-              <div className="grid flex-1 text-left text-sm leading-tight *:select-none">
+              <span className="grid flex-1 text-left text-sm leading-tight *:select-none">
                 <span className="truncate font-medium">{"Desa"}</span>
                 <span className="truncate text-xs">{"Warga"}</span>
-              </div>
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
