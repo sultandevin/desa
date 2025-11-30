@@ -72,7 +72,7 @@ const PeraturanTablePublic = () => {
 
               <DropdownMenuItem
                 onClick={() =>
-                  router.push(`/dashboard/peraturan/${id}` as any)
+                  router.push(`/public/peraturan/${id}` as any)
                 }
                 className="cursor-pointer"
               >

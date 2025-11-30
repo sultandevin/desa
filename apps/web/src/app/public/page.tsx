@@ -17,7 +17,7 @@ import {
   DashboardTitle,
 } from "../dashboard/components/dashboard";
 
-export default async function DashboardPage() {
+export default async function PublicPage() {
 
   return (
     <Dashboard>

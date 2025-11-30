@@ -3,10 +3,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
+  Check,
   ChevronRight,
   ChevronsLeft,
   Copy,
   FileWarning,
+  Loader,
   MoreHorizontal,
   NotebookIcon,
   Pencil,
@@ -71,8 +73,22 @@ const AssetTable = () => {
     orpc.asset.list.queryOptions({ input: { query, cursor } }),
   );
 
-  const removeAssetOptions = useMutation(
+  const removeRequestAssetOptions = useMutation(
     orpc.asset.requestRemove.mutationOptions({
+      onSuccess: (data) => {
+        queryClient.invalidateQueries({ queryKey: orpc.asset.key() });
+        toast.success(data.message);
+      },
+      onError: ({ message }) => {
+        toast.error("Gagal mengirim permintaan penghapusan aset", {
+          description: () => <p>{message}</p>,
+        });
+      },
+    }),
+  );
+
+  const kadesRemoveAssetOptions = useMutation(
+    orpc.asset.remove.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: orpc.asset.key() });
         toast.success("Permintaan penghapusan aset berhasil dikirim");
@@ -127,7 +143,7 @@ const AssetTable = () => {
         id: "aksi",
         cell: ({ row }) => {
           function handleRemove() {
-            removeAssetOptions.mutate({
+            removeRequestAssetOptions.mutate({
               id: row.original.id,
             });
           }
@@ -187,6 +203,30 @@ const AssetTable = () => {
                           </DropdownMenuItem>
                         </AlertDialogTrigger>
                       )}
+
+                    {row.original.deleteStatus === "requested" &&
+                      session.data &&
+                      session.data.user.role === "kades" && (
+                        <DropdownMenuItem
+                          onClick={() => {
+                            kadesRemoveAssetOptions.mutate({
+                              id: row.original.id,
+                            });
+                            queryClient.invalidateQueries({
+                              queryKey: orpc.asset.key(),
+                            });
+                          }}
+                          disabled={kadesRemoveAssetOptions.isPending}
+                          variant="destructive"
+                        >
+                          {kadesRemoveAssetOptions.isPending ? (
+                            <Loader className="animate-spin" />
+                          ) : (
+                            <Check />
+                          )}
+                          Setujui Penghapusan Aset
+                        </DropdownMenuItem>
+                      )}
                   </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -203,10 +243,10 @@ const AssetTable = () => {
                     <AlertDialogAction asChild>
                       <Button
                         onClick={handleRemove}
-                        disabled={removeAssetOptions.isPending}
+                        disabled={removeRequestAssetOptions.isPending}
                         variant={"destructive"}
                       >
-                        {removeAssetOptions.isPending ? (
+                        {removeRequestAssetOptions.isPending ? (
                           "Menghapus..."
                         ) : (
                           <>
