@@ -14,6 +14,7 @@ import { and, desc, eq, ilike, isNull, lt, or } from "drizzle-orm";
 import * as z from "zod";
 import { kadesProcedure, protectedProcedure, publicProcedure } from "..";
 import { cursorPaginationSchema } from "../schemas";
+import { decision } from "@desa/db/schema/decision";
 
 const list = publicProcedure
   .route({
@@ -56,8 +57,26 @@ const list = publicProcedure
       throw errors.NOT_FOUND();
     }
 
+    const assetsWithDeleteStatus = assets.map((asset) => {
+      let deleteStatus: null | "requested" | "deleted";
+      const isPendingDeletion = asset.requestDeletedAt && !asset.deletedAt;
+
+      if (isPendingDeletion) {
+        deleteStatus = "requested";
+      } else if (asset.deletedAt) {
+        deleteStatus = "deleted";
+      } else {
+        deleteStatus = null;
+      }
+
+      return {
+        ...asset,
+        deleteStatus,
+      };
+    });
+
     return {
-      data: assets,
+      data: assetsWithDeleteStatus,
       nextCursor:
         assets.length === input.pageSize
           ? (assets.at(-1)?.updatedAt ?? null)
@@ -190,7 +209,7 @@ const update = protectedProcedure
         and(
           eq(asset.id, id),
           isNull(asset.deletedAt),
-          !isKades ? undefined : eq(asset.createdBy, context.session.user.id),
+          isKades ? undefined : eq(asset.createdBy, context.session.user.id),
         ),
       )
       .returning();
@@ -268,12 +287,26 @@ const remove = kadesProcedure
       )
       .returning();
 
+    if (!deletedAsset) throw errors.NOT_FOUND();
+
+    const [kadesDecision] = await db
+      .insert(decision)
+      .values({
+        number: `SK-HAPUS-ASET-${deletedAsset.id}`,
+        date: new Date().toDateString(),
+        regarding: `Penghapusan Aset ${deletedAsset.name}`,
+        reportNumber: `RPT-HAPUS-ASET-${deletedAsset.id}`,
+        reportDate: new Date().toDateString(),
+        createdBy: context.session.user.id,
+      })
+      .returning();
+
     if (!deletedAsset) {
       throw errors.NOT_FOUND();
     }
 
     return {
-      message: `Sukses menghapus aset "${deletedAsset.name}"`,
+      message: `Sukses menghapus aset ${deletedAsset.name} dan generasi Surat Keputusan ${kadesDecision?.number}`,
     };
   });
 

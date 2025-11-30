@@ -7,6 +7,8 @@ import { toast } from "sonner";
 import { DataTable } from "@/components/data-table";
 import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -16,6 +18,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -60,6 +71,22 @@ const DamageReportTable = () => {
         });
 
         toast.success("Laporan berhasil diverifikasi");
+      },
+    }),
+  );
+
+  const removeReportMutation = useMutation(
+    orpc.damageReport.remove.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: orpc.damageReport.list.queryKey(),
+        });
+        toast.success("Laporan kerusakan berhasil dihapus");
+      },
+      onError: ({ message }) => {
+        toast.error("Gagal menghapus laporan kerusakan", {
+          description: <p>{message}</p>,
+        });
       },
     }),
   );
@@ -142,62 +169,103 @@ const DamageReportTable = () => {
             id: row.original.id,
           });
         }
+
+        function handleRemoveReport() {
+          removeReportMutation.mutate({
+            id: row.original.id,
+          });
+        }
+
         const isVerified = !!row.original.verifiedAt;
+        const canVerify =
+          !isVerified &&
+          session.data &&
+          session.data.user.role === "kades";
+        const canDelete =
+          session.data &&
+          (session.data.user.id === row.original.reportedBy ||
+            session.data.user.role === "kades");
 
         return (
           <AlertDialog>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {!isVerified &&
-                  session.data &&
-                  session.data.user.role === "kades" && (
-                    <AlertDialogTrigger asChild>
+            <Dialog>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {canVerify && (
+                    <DialogTrigger asChild>
                       <DropdownMenuItem>
                         <Check />
                         Verifikasi Laporan
                       </DropdownMenuItem>
+                    </DialogTrigger>
+                  )}
+                  {canDelete && (
+                    <AlertDialogTrigger asChild>
+                      <DropdownMenuItem variant="destructive">
+                        <Trash />
+                        Hapus Laporan
+                      </DropdownMenuItem>
                     </AlertDialogTrigger>
                   )}
-                <DropdownMenuItem variant="destructive">
-                  <Trash />
-                  Hapus Laporan
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Verifikasi Laporan Kerusakan
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  Apakah Anda yakin ingin memverifikasi laporan kerusakan ini?
-                  Tindakan ini tidak dapat dibatalkan.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <Button
-                  variant="default"
-                  onClick={handleVerifyReport}
-                  disabled={damageReportVerifyMutation.isPending}
-                >
-                  {damageReportVerifyMutation.isPending
-                    ? "Memverifikasi..."
-                    : "Ya, Verifikasi"}
-                </Button>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline">Batal</Button>
-                </AlertDialogTrigger>
-              </AlertDialogFooter>
-            </AlertDialogContent>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Verifikasi Laporan Kerusakan</DialogTitle>
+                  <DialogDescription>
+                    Apakah Anda yakin ingin memverifikasi laporan kerusakan ini?
+                    Tindakan ini tidak dapat dibatalkan.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button
+                    variant="default"
+                    onClick={handleVerifyReport}
+                    disabled={damageReportVerifyMutation.isPending}
+                  >
+                    {damageReportVerifyMutation.isPending
+                      ? "Memverifikasi..."
+                      : "Ya, Verifikasi"}
+                  </Button>
+                  <DialogTrigger asChild>
+                    <Button variant="outline">Batal</Button>
+                  </DialogTrigger>
+                </DialogFooter>
+              </DialogContent>
+
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Konfirmasi Hapus Laporan</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Apakah Anda yakin ingin menghapus laporan kerusakan ini?
+                    Tindakan ini tidak dapat dibatalkan.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogAction asChild>
+                    <Button
+                      variant="destructive"
+                      onClick={handleRemoveReport}
+                      disabled={removeReportMutation.isPending}
+                    >
+                      {removeReportMutation.isPending
+                        ? "Menghapus..."
+                        : "Hapus"}
+                    </Button>
+                  </AlertDialogAction>
+                  <AlertDialogCancel>Batal</AlertDialogCancel>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </Dialog>
           </AlertDialog>
         );
       },
