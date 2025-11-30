@@ -32,10 +32,19 @@ const list = publicProcedure
       category: z.enum(["anggaran", "personal", "infrastruktur"]).optional(),
     }),
   )
-  // .output(z.array(decisionSelectSchema))
+  .output(
+    z.array(
+      decisionSelectSchema.extend({
+        fileUrl: z.string().nullable().optional(),
+      }),
+    ),
+  )
   .handler(async ({ input }) => {
     try {
-      const searchTerm = input.query?.trim() ? `%${input.query}%` : null;
+      const sanitizeSearchTerm = (term: string) => {
+        return term.replace(/[%_'"]/g, '').trim();
+      };
+      const searchTerm = input.query?.trim() ? `%${sanitizeSearchTerm(input.query)}%` : null;
 
       const categoryCondition = input.category
         ? (() => {
@@ -88,8 +97,12 @@ const list = publicProcedure
         : undefined;
 
       const decisions = await db
-        .select()
+        .select({
+          ...getTableColumns(decision),
+          fileUrl: file.path,
+        })
         .from(decision)
+        .leftJoin(file, eq(decision.file, file.id))
         .where(
           and(
             searchTerm
@@ -134,7 +147,7 @@ const find = publicProcedure
       fileUrl: z.string().nullable().optional(),
     }),
   )
-  .handler(async ({ input, errors }) => {
+  .handler(async ({ input }) => {
     const id = input.id;
     const [decisionItem] = await db
       .select({
@@ -147,7 +160,7 @@ const find = publicProcedure
       .limit(1);
 
     if (!decisionItem) {
-      throw errors.NOT_FOUND();
+      throw new ORPCError("NOT_FOUND");
     }
     return decisionItem;
   });
@@ -206,7 +219,7 @@ const create = protectedProcedure
 const update = protectedProcedure
   .route({
     method: "PUT",
-    // path: "/decisions/{id}",
+    path: "/decisions/{id}",
     summary: "Update decision by ID",
     tags: ["Decisions"],
   })

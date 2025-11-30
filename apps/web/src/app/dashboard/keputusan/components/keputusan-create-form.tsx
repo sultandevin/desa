@@ -2,6 +2,7 @@
 
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
+import { useState, useRef } from "react";
 import { Loader, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -26,9 +27,13 @@ interface KeputusanCreateFormProps {
 }
 
 const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitTimeRef = useRef<number>(0);
+
   const keputusanMutation = useMutation(
     orpc.decision.create.mutationOptions({
       onSuccess: () => {
+        setIsSubmitting(false); 
         queryClient.invalidateQueries({
           queryKey: orpc.decision.key(),
         });
@@ -36,6 +41,7 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
         onSuccess?.();
       },
       onError: (error) => {
+        setIsSubmitting(false); 
         toast.error(`Gagal menambahkan keputusan: ${error.message}`);
       },
     }),
@@ -44,15 +50,16 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
   const form = useForm({
     defaultValues: {
       number: "",
-      date: "",
+      date: new Date().toISOString().split("T")[0], 
       regarding: "",
       shortDescription: "",
       reportNumber: "",
-      reportDate: "",
+      reportDate: new Date().toISOString().split("T")[0],
       notes: "",
       file: null as File | null, // Tambahkan state untuk file
     },
-    onSubmit: ({ value }) => {
+
+    onSubmit: async ({ value }) => {
       if (
         !value.number?.trim() ||
         !value.date ||
@@ -64,31 +71,57 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
         return;
       }
 
-      const submitData = async () => {
-        let fileId: string | undefined;
+      // VALIDASI
+      const trimmedNumber = value.number.trim();
+      const trimmedReportNumber = value.reportNumber.trim();
 
+      if (!/^[a-zA-Z0-9\s\/\-\.()&\[\]]+$/.test(trimmedNumber)) {
+        toast.error("Nomor keputusan hanya boleh huruf, angka, spasi, dan karakter: / - . ( ) & [ ]");
+        return;
+      }
+
+      if (!/^[a-zA-Z0-9\s\/\-\.()&\[\]]+$/.test(trimmedReportNumber)) {
+        toast.error("Nomor laporan hanya boleh huruf, angka, spasi, dan karakter: / - . ( ) & [ ]");
+        return;
+      }
+
+      if (value.date && value.reportDate) {
+        const decisionDate = new Date(value.date);
+        const reportDate = new Date(value.reportDate);
+        if (reportDate < decisionDate) {
+          toast.error("Tanggal laporan tidak boleh lebih awal dari tanggal keputusan");
+          return;
+        }
+      }
+
+      const now = Date.now();
+      if (isSubmitting || keputusanMutation.isPending || (now - submitTimeRef.current < 1000)) {
+        return;
+      }
+
+      submitTimeRef.current = now;
+      setIsSubmitting(true);
+
+      let fileId: string | null = null;
+
+      try {
         if (value.file) {
-          try {
-            const formData = new FormData();
-            formData.append("file", value.file);
+          const formData = new FormData();
+          formData.append("file", value.file);
 
-            const res = await fetch("/api/upload", {
-              method: "POST",
-              body: formData,
-            });
+          const res = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
 
-            if (!res.ok) {
-              toast.error("Gagal mengupload file");
-              return;
-            }
-
-            const data = await res.json();
-            fileId = data.id;
-          } catch (error) {
-            console.error("Upload error:", error);
-            toast.error("Terjadi kesalahan saat upload file");
+          if (!res.ok) {
+            toast.error("Upload file gagal");
+            setIsSubmitting(false);
             return;
           }
+
+          const data = await res.json();
+          fileId = data.id;
         }
 
         // Pastikan backend (orpc.decision.create) mendukung properti 'file'
@@ -102,9 +135,10 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
           notes: value.notes?.trim() || null,
           file: fileId, // Kirim file ke backend
         });
-      };
-
-      submitData();
+      } catch (e) {
+        setIsSubmitting(false);
+        toast.error("Terjadi kesalahan.");
+      }
     },
   });
 
@@ -340,8 +374,17 @@ const KeputusanCreateForm = ({ onSuccess }: KeputusanCreateFormProps) => {
       </SheetInnerContent>
 
       <SheetFooter className="grid shrink-0 grid-cols-1 gap-2 border-t bg-background p-4 sm:grid-cols-2">
-        <Button type="submit" disabled={keputusanMutation.isPending}>
-          {keputusanMutation.isPending ? (
+        <Button
+          type="submit"
+          disabled={keputusanMutation.isPending || isSubmitting}
+          onClick={(e) => {
+            if (isSubmitting || keputusanMutation.isPending) {
+              e.preventDefault();
+              return;
+            }
+          }}
+        >
+          {keputusanMutation.isPending || isSubmitting ? (
             <>
               <Loader className="mr-2 size-4 animate-spin" />
               Menyimpan...

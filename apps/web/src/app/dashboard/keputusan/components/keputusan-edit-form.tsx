@@ -2,12 +2,12 @@
 
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Edit, Loader } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Field,
-  FieldDescription,
   FieldError,
   FieldLabel,
 } from "@/components/ui/field";
@@ -30,6 +30,9 @@ const KeputusanEditForm = ({
   keputusanId,
   onSuccess,
 }: KeputusanEditFormProps) => {
+  const [file, setFile] = useState<File | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const keputusanQuery = useQuery(
     orpc.decision.find.queryOptions({
       input: { id: keputusanId },
@@ -39,6 +42,7 @@ const KeputusanEditForm = ({
   const keputusanMutation = useMutation(
     orpc.decision.update.mutationOptions({
       onSuccess: (_, variables) => {
+        setIsSubmitting(false); 
         queryClient.invalidateQueries({
           queryKey: orpc.decision.key(),
         });
@@ -46,6 +50,7 @@ const KeputusanEditForm = ({
         onSuccess?.();
       },
       onError: (error) => {
+        setIsSubmitting(false); 
         console.error("Update keputusan error:", error);
         toast.error(`Gagal memperbarui keputusan: ${error.message}`);
       },
@@ -61,9 +66,10 @@ const KeputusanEditForm = ({
       reportNumber: keputusanQuery.data?.reportNumber || "",
       reportDate: keputusanQuery.data?.reportDate || "",
       notes: keputusanQuery.data?.notes || "",
-      file: null as File | null,
+      // file: null as File | null,
+      file: keputusanQuery.data?.file || null,
     },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (
         !value.number.trim() ||
         !value.date ||
@@ -75,47 +81,71 @@ const KeputusanEditForm = ({
         return;
       }
 
-      const submitData = async () => {
-        let fileId: string | undefined;
+      const trimmedNumber = value.number.trim();
+      const trimmedReportNumber = value.reportNumber.trim();
 
-        if (value.file) {
-          try {
-            const formData = new FormData();
-            formData.append("file", value.file);
+      if (!/^[a-zA-Z0-9\s\/\-\.()&\[\]]+$/.test(trimmedNumber)) {
+        toast.error("Nomor keputusan hanya boleh huruf, angka, spasi, dan karakter: / - . ( ) & [ ]");
+        return;
+      }
 
-            const res = await fetch("/api/upload", {
-              method: "POST",
-              body: formData,
-            });
+      if (!/^[a-zA-Z0-9\s\/\-\.()&\[\]]+$/.test(trimmedReportNumber)) {
+        toast.error("Nomor laporan hanya boleh huruf, angka, spasi, dan karakter: / - . ( ) & [ ]");
+        return;
+      }
 
-            if (!res.ok) {
-              toast.error("Gagal mengupload file");
-              return;
-            }
+      if (value.date && value.reportDate) {
+        const decisionDate = new Date(value.date);
+        const reportDate = new Date(value.reportDate);
+        if (reportDate < decisionDate) {
+          toast.error("Tanggal laporan tidak boleh lebih awal dari tanggal keputusan");
+          return;
+        }
+      }
 
-            const data = await res.json();
-            fileId = data.id;
-          } catch (error) {
-            console.error("Upload error:", error);
-            toast.error("Terjadi kesalahan saat upload file");
+      if (keputusanMutation.isPending) {
+        return;
+      }
+
+      setIsSubmitting(true);
+
+      let fileId: string | null = value.file;
+
+      try {
+        if (file) {
+          const formData = new FormData();
+          formData.append("file", file);
+
+          const res = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!res.ok) {
+            toast.error("Upload file gagal");
+            setIsSubmitting(false);
             return;
           }
+
+          const data = await res.json();
+          fileId = data.id;
         }
 
         keputusanMutation.mutate({
           id: keputusanId,
-          number: value.number.trim(),
+          number: trimmedNumber,
           date: value.date,
           regarding: value.regarding.trim(),
           shortDescription: value.shortDescription?.trim() || null,
-          reportNumber: value.reportNumber.trim(),
+          reportNumber: trimmedReportNumber,
           reportDate: value.reportDate,
           notes: value.notes?.trim() || null,
           file: fileId,
         });
-      };
-
-      submitData();
+      } catch (e) {
+        setIsSubmitting(false);
+        toast.error("Terjadi kesalahan.");
+      }
     },
   });
 
@@ -217,22 +247,39 @@ const KeputusanEditForm = ({
             children={(field) => (
               <Field>
                 <FieldLabel htmlFor={field.name}>Lampiran File</FieldLabel>
-                <div className="flex items-center gap-2">
+                <div className="space-y-2">
                   <Input
                     id={field.name}
                     type="file"
                     accept=".pdf,application/pdf"
                     onBlur={field.handleBlur}
                     onChange={(e) => {
-                      const file = e.target.files?.[0] || null;
-                      field.handleChange(file);
+                      const selectedFile = e.target.files?.[0] || null;
+                      setFile(selectedFile);
                     }}
                     className="cursor-pointer file:mr-4 file:cursor-pointer file:text-primary"
                   />
+                  {keputusanQuery.data?.file && !file && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="text-muted-foreground">File tersimpan:</span>
+
+                      {keputusanQuery.data.fileUrl ? (
+                        <a
+                          href={keputusanQuery.data.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-primary hover:underline"
+                        >
+                          {keputusanQuery.data.file}
+                        </a>
+                      ) : (
+                        <span className="font-medium text-foreground">
+                          {keputusanQuery.data.file}
+                        </span>
+                      )}
+                    </div>
+                  )}  
                 </div>
-                <FieldDescription>
-                  Format yang didukung: PDF. Maksimal ukuran file: 10MB.
-                </FieldDescription>
               </Field>
             )}
           />
@@ -350,8 +397,11 @@ const KeputusanEditForm = ({
       </SheetInnerContent>
 
       <SheetFooter className="grid shrink-0 grid-cols-1 gap-2 border-t bg-background p-4 sm:grid-cols-2">
-        <Button type="submit" disabled={keputusanMutation.isPending}>
-          {keputusanMutation.isPending ? (
+        <Button
+          type="submit"
+          disabled={keputusanMutation.isPending || isSubmitting}
+        >
+          {keputusanMutation.isPending || isSubmitting ? (
             <>
               <Loader className="mr-2 size-4 animate-spin" />
               Menyimpan...

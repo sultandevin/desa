@@ -9,6 +9,7 @@ import {
   ChevronsLeft,
   Edit,
   Eye,
+  FileText, 
   MoreHorizontal,
   Plus,
   SearchIcon,
@@ -46,6 +47,13 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import {
   Sheet,
   SheetContent,
@@ -136,7 +144,7 @@ const KeputusanTable = () => {
     },
     {
       id: "nomorTanggalKeputusan",
-      header: "No dan Tanggal Keputusan",
+      header: "No & Tgl Keputusan",
       cell: ({ row }) => {
         const decisionNumber = row.original.number;
         // Format tanggal di sini
@@ -159,7 +167,7 @@ const KeputusanTable = () => {
     },
     {
       id: "nomorTanggalDilaporkan",
-      header: "No dan Tanggal Dilaporkan",
+      header: "No & Tgl Dilaporkan",
       cell: ({ row }) => {
         const reportNumber = row.original.reportNumber;
         // Format tanggal di sini
@@ -175,6 +183,32 @@ const KeputusanTable = () => {
     {
       accessorKey: "notes",
       header: "Keterangan",
+    },
+    {
+      accessorKey: "file",
+      header: "File",
+      cell: ({ row }) => {
+        const file = row.getValue("file");
+        const fileUrl = row.original.fileUrl;
+    
+        if (!file) {
+          return (
+            <div className="flex justify-center items-center h-9 w-9">
+              <span className="text-muted-foreground text-xs">-</span>
+            </div>
+          );
+        }
+
+        return (
+          <Button
+            size="sm"
+            onClick={() => fileUrl && window.open(fileUrl, "_blank")}
+            className="h-9 w-9 p-0"
+          >
+            <FileText className="h-4 w-4" />
+          </Button>
+        );
+      },
     },
     {
       id: "aksi",
@@ -269,7 +303,7 @@ const KeputusanTable = () => {
       isFetching={keputusan.isFetching} // Gunakan isFetching agar spinner kecil bisa muncul jika perlu
       configButtons={
         <>
-          <InputGroup className="w-fit w-full max-w-sm">
+          <InputGroup className="w-full sm:max-w-sm">
             <InputGroupInput
               id="query"
               className="w-fit min-w-60"
@@ -287,14 +321,6 @@ const KeputusanTable = () => {
             <InputGroupAddon>
               <SearchIcon />
             </InputGroupAddon>
-            {keputusan.data && (
-              <InputGroupAddon
-                align={`inline-end`}
-                className={`${keputusan.isFetching && "animate-pulse"}`}
-              >
-                {keputusan.data.length} hasil
-              </InputGroupAddon>
-            )}
           </InputGroup>
 
           <Button
@@ -325,8 +351,8 @@ const KeputusanTable = () => {
           </Sheet>
 
           {showFilters && (
-            <div className="flex w-full flex-wrap gap-4 rounded-lg border bg-background p-4">
-              <div className="flex flex-col space-y-2">
+            <div className="flex w-full flex-col sm:flex-row gap-3 sm:gap-4 rounded-lg border bg-background p-4">
+              <div className="flex flex-col space-y-2 flex-1 sm:flex-none">
                 <label className="font-medium text-foreground text-sm">
                   Tahun Keputusan
                 </label>
@@ -341,38 +367,40 @@ const KeputusanTable = () => {
                     setYearInput(e.target.value);
                     // Kita tidak setOffset di sini, tapi di useEffect debounce
                   }}
-                  className="w-28"
+                  className="w-full sm:w-28"
                 />
               </div>
 
-              <div className="flex flex-col space-y-2">
+              <div className="flex flex-col space-y-2 flex-1 sm:flex-none">
                 <label className="font-medium text-foreground text-sm">
                   Kategori
                 </label>
-                <select
-                  value={category}
-                  onChange={(e) => {
-                    setCategory(e.target.value);
-                    setOffset(0);
-                    // setQuery(""); // Opsional: apakah ganti kategori mereset search text? biasanya tidak
-                  }}
-                  className="w-48 rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                >
-                  <option value="">Semua Kategori</option>
-                  <option value="anggaran">Anggaran & Keuangan</option>
-                  <option value="personal">Personal & SDM</option>
-                  <option value="infrastruktur">
-                    Infrastruktur & Bangunan
-                  </option>
-                </select>
-              </div>
+                <Select
+                value={category || "all"}
+                onValueChange={(value) => {
+                  setCategory(value === "all" ? "" : value);
+                  setOffset(0);
+                  setQuery("");
+                }}
+              >
+                <SelectTrigger className="w-full sm:w-48">
+                  <SelectValue placeholder="Semua Kategori" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Semua Kategori</SelectItem>
+                  <SelectItem value="anggaran">Anggaran & Keuangan</SelectItem>
+                  <SelectItem value="personal">Personal & SDM</SelectItem>
+                  <SelectItem value="infrastruktur">
+                    Infrastruktur & Bangunan</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-              <div className="flex flex-col space-y-2">
-                <label className="font-medium text-sm text-transparent">
+              <div className="flex flex-col space-y-2 sm:items-end">
+                <label className="font-medium text-sm text-transparent sm:text-foreground">
                   .
                 </label>
                 <Button
-                  variant="outline"
                   size="sm"
                   onClick={() => {
                     setYear("");
@@ -380,7 +408,7 @@ const KeputusanTable = () => {
                     setCategory("");
                     setOffset(0);
                   }}
-                  className="h-9"
+                  className="h-9 w-full sm:w-auto"
                 >
                   Reset Filter
                 </Button>
