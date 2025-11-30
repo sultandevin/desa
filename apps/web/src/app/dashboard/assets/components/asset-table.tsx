@@ -111,9 +111,11 @@ const AssetTable = () => {
           return (
             <div className="flex gap-2">
               {row.getValue("name")}
-              <span className="rounded-full bg-destructive px-1.5 py-0.5 text-xs">
-                permintaan penghapusan
-              </span>
+              {row.original.removalStatus === "PENDING" && (
+                <span className="rounded-full bg-destructive px-1.5 py-0.5 text-xs">
+                  permintaan penghapusan
+                </span>
+              )}
             </div>
           );
         },
@@ -203,9 +205,8 @@ const AssetTable = () => {
                     </DialogTrigger>
 
                     {row.original.removalStatus === null &&
-                      session.data &&
-                      (session.data.user.id === row.original.createdBy ||
-                        session.data.user.role === "kades") && (
+                      (session.data?.user.id === row.original.createdBy ||
+                        session.data?.user.role === "kades") && (
                         <AlertDialogTrigger asChild>
                           <DropdownMenuItem variant="destructive">
                             <Trash />
@@ -215,8 +216,7 @@ const AssetTable = () => {
                       )}
 
                     {row.original.removalStatus === "PENDING" &&
-                      session.data &&
-                      session.data.user.role === "kades" && (
+                      session.data?.user.role === "kades" && (
                         <DropdownMenuItem
                           onClick={() => {
                             kadesRemoveAssetOptions.mutate({
