@@ -45,7 +45,13 @@ export default function Home() {
 
             <div className="flex items-center justify-center gap-2">
               <Button asChild>
-                <Link href="/dashboard">Mulai Sekarang</Link>
+                <Link href="/dashboard">Login Sebagai Admin</Link>
+              </Button>
+            </div>
+
+            <div className="flex items-center justify-center gap-2">
+              <Button asChild>
+                <Link href="/public">Jelajahi Sebagai Warga</Link>
               </Button>
             </div>
           </div>

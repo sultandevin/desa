@@ -102,7 +102,7 @@ const RegulationCreateForm = () => {
                   id={field.name}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Contoh: Peraturan Akademik Mahasiswa"
+                  placeholder="Contoh: Peraturan Desa Tentang..."
                 />
                 {field.state.meta.isTouched && !field.state.meta.isValid && (
                   <FieldError errors={field.state.meta.errors} />
@@ -142,7 +142,7 @@ const RegulationCreateForm = () => {
                   id={field.name}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Universitas / Fakultas / Program Studi"
+                  placeholder="Desa / Kecamatan / Kabupaten"
                 />
                 {field.state.meta.isTouched && !field.state.meta.isValid && (
                   <FieldError errors={field.state.meta.errors} />
