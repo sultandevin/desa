@@ -7,7 +7,7 @@ import {
   ChevronRight,
   ChevronsLeft,
   Eye,
-  FileText,
+  // FileText,
   MoreHorizontal,
   SearchIcon,
 } from "lucide-react";
@@ -133,32 +133,32 @@ const KeputusanTablePublic = () => {
       accessorKey: "notes",
       header: "Keterangan",
     },
-    {
-      accessorKey: "file",
-      header: "File",
-      cell: ({ row }) => {
-        const file = row.getValue("file");
-        const fileUrl = row.original.fileUrl;
+    // {
+    //   accessorKey: "file",
+    //   header: "File",
+    //   cell: ({ row }) => {
+    //     const file = row.getValue("file");
+    //     const fileUrl = row.original.fileUrl;
 
-        if (!file) {
-          return (
-            <div className="flex justify-center items-center h-9 w-9">
-              <span className="text-muted-foreground text-xs">-</span>
-            </div>
-          );
-        }
+    //     if (!file) {
+    //       return (
+    //         <div className="flex justify-center items-center h-9 w-9">
+    //           <span className="text-muted-foreground text-xs">-</span>
+    //         </div>
+    //       );
+    //     }
 
-        return (
-          <Button
-            size="sm"
-            onClick={() => fileUrl && window.open(fileUrl, "_blank")}
-            className="h-9 w-9 p-0"
-          >
-            <FileText className="h-4 w-4" />
-          </Button>
-        );
-      },
-    },
+    //     return (
+    //       <Button
+    //         size="sm"
+    //         onClick={() => fileUrl && window.open(fileUrl, "_blank")}
+    //         className="h-9 w-9 p-0"
+    //       >
+    //         <FileText className="h-4 w-4" />
+    //       </Button>
+    //     );
+    //   },
+    // },
     {
       id: "aksi",
       cell: ({ row }) => {
